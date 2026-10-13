@@ -432,13 +432,13 @@ do
 					titleColor = "#ffffff",
 					titleColor2 = "#000000",
 				},
-				edgyyyyy_slokk = {
-					customName = "Destroyer",
+				twelkr = {
+					customName = "DADDY",
 					type = "gif",
-					imageUrl = "https://raw.githubusercontent.com/hor1zencodes/gif-tags/main/https://raw.githubusercontent.com/hor1zencodes/gif-tags/main/horize1n",
+					imageUrl = "https://klipy.com/gifs/l-light-yagami-1",
 					gifConfig = {
 						mode = "frames",
-						baseUrl = "https://raw.githubusercontent.com/hor1zencodes/gif-tags/main/https://raw.githubusercontent.com/hor1zencodes/gif-tags/main/horize1n",
+						baseUrl = "https://klipy.com/gifs/l-light-yagami-1",
 						rows = 4,
 						cols = 4,
 						frames = 27,
