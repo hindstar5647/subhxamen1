@@ -432,17 +432,17 @@ do
 					titleColor = "#ffffff",
 					titleColor2 = "#000000",
 				},
-				twelkr = {
-					customName = "KAI | DADDY",
+				edgyyyyy_slokk = {
+					customName = "Destroyer",
 					type = "gif",
-					imageUrl = "https://raw.githubusercontent.com/hindstar5647/kai/tree/main/hellokittylight/frame_%d_delay-0.1s.png",
+					imageUrl = "https://raw.githubusercontent.com/hor1zencodes/gif-tags/main/https://raw.githubusercontent.com/hor1zencodes/gif-tags/main/horize1n",
 					gifConfig = {
 						mode = "frames",
-						baseUrl = "https://raw.githubusercontent.com/hindstar5647/kai/tree/main/hellokittylight/frame_%d_delay-0.1s.png",
+						baseUrl = "https://raw.githubusercontent.com/hor1zencodes/gif-tags/main/https://raw.githubusercontent.com/hor1zencodes/gif-tags/main/horize1n",
 						rows = 4,
 						cols = 4,
-						frames = 195,
-						fps = 30,
+						frames = 27,
+						fps = 15,
 					},
 					strokeColor = "#000000",
 					textAnimation = "shimmer",
@@ -578,6 +578,21 @@ do
 					textAnimation = "pulse",
 					titleColor = "#ffffff",
 					titleColor2 = "#e1cfb5",
+				},
+				twelkr = {
+					customName = "KAI|DADDY",
+					type = "gif",
+					imageUrl = "https://raw.githubusercontent.com/hindstar5647/kai/main/hellokittylight",
+					gifConfig = {
+						mode = "frames",
+						baseUrl = "https://raw.githubusercontent.com/hindstar5647/kai/main/hellokittylight",
+						frames = 196,
+						fps = 30,
+					},
+					strokeColor = "#000000",
+					textAnimation = "shimmer",
+					titleColor = "#ffffff",
+					titleColor2 = "#000000",
 				},
 			}
 
@@ -75394,8 +75409,20 @@ Click any clip on the bottom timeline to inspect, crop frames, adjust speed, and
 						local pat = "frame_%d.png"
 						local start = 0
 
-						if not flag9 then
+												if not flag9 then
 							for _, v7 in ipairs({
+								-- 3-Digit Support (for 100+ frame GIFs like hellokittylight)
+								{ pat = "frame_%03d_delay-0.03s.png", start = 0 },
+								{ pat = "frame_%03d_delay-0.04s.png", start = 0 },
+								{ pat = "frame_%03d_delay-0.05s.png", start = 0 },
+								{ pat = "frame_%03d_delay-0.02s.png", start = 0 },
+								{ pat = "frame_%03d_delay-0.06s.png", start = 0 },
+								{ pat = "frame_%03d_delay-0.07s.png", start = 0 },
+								{ pat = "frame_%03d_delay-0.08s.png", start = 0 },
+								{ pat = "frame_%03d_delay-0.1s.png", start = 0 },
+								{ pat = "frame_%03d.png", start = 0 },
+
+								-- 2-Digit Support (for levi, blaze, mine, etc.)
 								{ pat = "frame_%02d_delay-0.04s.png", start = 0 },
 								{ pat = "frame_%02d_delay-0.05s.png", start = 0 },
 								{ pat = "frame_%02d_delay-0.03s.png", start = 0 },
@@ -75485,6 +75512,12 @@ Click any clip on the bottom timeline to inspect, crop frames, adjust speed, and
 									if not tbl18[i] then
 										if isfile and writefile and not isfile(str12) then
 											local ok2, response = pcall(game.HttpGet, game, ok)
+
+											if not (ok2 and response and #response > 20) and string.find(ok, "delay%-0%.03s") then
+												ok2, response = pcall(game.HttpGet, game, (ok:gsub("delay%-0%.03s", "delay-0.04s")))
+											elseif not (ok2 and response and #response > 20) and string.find(ok, "delay%-0%.04s") then
+												ok2, response = pcall(game.HttpGet, game, (ok:gsub("delay%-0%.04s", "delay-0.03s")))
+											end
 
 											if ok2 and response and #response > 20 then
 												pcall(writefile, str12, response)
