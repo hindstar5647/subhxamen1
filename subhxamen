@@ -50557,17 +50557,256 @@ Click any clip on the bottom timeline to inspect, crop frames, adjust speed, and
 				end
 
 				do
+					local _EMBEDDED_TERRAINS = {
+	["snow.lua"] = function()
+		local ws = game:GetService("Workspace")
+		getgenv().ORIGINAL_TERRAIN_PROPS = getgenv().ORIGINAL_TERRAIN_PROPS or {}
+		local function snapshot(p)
+			if not getgenv().ORIGINAL_TERRAIN_PROPS[p] then
+				getgenv().ORIGINAL_TERRAIN_PROPS[p] = {
+					Material = p.Material,
+					Color = p.Color,
+					Transparency = p.Transparency,
+					Reflectance = p.Reflectance
+				}
+			end
+		end
+		local function clean(p)
+			for _, c in ipairs(p:GetChildren()) do
+				if c.Name:find("^EternityTerrain_") then pcall(function() c:Destroy() end) end
+			end
+		end
+		for _, obj in ipairs(ws:GetDescendants()) do
+			if obj:IsA("BasePart") then
+				local m = obj:FindFirstAncestorOfClass("Model")
+				if not (m and m:FindFirstChildOfClass("Humanoid")) then
+					local n = string.lower(obj.Name)
+					if n:find("baseplate") or n:find("floor") or n:find("ground") or (obj.Size.X >= 100 and obj.Size.Z >= 100 and obj.Size.Y <= 25) then
+						pcall(function()
+							snapshot(obj)
+							clean(obj)
+							obj.Material = Enum.Material.Snow
+							obj.Color = Color3.fromRGB(245, 250, 255)
+							obj.Reflectance = 0.08
+							obj.Transparency = 0
+						end)
+					end
+				end
+			end
+		end
+		local t = ws:FindFirstChildOfClass("Terrain")
+		if t then pcall(function() t.WaterColor = Color3.fromRGB(180, 220, 255) end) end
+	end,
+	["grass.lua"] = function()
+		local ws = game:GetService("Workspace")
+		getgenv().ORIGINAL_TERRAIN_PROPS = getgenv().ORIGINAL_TERRAIN_PROPS or {}
+		local function snapshot(p)
+			if not getgenv().ORIGINAL_TERRAIN_PROPS[p] then
+				getgenv().ORIGINAL_TERRAIN_PROPS[p] = {
+					Material = p.Material,
+					Color = p.Color,
+					Transparency = p.Transparency,
+					Reflectance = p.Reflectance
+				}
+			end
+		end
+		local function clean(p)
+			for _, c in ipairs(p:GetChildren()) do
+				if c.Name:find("^EternityTerrain_") then pcall(function() c:Destroy() end) end
+			end
+		end
+		for _, obj in ipairs(ws:GetDescendants()) do
+			if obj:IsA("BasePart") then
+				local m = obj:FindFirstAncestorOfClass("Model")
+				if not (m and m:FindFirstChildOfClass("Humanoid")) then
+					local n = string.lower(obj.Name)
+					if n:find("baseplate") or n:find("floor") or n:find("ground") or (obj.Size.X >= 100 and obj.Size.Z >= 100 and obj.Size.Y <= 25) then
+						pcall(function()
+							snapshot(obj)
+							clean(obj)
+							obj.Material = Enum.Material.Grass
+							obj.Color = Color3.fromRGB(50, 150, 60)
+							obj.Reflectance = 0
+							obj.Transparency = 0
+						end)
+					end
+				end
+			end
+		end
+		local t = ws:FindFirstChildOfClass("Terrain")
+		if t then pcall(function() t.Decoration = true end) end
+	end,
+	["water.lua"] = function()
+		local ws = game:GetService("Workspace")
+		getgenv().ORIGINAL_TERRAIN_PROPS = getgenv().ORIGINAL_TERRAIN_PROPS or {}
+		local function snapshot(p)
+			if not getgenv().ORIGINAL_TERRAIN_PROPS[p] then
+				getgenv().ORIGINAL_TERRAIN_PROPS[p] = {
+					Material = p.Material,
+					Color = p.Color,
+					Transparency = p.Transparency,
+					Reflectance = p.Reflectance
+				}
+			end
+		end
+		local function clean(p)
+			for _, c in ipairs(p:GetChildren()) do
+				if c.Name:find("^EternityTerrain_") then pcall(function() c:Destroy() end) end
+			end
+		end
+		for _, obj in ipairs(ws:GetDescendants()) do
+			if obj:IsA("BasePart") then
+				local m = obj:FindFirstAncestorOfClass("Model")
+				if not (m and m:FindFirstChildOfClass("Humanoid")) then
+					local n = string.lower(obj.Name)
+					if n:find("baseplate") or n:find("floor") or n:find("ground") or (obj.Size.X >= 100 and obj.Size.Z >= 100 and obj.Size.Y <= 25) then
+						pcall(function()
+							snapshot(obj)
+							clean(obj)
+							obj.Material = Enum.Material.Glass
+							obj.Color = Color3.fromRGB(15, 135, 220)
+							obj.Reflectance = 0.75
+							obj.Transparency = 0.3
+						end)
+					end
+				end
+			end
+		end
+		local t = ws:FindFirstChildOfClass("Terrain")
+		if t then
+			pcall(function()
+				t.WaterColor = Color3.fromRGB(15, 135, 220)
+				t.WaterTransparency = 0.35
+				t.WaterWaveSize = 0.3
+				t.WaterWaveSpeed = 15
+				t.WaterReflectance = 0.8
+			end)
+		end
+	end,
+	["sand.lua"] = function()
+		local ws = game:GetService("Workspace")
+		getgenv().ORIGINAL_TERRAIN_PROPS = getgenv().ORIGINAL_TERRAIN_PROPS or {}
+		local function snapshot(p)
+			if not getgenv().ORIGINAL_TERRAIN_PROPS[p] then
+				getgenv().ORIGINAL_TERRAIN_PROPS[p] = {
+					Material = p.Material,
+					Color = p.Color,
+					Transparency = p.Transparency,
+					Reflectance = p.Reflectance
+				}
+			end
+		end
+		local function clean(p)
+			for _, c in ipairs(p:GetChildren()) do
+				if c.Name:find("^EternityTerrain_") then pcall(function() c:Destroy() end) end
+			end
+		end
+		for _, obj in ipairs(ws:GetDescendants()) do
+			if obj:IsA("BasePart") then
+				local m = obj:FindFirstAncestorOfClass("Model")
+				if not (m and m:FindFirstChildOfClass("Humanoid")) then
+					local n = string.lower(obj.Name)
+					if n:find("baseplate") or n:find("floor") or n:find("ground") or (obj.Size.X >= 100 and obj.Size.Z >= 100 and obj.Size.Y <= 25) then
+						pcall(function()
+							snapshot(obj)
+							clean(obj)
+							obj.Material = Enum.Material.Sand
+							obj.Color = Color3.fromRGB(225, 200, 140)
+							obj.Reflectance = 0.04
+							obj.Transparency = 0
+						end)
+					end
+				end
+			end
+		end
+	end,
+	["lava.lua"] = function()
+		local ws = game:GetService("Workspace")
+		getgenv().ORIGINAL_TERRAIN_PROPS = getgenv().ORIGINAL_TERRAIN_PROPS or {}
+		local function snapshot(p)
+			if not getgenv().ORIGINAL_TERRAIN_PROPS[p] then
+				getgenv().ORIGINAL_TERRAIN_PROPS[p] = {
+					Material = p.Material,
+					Color = p.Color,
+					Transparency = p.Transparency,
+					Reflectance = p.Reflectance
+				}
+			end
+		end
+		local function clean(p)
+			for _, c in ipairs(p:GetChildren()) do
+				if c.Name:find("^EternityTerrain_") then pcall(function() c:Destroy() end) end
+			end
+		end
+		for _, obj in ipairs(ws:GetDescendants()) do
+			if obj:IsA("BasePart") then
+				local m = obj:FindFirstAncestorOfClass("Model")
+				if not (m and m:FindFirstChildOfClass("Humanoid")) then
+					local n = string.lower(obj.Name)
+					if n:find("baseplate") or n:find("floor") or n:find("ground") or (obj.Size.X >= 100 and obj.Size.Z >= 100 and obj.Size.Y <= 25) then
+						pcall(function()
+							snapshot(obj)
+							clean(obj)
+							obj.Material = Enum.Material.Basalt
+							obj.Color = Color3.fromRGB(255, 60, 0)
+							obj.Reflectance = 0.2
+							obj.Transparency = 0
+							local pl = Instance.new("PointLight")
+							pl.Name = "EternityTerrain_LavaLight"
+							pl.Color = Color3.fromRGB(255, 80, 10)
+							pl.Brightness = 2
+							pl.Range = 30
+							pl.Parent = obj
+						end)
+					end
+				end
+			end
+		end
+		local t = ws:FindFirstChildOfClass("Terrain")
+		if t then pcall(function() t.WaterColor = Color3.fromRGB(255, 50, 0) end) end
+	end,
+	["reset.lua"] = function()
+		local orig = getgenv().ORIGINAL_TERRAIN_PROPS
+		if orig then
+			for part, props in pairs(orig) do
+				if part and part.Parent then
+					pcall(function()
+						part.Material = props.Material
+						part.Color = props.Color
+						part.Transparency = props.Transparency
+						part.Reflectance = props.Reflectance
+						for _, c in ipairs(part:GetChildren()) do
+							if c.Name:find("^EternityTerrain_") then c:Destroy() end
+						end
+					end)
+				end
+			end
+		end
+		getgenv().ORIGINAL_TERRAIN_PROPS = nil
+	end,
+}
+
 					function applyTerrain(url, str3)
 						task.spawn(function()
-							pcall(fn16)
-							if not url then
+							if not url or url == "reset.lua" then
+								if _EMBEDDED_TERRAINS["reset.lua"] then
+									pcall(_EMBEDDED_TERRAINS["reset.lua"])
+								end
 								SendNotification("Eternity", "Terrains reset to default!", 2)
 								return
 							end
 
-							local ok, result = pcall(function()
-								loadstring(game:HttpGet(url))()
-							end)
+							local fileName = tostring(url):match("([^/]+)$") or tostring(url)
+							local terrainFn = _EMBEDDED_TERRAINS[fileName] or _EMBEDDED_TERRAINS[url]
+							local ok, result
+
+							if terrainFn then
+								ok, result = pcall(terrainFn)
+							else
+								ok, result = pcall(function()
+									loadstring(game:HttpGet(url))()
+								end)
+							end
 
 							if ok then
 								SendNotification("Eternity", str3 .. " terrain applied!", 2)
