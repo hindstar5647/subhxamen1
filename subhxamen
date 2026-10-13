@@ -467,11 +467,19 @@ do
 					titleColor = "#ffffff",
 					titleColor2 = "#000000",
 				},
-				sukiie_09 = {
-					customName = "Xeo",
-					type = "image",
+				Tutan_gamerz = {
+					customName = "TUTAN",
+					type = "gif",
 					backgroundId = "87250326383766",
-					imageUrl = "https://media.discordapp.net/attachments/1518929110284636322/1551288350843998389/image.png",
+					imageUrl = "https://raw.githubusercontent.com/hor1zencodes/gif-tags/main/rudra",
+                                       gifConfig = {
+						mode = "frames",
+						baseUrl = "https://raw.githubusercontent.com/hor1zencodes/gif-tags/main/rudra",
+						rows = 4,
+						cols = 4,
+						frames = 24,
+						fps = 20,
+					},
 					strokeColor = "#ec4899",
 					textAnimation = "shimmer",
 					titleColor = "#ffffff",
