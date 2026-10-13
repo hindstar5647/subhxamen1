@@ -48259,18 +48259,2054 @@ Click any clip on the bottom timeline to inspect, crop frames, adjust speed, and
 							print(string.format("[Reset] DONE. %d parts restored, %d skipped. Glow and fog removed.", count5, count6))
 						end
 
+						local _EMBEDDED_SHADERS = {
+	["aesthetic.lua"] = function()
+		local Players   = game:GetService("Players")
+		local Lighting  = game:GetService("Lighting")
+		local Workspace = game:GetService("Workspace")
+		
+		-- Wipe any old snapshot first
+		getgenv().ORIGINAL_COLORS   = setmetatable({}, {__mode = "k"})
+		getgenv().ORIGINAL_LIGHTING = {}
+		getgenv().ORIGINAL_WATER    = nil
+		getgenv().ORIGINAL_SKY      = nil
+		getgenv().ORIGINAL_ATMO     = nil
+		
+		local function isCharacterPart(part)
+		    local model = part:FindFirstAncestorOfClass("Model")
+		    return model and model:FindFirstChildOfClass("Humanoid") ~= nil
+		end
+		
+		-- Snapshot every BasePart color in the workspace
+		local colorCount = 0
+		for _, obj in ipairs(Workspace:GetDescendants()) do
+		    if obj:IsA("BasePart") and not isCharacterPart(obj) then
+		        pcall(function()
+		            getgenv().ORIGINAL_COLORS[obj] = obj.Color
+		            colorCount += 1
+		        end)
+		    end
+		end
+		
+		Workspace.DescendantAdded:Connect(function(obj)
+		    if obj:IsA("BasePart") and not isCharacterPart(obj) then
+		        pcall(function()
+		            if not getgenv().ORIGINAL_COLORS[obj] then
+		                getgenv().ORIGINAL_COLORS[obj] = obj.Color
+		            end
+		        end)
+		    end
+		end)
+		
+		local L = getgenv().ORIGINAL_LIGHTING
+		L.Technology               = Lighting.Technology
+		L.Ambient                  = Lighting.Ambient
+		L.OutdoorAmbient           = Lighting.OutdoorAmbient
+		L.Brightness               = Lighting.Brightness
+		L.ColorShift_Bottom        = Lighting.ColorShift_Bottom
+		L.ColorShift_Top           = Lighting.ColorShift_Top
+		L.FogColor                 = Lighting.FogColor
+		L.FogEnd                   = Lighting.FogEnd
+		L.FogStart                 = Lighting.FogStart
+		L.GlobalShadows            = Lighting.GlobalShadows
+		L.ShadowSoftness           = Lighting.ShadowSoftness
+		L.EnvironmentDiffuseScale  = Lighting.EnvironmentDiffuseScale
+		L.EnvironmentSpecularScale = Lighting.EnvironmentSpecularScale
+		L.ExposureCompensation     = Lighting.ExposureCompensation
+		L.ClockTime                = Lighting.ClockTime
+		L.GeographicLatitude       = Lighting.GeographicLatitude
+		
+		local existingSky = Lighting:FindFirstChildOfClass("Sky")
+		if existingSky then
+		    getgenv().ORIGINAL_SKY = {
+		        SkyboxBk             = existingSky.SkyboxBk,
+		        SkyboxDn             = existingSky.SkyboxDn,
+		        SkyboxFt             = existingSky.SkyboxFt,
+		        SkyboxLf             = existingSky.SkyboxLf,
+		        SkyboxRt             = existingSky.SkyboxRt,
+		        SkyboxUp             = existingSky.SkyboxUp,
+		        CelestialBodiesShown = existingSky.CelestialBodiesShown,
+		        StarCount            = existingSky.StarCount,
+		    }
+		end
+		
+		local existingAtmo = Lighting:FindFirstChildOfClass("Atmosphere")
+		if existingAtmo then
+		    getgenv().ORIGINAL_ATMO = {
+		        Density = existingAtmo.Density,
+		        Offset  = existingAtmo.Offset,
+		        Color   = existingAtmo.Color,
+		        Decay   = existingAtmo.Decay,
+		        Glare   = existingAtmo.Glare,
+		        Haze    = existingAtmo.Haze,
+		    }
+		end
+		
+		local Terrain = Workspace:FindFirstChildOfClass("Terrain")
+		if Terrain then
+		    getgenv().ORIGINAL_WATER = {
+		        WaterColor        = Terrain.WaterColor,
+		        WaterReflectance  = Terrain.WaterReflectance,
+		        WaterTransparency = Terrain.WaterTransparency,
+		        WaterWaveSize     = Terrain.WaterWaveSize,
+		        WaterWaveSpeed    = Terrain.WaterWaveSpeed,
+		    }
+		end
+		
+		print(string.format("[Snapshot] Ready. Saved %d part colors, lighting, sky, atmosphere & water. Safe to run shaders.", colorCount))
+		
+		-- ==========================================
+		-- CUSTOM THEME: AESTHETIC
+		-- ==========================================
+		
+		local function applyAesthetic(part)
+		    if part:IsA("BasePart") or part:IsA("Terrain") then
+		        if isCharacterPart(part) then return end
+		        if part.Name == "ZenTile" then return end
+		
+		        if part:IsA("Terrain") then
+		            part.WaterColor = Color3.fromRGB(20, 100, 140)
+		            part.WaterReflectance = 1
+		        else
+		            local origColor = getgenv().ORIGINAL_COLORS[part] or part.Color
+		            part.Color = origColor:Lerp(Color3.fromRGB(255, 200, 180), 0.85) -- 85% strength so it's obvious!
+		        end
+		    end
+		end
+		
+		for _, obj in ipairs(Workspace:GetDescendants()) do
+		    applyAesthetic(obj)
+		end
+		Workspace.DescendantAdded:Connect(applyAesthetic)
+		
+		Lighting:ClearAllChildren()
+		
+		-- Lighting settings
+		Lighting.Technology = Enum.Technology.Future
+		Lighting.Ambient = Color3.fromRGB(70, 70, 70)
+		Lighting.OutdoorAmbient = Color3.fromRGB(70, 70, 70)
+		Lighting.Brightness = 2.5 -- Restored brightness so the world isn't flat
+		Lighting.ColorShift_Bottom = Color3.fromRGB(0, 0, 0)
+		Lighting.ColorShift_Top = Color3.fromRGB(255, 237, 219)
+		Lighting.EnvironmentDiffuseScale = 1
+		Lighting.EnvironmentSpecularScale = 1
+		Lighting.GlobalShadows = true
+		Lighting.ShadowSoftness = 0.1
+		Lighting.ClockTime = 17.5
+		Lighting.GeographicLatitude = 0
+		Lighting.ExposureCompensation = 0
+		
+		-- Skybox 1
+		local Sky1 = Instance.new("Sky")
+		Sky1.Name = "Sky"
+		Sky1.MoonAngularSize = 11
+		Sky1.MoonTextureId = "rbxasset://sky/moon.jpg"
+		Sky1.SkyboxBk = "rbxassetid://600830446"
+		Sky1.SkyboxDn = "rbxassetid://600831635"
+		Sky1.SkyboxFt = "rbxassetid://600832720"
+		Sky1.SkyboxLf = "rbxassetid://600886090"
+		Sky1.SkyboxRt = "rbxassetid://600833862"
+		Sky1.SkyboxUp = "rbxassetid://600835177"
+		Sky1.StarCount = 3000
+		Sky1.SunAngularSize = 21
+		Sky1.SunTextureId = "rbxassetid://1084351190"
+		Sky1.CelestialBodiesShown = false
+		Sky1.Parent = Lighting
+		
+		-- Atmosphere (Warm, soft vibe)
+		local Atmo1 = Instance.new("Atmosphere")
+		Atmo1.Name = "Atmosphere"
+		Atmo1.Density = 0.4
+		Atmo1.Offset = 0.25
+		Atmo1.Color = Color3.fromRGB(255, 170, 150)
+		Atmo1.Decay = Color3.fromRGB(255, 120, 100)
+		Atmo1.Glare = 0.3 -- Restored some glare for the sun glow
+		Atmo1.Haze = 0.5
+		Atmo1.Parent = Lighting
+		
+		-- Bloom
+		local Bloom = Instance.new("BloomEffect")
+		Bloom.Enabled = true
+		Bloom.Intensity = 0.65 -- Brought back the glow, but lower than the original 0.8
+		Bloom.Size = 36
+		Bloom.Threshold = 0.85 -- Lowered threshold so normal light can glow again
+		Bloom.Parent = Lighting
+		
+		-- Depth of Field (DSLR RTX focus)
+		local DepthOfField = Instance.new("DepthOfFieldEffect")
+		DepthOfField.Enabled = true
+		DepthOfField.FarIntensity = 0.15
+		DepthOfField.NearIntensity = 0.75
+		DepthOfField.FocusDistance = 0.05
+		DepthOfField.InFocusRadius = 30
+		DepthOfField.Parent = Lighting
+		
+		-- Color Correction
+		local ColorCorrection = Instance.new("ColorCorrectionEffect")
+		ColorCorrection.Enabled = true
+		ColorCorrection.Brightness = 0.05
+		ColorCorrection.Contrast = 0.35
+		ColorCorrection.Saturation = 0.2
+		ColorCorrection.TintColor = Color3.fromRGB(181, 168, 135)
+		ColorCorrection.Parent = Lighting
+		
+		-- SunRays
+		local SunRays = Instance.new("SunRaysEffect")
+		SunRays.Enabled = true
+		SunRays.Intensity = 0.4
+		SunRays.Spread = 2
+		SunRays.Parent = Lighting
+		
+		-- RTX Terrain & Volumetric Clouds
+		if Workspace:FindFirstChildOfClass("Terrain") then
+		    Workspace.Terrain.Decoration = true
+		    
+		    for _, c in ipairs(Workspace.Terrain:GetChildren()) do
+		        if c:IsA("Clouds") then c:Destroy() end
+		    end
+		    
+		    local Clouds = Instance.new("Clouds")
+		    Clouds.Name = "RTX_Clouds"
+		    Clouds.Cover = 0.9 -- Extremely high so it's obvious
+		    Clouds.Density = 1.0 -- Extremely high so it's obvious
+		    Clouds.Color = Color3.fromRGB(255, 220, 200)
+		    Clouds.Parent = Workspace.Terrain
+		end
+	end,
+	["anime.lua"] = function()
+		local Players   = game:GetService("Players")
+		local Lighting  = game:GetService("Lighting")
+		local Workspace = game:GetService("Workspace")
+		
+		-- Wipe any old snapshot first
+		getgenv().ORIGINAL_COLORS   = setmetatable({}, {__mode = "k"})
+		getgenv().ORIGINAL_LIGHTING = {}
+		getgenv().ORIGINAL_WATER    = nil
+		getgenv().ORIGINAL_SKY      = nil
+		getgenv().ORIGINAL_ATMO     = nil
+		
+		local function isCharacterPart(part)
+		    local model = part:FindFirstAncestorOfClass("Model")
+		    return model and model:FindFirstChildOfClass("Humanoid") ~= nil
+		end
+		
+		-- Snapshot every BasePart color in the workspace
+		local colorCount = 0
+		for _, obj in ipairs(Workspace:GetDescendants()) do
+		    if obj:IsA("BasePart") and not isCharacterPart(obj) then
+		        pcall(function()
+		            getgenv().ORIGINAL_COLORS[obj] = obj.Color
+		            colorCount += 1
+		        end)
+		    end
+		end
+		
+		Workspace.DescendantAdded:Connect(function(obj)
+		    if obj:IsA("BasePart") and not isCharacterPart(obj) then
+		        pcall(function()
+		            if not getgenv().ORIGINAL_COLORS[obj] then
+		                getgenv().ORIGINAL_COLORS[obj] = obj.Color
+		            end
+		        end)
+		    end
+		end)
+		
+		local L = getgenv().ORIGINAL_LIGHTING
+		L.Technology               = Lighting.Technology
+		L.Ambient                  = Lighting.Ambient
+		L.OutdoorAmbient           = Lighting.OutdoorAmbient
+		L.Brightness               = Lighting.Brightness
+		L.ColorShift_Bottom        = Lighting.ColorShift_Bottom
+		L.ColorShift_Top           = Lighting.ColorShift_Top
+		L.FogColor                 = Lighting.FogColor
+		L.FogEnd                   = Lighting.FogEnd
+		L.FogStart                 = Lighting.FogStart
+		L.GlobalShadows            = Lighting.GlobalShadows
+		L.ShadowSoftness           = Lighting.ShadowSoftness
+		L.EnvironmentDiffuseScale  = Lighting.EnvironmentDiffuseScale
+		L.EnvironmentSpecularScale = Lighting.EnvironmentSpecularScale
+		L.ExposureCompensation     = Lighting.ExposureCompensation
+		L.ClockTime                = Lighting.ClockTime
+		L.GeographicLatitude       = Lighting.GeographicLatitude
+		
+		local existingSky = Lighting:FindFirstChildOfClass("Sky")
+		if existingSky then
+		    getgenv().ORIGINAL_SKY = {
+		        SkyboxBk             = existingSky.SkyboxBk,
+		        SkyboxDn             = existingSky.SkyboxDn,
+		        SkyboxFt             = existingSky.SkyboxFt,
+		        SkyboxLf             = existingSky.SkyboxLf,
+		        SkyboxRt             = existingSky.SkyboxRt,
+		        SkyboxUp             = existingSky.SkyboxUp,
+		        CelestialBodiesShown = existingSky.CelestialBodiesShown,
+		        StarCount            = existingSky.StarCount,
+		    }
+		end
+		
+		local existingAtmo = Lighting:FindFirstChildOfClass("Atmosphere")
+		if existingAtmo then
+		    getgenv().ORIGINAL_ATMO = {
+		        Density = existingAtmo.Density,
+		        Offset  = existingAtmo.Offset,
+		        Color   = existingAtmo.Color,
+		        Decay   = existingAtmo.Decay,
+		        Glare   = existingAtmo.Glare,
+		        Haze    = existingAtmo.Haze,
+		    }
+		end
+		
+		local Terrain = Workspace:FindFirstChildOfClass("Terrain")
+		if Terrain then
+		    getgenv().ORIGINAL_WATER = {
+		        WaterColor        = Terrain.WaterColor,
+		        WaterReflectance  = Terrain.WaterReflectance,
+		        WaterTransparency = Terrain.WaterTransparency,
+		        WaterWaveSize     = Terrain.WaterWaveSize,
+		        WaterWaveSpeed    = Terrain.WaterWaveSpeed,
+		    }
+		end
+		
+		print(string.format("[Snapshot] Ready. Saved %d part colors, lighting, sky, atmosphere & water. Safe to run shaders.", colorCount))
+		
+		-- ==========================================
+		-- CUSTOM THEME: ANIME
+		-- ==========================================
+		
+		local function applyAnime(part)
+		    if part:IsA("BasePart") or part:IsA("Terrain") then
+		        if isCharacterPart(part) then return end
+		        if part.Name == "ZenTile" then return end
+		        if part:IsA("Terrain") then
+		            part.WaterColor = Color3.fromRGB(20, 100, 140)
+		            part.WaterReflectance = 1
+		        else
+		            local origColor = getgenv().ORIGINAL_COLORS[part] or part.Color
+		            part.Color = origColor:Lerp(Color3.fromRGB(150, 220, 255), 0.85) -- 85% strength so it's obvious!
+		        end
+		    end
+		end
+		
+		for _, obj in ipairs(Workspace:GetDescendants()) do
+		    applyAnime(obj)
+		end
+		Workspace.DescendantAdded:Connect(applyAnime)
+		
+		Lighting:ClearAllChildren()
+		
+		-- RTX Lighting settings
+		Lighting.Technology = Enum.Technology.Future
+		Lighting.Ambient = Color3.fromRGB(70, 70, 70)
+		Lighting.OutdoorAmbient = Color3.fromRGB(90, 90, 110)
+		Lighting.Brightness = 3
+		Lighting.ColorShift_Bottom = Color3.fromRGB(0, 0, 0)
+		Lighting.ColorShift_Top = Color3.fromRGB(255, 180, 220) -- Light pink light
+		Lighting.EnvironmentDiffuseScale = 1
+		Lighting.EnvironmentSpecularScale = 1
+		Lighting.GlobalShadows = true
+		Lighting.ShadowSoftness = 0.2
+		Lighting.ClockTime = 14.0 -- Midday so the light isn't naturally orange
+		Lighting.GeographicLatitude = 80 -- Pushes the sun down to the horizon for long shadows!
+		Lighting.ExposureCompensation = 0
+		
+		-- Sky "Sky"
+		local Sky1 = Instance.new("Sky")
+		Sky1.Name = "Sky"
+		Sky1.MoonAngularSize = 11
+		Sky1.MoonTextureId = "rbxassetid://6444320592"
+		Sky1.SkyboxBk = "rbxassetid://81858382098344"
+		Sky1.SkyboxDn = "rbxassetid://138472117789684"
+		Sky1.SkyboxFt = "rbxassetid://95687237979398"
+		Sky1.SkyboxLf = "rbxassetid://84924000207295"
+		Sky1.SkyboxRt = "rbxassetid://99961685452126"
+		Sky1.SkyboxUp = "rbxassetid://104038404823203"
+		Sky1.StarCount = 5000
+		Sky1.SunAngularSize = 11
+		Sky1.SunTextureId = "rbxassetid://6196665106"
+		Sky1.CelestialBodiesShown = true
+		Sky1.Parent = Lighting
+		
+		-- Atmosphere (Clean, very subtle blue volumetric fog for Anime RTX vibe)
+		local Atmo1 = Instance.new("Atmosphere")
+		Atmo1.Name = "Atmosphere"
+		Atmo1.Density = 0.1
+		Atmo1.Offset = 0.25
+		Atmo1.Color = Color3.fromRGB(199, 230, 255)
+		Atmo1.Decay = Color3.fromRGB(106, 120, 150)
+		Atmo1.Glare = 0.4
+		Atmo1.Haze = 0.5
+		Atmo1.Parent = Lighting
+		
+		-- Bloom
+		local Bloom = Instance.new("BloomEffect")
+		Bloom.Enabled = true
+		Bloom.Intensity = 1.2
+		Bloom.Size = 28
+		Bloom.Threshold = 1.0
+		Bloom.Parent = Lighting
+		
+		-- Depth of Field (DSLR RTX focus)
+		local DepthOfField = Instance.new("DepthOfFieldEffect")
+		DepthOfField.Enabled = true
+		DepthOfField.FarIntensity = 0.1
+		DepthOfField.NearIntensity = 0.75
+		DepthOfField.FocusDistance = 0.05
+		DepthOfField.InFocusRadius = 30
+		DepthOfField.Parent = Lighting
+		
+		-- Color Correction (Anime High Saturation & Contrast)
+		local ColorCorrection = Instance.new("ColorCorrectionEffect")
+		ColorCorrection.Enabled = true
+		ColorCorrection.Brightness = 0.02
+		ColorCorrection.Contrast = 0.15
+		ColorCorrection.Saturation = 0.35
+		ColorCorrection.TintColor = Color3.fromRGB(255, 230, 240) -- Light pink tint for the whole scene
+		ColorCorrection.Parent = Lighting
+		
+		-- SunRays
+		local SunRays = Instance.new("SunRaysEffect")
+		SunRays.Enabled = true
+		SunRays.Intensity = 0.2
+		SunRays.Spread = 0.5
+		SunRays.Parent = Lighting
+		
+		-- RTX Terrain & Volumetric Clouds
+		if Workspace:FindFirstChildOfClass("Terrain") then
+		    Workspace.Terrain.Decoration = true
+		    
+		    for _, c in ipairs(Workspace.Terrain:GetChildren()) do
+		        if c:IsA("Clouds") then c:Destroy() end
+		    end
+		    
+		    local Clouds = Instance.new("Clouds")
+		    Clouds.Name = "RTX_Clouds"
+		    Clouds.Cover = 1.0 -- Extremely thick
+		    Clouds.Density = 1.0 -- Extremely thick
+		    Clouds.Color = Color3.fromRGB(255, 255, 255)
+		    Clouds.Parent = Workspace.Terrain
+		end
+	end,
+	["aurora.lua"] = function()
+		local Players   = game:GetService("Players")
+		local Lighting  = game:GetService("Lighting")
+		local Workspace = game:GetService("Workspace")
+		
+		-- Wipe any old snapshot first
+		getgenv().ORIGINAL_COLORS   = setmetatable({}, {__mode = "k"})
+		getgenv().ORIGINAL_LIGHTING = {}
+		getgenv().ORIGINAL_WATER    = nil
+		getgenv().ORIGINAL_SKY      = nil
+		getgenv().ORIGINAL_ATMO     = nil
+		
+		local function isCharacterPart(part)
+		    local model = part:FindFirstAncestorOfClass("Model")
+		    return model and model:FindFirstChildOfClass("Humanoid") ~= nil
+		end
+		
+		-- Snapshot every BasePart color in the workspace
+		local colorCount = 0
+		for _, obj in ipairs(Workspace:GetDescendants()) do
+		    if obj:IsA("BasePart") and not isCharacterPart(obj) then
+		        pcall(function()
+		            getgenv().ORIGINAL_COLORS[obj] = obj.Color
+		            colorCount += 1
+		        end)
+		    end
+		end
+		
+		Workspace.DescendantAdded:Connect(function(obj)
+		    if obj:IsA("BasePart") and not isCharacterPart(obj) then
+		        pcall(function()
+		            if not getgenv().ORIGINAL_COLORS[obj] then
+		                getgenv().ORIGINAL_COLORS[obj] = obj.Color
+		            end
+		        end)
+		    end
+		end)
+		
+		local L = getgenv().ORIGINAL_LIGHTING
+		L.Technology               = Lighting.Technology
+		L.Ambient                  = Lighting.Ambient
+		L.OutdoorAmbient           = Lighting.OutdoorAmbient
+		L.Brightness               = Lighting.Brightness
+		L.ColorShift_Bottom        = Lighting.ColorShift_Bottom
+		L.ColorShift_Top           = Lighting.ColorShift_Top
+		L.FogColor                 = Lighting.FogColor
+		L.FogEnd                   = Lighting.FogEnd
+		L.FogStart                 = Lighting.FogStart
+		L.GlobalShadows            = Lighting.GlobalShadows
+		L.ShadowSoftness           = Lighting.ShadowSoftness
+		L.EnvironmentDiffuseScale  = Lighting.EnvironmentDiffuseScale
+		L.EnvironmentSpecularScale = Lighting.EnvironmentSpecularScale
+		L.ExposureCompensation     = Lighting.ExposureCompensation
+		L.ClockTime                = Lighting.ClockTime
+		L.GeographicLatitude       = Lighting.GeographicLatitude
+		
+		local existingSky = Lighting:FindFirstChildOfClass("Sky")
+		if existingSky then
+		    getgenv().ORIGINAL_SKY = {
+		        SkyboxBk             = existingSky.SkyboxBk,
+		        SkyboxDn             = existingSky.SkyboxDn,
+		        SkyboxFt             = existingSky.SkyboxFt,
+		        SkyboxLf             = existingSky.SkyboxLf,
+		        SkyboxRt             = existingSky.SkyboxRt,
+		        SkyboxUp             = existingSky.SkyboxUp,
+		        CelestialBodiesShown = existingSky.CelestialBodiesShown,
+		        StarCount            = existingSky.StarCount,
+		    }
+		end
+		
+		local existingAtmo = Lighting:FindFirstChildOfClass("Atmosphere")
+		if existingAtmo then
+		    getgenv().ORIGINAL_ATMO = {
+		        Density = existingAtmo.Density,
+		        Offset  = existingAtmo.Offset,
+		        Color   = existingAtmo.Color,
+		        Decay   = existingAtmo.Decay,
+		        Glare   = existingAtmo.Glare,
+		        Haze    = existingAtmo.Haze,
+		    }
+		end
+		
+		local Terrain = Workspace:FindFirstChildOfClass("Terrain")
+		if Terrain then
+		    getgenv().ORIGINAL_WATER = {
+		        WaterColor        = Terrain.WaterColor,
+		        WaterReflectance  = Terrain.WaterReflectance,
+		        WaterTransparency = Terrain.WaterTransparency,
+		        WaterWaveSize     = Terrain.WaterWaveSize,
+		        WaterWaveSpeed    = Terrain.WaterWaveSpeed,
+		    }
+		end
+		
+		print(string.format("[Snapshot] Ready. Saved %d part colors, lighting, sky, atmosphere & water. Safe to run shaders.", colorCount))
+		
+		-- ==========================================
+		-- CUSTOM THEME: AURORA (RTX VIBES)
+		-- ==========================================
+		
+		local function applyAurora(part)
+		    if part:IsA("BasePart") or part:IsA("Terrain") then
+		        if isCharacterPart(part) then return end
+		        if part.Name == "ZenTile" then return end
+		
+		        if part:IsA("Terrain") then
+		            part.WaterColor = Color3.fromRGB(20, 100, 140)
+		            part.WaterReflectance = 1
+		        else
+		            local origColor = getgenv().ORIGINAL_COLORS[part] or part.Color
+		            part.Color = origColor:Lerp(Color3.fromRGB(40, 80, 120), 0.85) -- 85% strength so it's obvious!
+		        end
+		    end
+		end
+		
+		for _, obj in ipairs(Workspace:GetDescendants()) do
+		    applyAurora(obj)
+		end
+		Workspace.DescendantAdded:Connect(applyAurora)
+		
+		Lighting:ClearAllChildren()
+		
+		-- RTX Lighting settings
+		Lighting.Technology = Enum.Technology.Future
+		Lighting.Ambient = Color3.fromRGB(60, 70, 85)
+		Lighting.OutdoorAmbient = Color3.fromRGB(60, 70, 85)
+		Lighting.Brightness = 3
+		Lighting.ColorShift_Bottom = Color3.fromRGB(10, 20, 40)
+		Lighting.ColorShift_Top = Color3.fromRGB(150, 220, 255) -- Light blue light
+		Lighting.EnvironmentDiffuseScale = 1
+		Lighting.EnvironmentSpecularScale = 1
+		Lighting.GlobalShadows = true
+		Lighting.ShadowSoftness = 0.1
+		Lighting.ClockTime = 14.0 -- Midday so the light isn't naturally orange
+		Lighting.GeographicLatitude = 80 -- Pushes the sun down to the horizon for long shadows!
+		Lighting.ExposureCompensation = 0
+		
+		-- Skybox 1
+		local Sky1 = Instance.new("Sky")
+		Sky1.Name = "Sky"
+		Sky1.MoonAngularSize = 1.5
+		Sky1.MoonTextureId = "rbxassetid://1075087760"
+		Sky1.SkyboxBk = "rbxassetid://126146408999925"
+		Sky1.SkyboxDn = "rbxassetid://118112392224589"
+		Sky1.SkyboxFt = "rbxassetid://121253817183621"
+		Sky1.SkyboxLf = "rbxassetid://134105463289425"
+		Sky1.SkyboxRt = "rbxassetid://89099449712918"
+		Sky1.SkyboxUp = "rbxassetid://138429250948648"
+		Sky1.StarCount = 500
+		Sky1.SunAngularSize = 12
+		Sky1.SunTextureId = "rbxassetid://1084351190"
+		Sky1.CelestialBodiesShown = true
+		Sky1.Parent = Lighting
+		
+		-- Atmosphere (Deep, rich magical fog for Aurora RTX vibe)
+		local Atmo1 = Instance.new("Atmosphere")
+		Atmo1.Name = "Atmosphere"
+		Atmo1.Density = 0.35
+		Atmo1.Offset = 0.2
+		Atmo1.Color = Color3.fromRGB(40, 80, 120)
+		Atmo1.Decay = Color3.fromRGB(20, 40, 80)
+		Atmo1.Glare = 0.4
+		Atmo1.Haze = 0.5
+		Atmo1.Parent = Lighting
+		
+		-- Bloom (Subtle glow for the aurora)
+		local Bloom = Instance.new("BloomEffect")
+		Bloom.Enabled = true
+		Bloom.Intensity = 1.0
+		Bloom.Size = 30
+		Bloom.Threshold = 1.0
+		Bloom.Parent = Lighting
+		
+		-- Depth of Field (DSLR RTX focus)
+		local DepthOfField = Instance.new("DepthOfFieldEffect")
+		DepthOfField.Enabled = true
+		DepthOfField.FarIntensity = 0.15
+		DepthOfField.NearIntensity = 0.75
+		DepthOfField.FocusDistance = 0.05
+		DepthOfField.InFocusRadius = 30
+		DepthOfField.Parent = Lighting
+		
+		-- Color Correction (Cinematic contrast, boosted magical colors)
+		local ColorCorrection = Instance.new("ColorCorrectionEffect")
+		ColorCorrection.Enabled = true
+		ColorCorrection.Brightness = 0.02
+		ColorCorrection.Contrast = 0.2
+		ColorCorrection.Saturation = 0.15
+		ColorCorrection.TintColor = Color3.fromRGB(200, 230, 255) -- Light blue tint for the whole scene
+		ColorCorrection.Parent = Lighting
+		
+		-- SunRays (Reverted to subtle)
+		local SunRays = Instance.new("SunRaysEffect")
+		SunRays.Enabled = true
+		SunRays.Intensity = 0.05
+		SunRays.Spread = 0.5
+		SunRays.Parent = Lighting
+		
+		-- RTX Terrain & Volumetric Clouds
+		if Workspace:FindFirstChildOfClass("Terrain") then
+		    Workspace.Terrain.Decoration = true
+		    
+		    for _, c in ipairs(Workspace.Terrain:GetChildren()) do
+		        if c:IsA("Clouds") then c:Destroy() end
+		    end
+		    
+		    local Clouds = Instance.new("Clouds")
+		    Clouds.Name = "RTX_Clouds"
+		    Clouds.Cover = 0.9 -- Extremely high
+		    Clouds.Density = 0.8 -- Thicker
+		    Clouds.Color = Color3.fromRGB(150, 180, 200)
+		    Clouds.Parent = Workspace.Terrain
+		end
+	end,
+	["cyan_space.lua"] = function()
+		local Players   = game:GetService("Players")
+		local Lighting  = game:GetService("Lighting")
+		local Workspace = game:GetService("Workspace")
+		
+		-- Wipe any old snapshot first
+		getgenv().ORIGINAL_COLORS   = setmetatable({}, {__mode = "k"})
+		getgenv().ORIGINAL_LIGHTING = {}
+		getgenv().ORIGINAL_WATER    = nil
+		getgenv().ORIGINAL_SKY      = nil
+		getgenv().ORIGINAL_ATMO     = nil
+		
+		local function isCharacterPart(part)
+		    local model = part:FindFirstAncestorOfClass("Model")
+		    return model and model:FindFirstChildOfClass("Humanoid") ~= nil
+		end
+		
+		-- ------------------------------------------------
+		-- Snapshot every BasePart color in the workspace
+		-- ------------------------------------------------
+		local colorCount = 0
+		for _, obj in ipairs(Workspace:GetDescendants()) do
+		    if obj:IsA("BasePart") and not isCharacterPart(obj) then
+		        pcall(function()
+		            getgenv().ORIGINAL_COLORS[obj] = obj.Color
+		            colorCount += 1
+		        end)
+		    end
+		end
+		
+		Workspace.DescendantAdded:Connect(function(obj)
+		    if obj:IsA("BasePart") and not isCharacterPart(obj) then
+		        pcall(function()
+		            if not getgenv().ORIGINAL_COLORS[obj] then
+		                getgenv().ORIGINAL_COLORS[obj] = obj.Color
+		            end
+		        end)
+		    end
+		end)
+		
+		-- ------------------------------------------------
+		-- Snapshot all Lighting properties
+		-- ------------------------------------------------
+		local L = getgenv().ORIGINAL_LIGHTING
+		L.Technology               = Lighting.Technology
+		L.Ambient                  = Lighting.Ambient
+		L.OutdoorAmbient           = Lighting.OutdoorAmbient
+		L.Brightness               = Lighting.Brightness
+		L.ColorShift_Bottom        = Lighting.ColorShift_Bottom
+		L.ColorShift_Top           = Lighting.ColorShift_Top
+		L.FogColor                 = Lighting.FogColor
+		L.FogEnd                   = Lighting.FogEnd
+		L.FogStart                 = Lighting.FogStart
+		L.GlobalShadows            = Lighting.GlobalShadows
+		L.ShadowSoftness           = Lighting.ShadowSoftness
+		L.EnvironmentDiffuseScale  = Lighting.EnvironmentDiffuseScale
+		L.EnvironmentSpecularScale = Lighting.EnvironmentSpecularScale
+		L.ExposureCompensation     = Lighting.ExposureCompensation
+		L.ClockTime                = Lighting.ClockTime
+		L.GeographicLatitude       = Lighting.GeographicLatitude
+		
+		-- ------------------------------------------------
+		-- Snapshot existing Sky & Atmo
+		-- ------------------------------------------------
+		local existingSky = Lighting:FindFirstChildOfClass("Sky")
+		if existingSky then
+		    getgenv().ORIGINAL_SKY = {
+		        SkyboxBk             = existingSky.SkyboxBk,
+		        SkyboxDn             = existingSky.SkyboxDn,
+		        SkyboxFt             = existingSky.SkyboxFt,
+		        SkyboxLf             = existingSky.SkyboxLf,
+		        SkyboxRt             = existingSky.SkyboxRt,
+		        SkyboxUp             = existingSky.SkyboxUp,
+		        CelestialBodiesShown = existingSky.CelestialBodiesShown,
+		        StarCount            = existingSky.StarCount,
+		    }
+		end
+		
+		local existingAtmo = Lighting:FindFirstChildOfClass("Atmosphere")
+		if existingAtmo then
+		    getgenv().ORIGINAL_ATMO = {
+		        Density = existingAtmo.Density,
+		        Offset  = existingAtmo.Offset,
+		        Color   = existingAtmo.Color,
+		        Decay   = existingAtmo.Decay,
+		        Glare   = existingAtmo.Glare,
+		        Haze    = existingAtmo.Haze,
+		    }
+		end
+		
+		-- ------------------------------------------------
+		-- Snapshot Terrain water
+		-- ------------------------------------------------
+		local Terrain = Workspace:FindFirstChildOfClass("Terrain")
+		if Terrain then
+		    getgenv().ORIGINAL_WATER = {
+		        WaterColor        = Terrain.WaterColor,
+		        WaterReflectance  = Terrain.WaterReflectance,
+		        WaterTransparency = Terrain.WaterTransparency,
+		        WaterWaveSize     = Terrain.WaterWaveSize,
+		        WaterWaveSpeed    = Terrain.WaterWaveSpeed,
+		    }
+		end
+		
+		print(string.format("[Snapshot] Ready. Saved %d part colors, lighting, sky, atmosphere & water. Safe to run shaders.", colorCount))
+		
+		-- ------------------------------------------------
+		-- Apply Cyan Space Colors
+		-- ------------------------------------------------
+		local function toCyanTint(c)
+		    local lum = 0.299 * c.R + 0.587 * c.G + 0.114 * c.B
+		    -- Keep it mostly gray but with a distinct cyan/blue tint
+		    return Color3.new(lum * 0.7, lum * 0.9, lum * 1.0)
+		end
+		
+		local colorCache = {}
+		
+		local function applyTint(part)
+		    if not part:IsA('BasePart') and not part:IsA('Terrain') then return end
+		    if part.Name == "ZenTile" then return end
+		    if colorCache[part] then return end
+		    if isCharacterPart(part) then return end
+		
+		    colorCache[part] = true
+		    
+		    if part:IsA("Terrain") then
+		        part.WaterColor = Color3.fromRGB(0, 150, 255)
+		    else
+		        part.Color = toCyanTint(part.Color)
+		    end
+		end
+		
+		for _, obj in ipairs(workspace:GetDescendants()) do
+		    pcall(applyTint, obj)
+		end
+		
+		workspace.DescendantAdded:Connect(function(inst)
+		    task.defer(function()
+		        pcall(applyTint, inst)
+		    end)
+		end)
+		
+		local function protectAvatar(char)
+		    if not char then return end
+		
+		    for _, part in ipairs(char:GetDescendants()) do
+		        pcall(function()
+		            if part:IsA('BasePart') and colorCache[part] then
+		                colorCache[part] = nil
+		            end
+		        end)
+		    end
+		
+		    char.DescendantAdded:Connect(function(inst)
+		        task.defer(function()
+		            pcall(function()
+		                if inst:IsA('BasePart') then
+		                    colorCache[inst] = nil
+		                end
+		            end)
+		        end)
+		    end)
+		end
+		
+		for _, plr in ipairs(Players:GetPlayers()) do
+		    protectAvatar(plr.Character)
+		    plr.CharacterAdded:Connect(protectAvatar)
+		end
+		
+		Players.PlayerAdded:Connect(function(plr)
+		    protectAvatar(plr.Character)
+		    plr.CharacterAdded:Connect(protectAvatar)
+		end)
+		
+		-- ------------------------------------------------
+		-- Apply Cyan Space Lighting & Skybox
+		-- ------------------------------------------------
+		Lighting:ClearAllChildren()
+		
+		local sky = Instance.new('Sky')
+		sky.SkyboxBk = 'http://www.roblox.com/asset/?id=16888989874'
+		sky.SkyboxDn = 'http://www.roblox.com/asset/?id=16888991855'
+		sky.SkyboxFt = 'http://www.roblox.com/asset/?id=16888995219'
+		sky.SkyboxLf = 'http://www.roblox.com/asset/?id=16888998994'
+		sky.SkyboxRt = 'http://www.roblox.com/asset/?id=16889000916'
+		sky.SkyboxUp = 'http://www.roblox.com/asset/?id=16889004122'
+		sky.StarCount = 8000
+		sky.Parent = Lighting
+		
+		local atmo = Instance.new('Atmosphere')
+		atmo.Density = 0.65
+		atmo.Offset = 0.15
+		atmo.Color = Color3.fromRGB(0, 180, 255)
+		atmo.Decay = Color3.fromRGB(0, 50, 100)
+		atmo.Glare = 0.05
+		atmo.Haze = 0.3
+		atmo.Parent = Lighting
+		
+		Lighting.Ambient = Color3.fromRGB(0, 60, 100)
+		Lighting.OutdoorAmbient = Color3.fromRGB(0, 80, 120)
+		Lighting.ColorShift_Top = Color3.fromRGB(100, 180, 255)
+		Lighting.ColorShift_Bottom = Color3.fromRGB(0, 30, 60)
+		Lighting.FogColor = Color3.fromRGB(0, 15, 30)
+		Lighting.FogEnd = 80000
+		Lighting.Brightness = 0.8
+		Lighting.GlobalShadows = true
+		Lighting.ClockTime = 15 -- Afternoon angle for nice long shadows
+		Lighting.ShadowSoftness = 0.2
+		Lighting.EnvironmentDiffuseScale = 1
+		Lighting.EnvironmentSpecularScale = 1
+		
+		local bloom = Instance.new('BloomEffect')
+		bloom.Enabled = true
+		bloom.Intensity = 0.35
+		bloom.Size = 42
+		bloom.Threshold = 0.15
+		bloom.Parent = Lighting
+		
+		local sunrays = Instance.new('SunRaysEffect')
+		sunrays.Enabled = true
+		sunrays.Intensity = 0.1
+		sunrays.Spread = 0.5
+		sunrays.Parent = Lighting
+		
+		local colorCorrection = Instance.new('ColorCorrectionEffect')
+		colorCorrection.Saturation = 0.2
+		colorCorrection.Brightness = 0.05
+		colorCorrection.Contrast = 0.15
+		colorCorrection.TintColor = Color3.fromRGB(220, 240, 255)
+		colorCorrection.Enabled = true
+		colorCorrection.Parent = Lighting
+		
+		print("[Cyan Space] Shader successfully applied!")
+	end,
+	["night_sky.lua"] = function()
+		local Players   = game:GetService("Players")
+		local Lighting  = game:GetService("Lighting")
+		local Workspace = game:GetService("Workspace")
+		
+		-- Wipe any old snapshot first
+		getgenv().ORIGINAL_COLORS   = setmetatable({}, {__mode = "k"})
+		getgenv().ORIGINAL_LIGHTING = {}
+		getgenv().ORIGINAL_WATER    = nil
+		getgenv().ORIGINAL_SKY      = nil
+		getgenv().ORIGINAL_ATMO     = nil
+		
+		local function isCharacterPart(part)
+		    local model = part:FindFirstAncestorOfClass("Model")
+		    return model and model:FindFirstChildOfClass("Humanoid") ~= nil
+		end
+		
+		-- Snapshot every BasePart color in the workspace
+		local colorCount = 0
+		for _, obj in ipairs(Workspace:GetDescendants()) do
+		    if obj:IsA("BasePart") and not isCharacterPart(obj) then
+		        pcall(function()
+		            getgenv().ORIGINAL_COLORS[obj] = obj.Color
+		            colorCount += 1
+		        end)
+		    end
+		end
+		
+		Workspace.DescendantAdded:Connect(function(obj)
+		    if obj:IsA("BasePart") and not isCharacterPart(obj) then
+		        pcall(function()
+		            if not getgenv().ORIGINAL_COLORS[obj] then
+		                getgenv().ORIGINAL_COLORS[obj] = obj.Color
+		            end
+		        end)
+		    end
+		end)
+		
+		local L = getgenv().ORIGINAL_LIGHTING
+		L.Technology               = Lighting.Technology
+		L.Ambient                  = Lighting.Ambient
+		L.OutdoorAmbient           = Lighting.OutdoorAmbient
+		L.Brightness               = Lighting.Brightness
+		L.ColorShift_Bottom        = Lighting.ColorShift_Bottom
+		L.ColorShift_Top           = Lighting.ColorShift_Top
+		L.FogColor                 = Lighting.FogColor
+		L.FogEnd                   = Lighting.FogEnd
+		L.FogStart                 = Lighting.FogStart
+		L.GlobalShadows            = Lighting.GlobalShadows
+		L.ShadowSoftness           = Lighting.ShadowSoftness
+		L.EnvironmentDiffuseScale  = Lighting.EnvironmentDiffuseScale
+		L.EnvironmentSpecularScale = Lighting.EnvironmentSpecularScale
+		L.ExposureCompensation     = Lighting.ExposureCompensation
+		L.ClockTime                = Lighting.ClockTime
+		L.GeographicLatitude       = Lighting.GeographicLatitude
+		
+		local existingSky = Lighting:FindFirstChildOfClass("Sky")
+		if existingSky then
+		    getgenv().ORIGINAL_SKY = {
+		        SkyboxBk             = existingSky.SkyboxBk,
+		        SkyboxDn             = existingSky.SkyboxDn,
+		        SkyboxFt             = existingSky.SkyboxFt,
+		        SkyboxLf             = existingSky.SkyboxLf,
+		        SkyboxRt             = existingSky.SkyboxRt,
+		        SkyboxUp             = existingSky.SkyboxUp,
+		        CelestialBodiesShown = existingSky.CelestialBodiesShown,
+		        StarCount            = existingSky.StarCount,
+		    }
+		end
+		
+		local existingAtmo = Lighting:FindFirstChildOfClass("Atmosphere")
+		if existingAtmo then
+		    getgenv().ORIGINAL_ATMO = {
+		        Density = existingAtmo.Density,
+		        Offset  = existingAtmo.Offset,
+		        Color   = existingAtmo.Color,
+		        Decay   = existingAtmo.Decay,
+		        Glare   = existingAtmo.Glare,
+		        Haze    = existingAtmo.Haze,
+		    }
+		end
+		
+		local Terrain = Workspace:FindFirstChildOfClass("Terrain")
+		if Terrain then
+		    getgenv().ORIGINAL_WATER = {
+		        WaterColor        = Terrain.WaterColor,
+		        WaterReflectance  = Terrain.WaterReflectance,
+		        WaterTransparency = Terrain.WaterTransparency,
+		        WaterWaveSize     = Terrain.WaterWaveSize,
+		        WaterWaveSpeed    = Terrain.WaterWaveSpeed,
+		    }
+		end
+		
+		print(string.format("[Snapshot] Ready. Saved %d part colors, lighting, sky, atmosphere & water. Safe to run shaders.", colorCount))
+		
+		-- ==========================================
+		-- CUSTOM THEME: NIGHT SKY
+		-- ==========================================
+		
+		local function applyNightSky(part)
+		    if part:IsA("BasePart") or part:IsA("Terrain") then
+		        if isCharacterPart(part) then return end
+		        if part.Name == "ZenTile" then return end
+		
+		        if part:IsA("Terrain") then
+		            part.WaterColor = Color3.fromRGB(20, 100, 140)
+		            part.WaterReflectance = 1
+		        else
+		            local origColor = getgenv().ORIGINAL_COLORS[part] or part.Color
+		            part.Color = origColor:Lerp(Color3.fromRGB(40, 50, 70), 0.40) -- Lighter tint so it's not pitch black
+		        end
+		    end
+		end
+		
+		for _, obj in ipairs(Workspace:GetDescendants()) do
+		    applyNightSky(obj)
+		end
+		Workspace.DescendantAdded:Connect(applyNightSky)
+		
+		Lighting:ClearAllChildren()
+		
+		-- RTX Lighting settings
+		-- RTX Lighting settings
+		Lighting.Technology = Enum.Technology.Future
+		Lighting.Ambient = Color3.fromRGB(50, 50, 60)
+		Lighting.OutdoorAmbient = Color3.fromRGB(50, 50, 60)
+		Lighting.Brightness = 3
+		Lighting.ColorShift_Bottom = Color3.fromRGB(5, 10, 20)
+		Lighting.ColorShift_Top = Color3.fromRGB(80, 120, 200) -- Dark blue typish light
+		Lighting.EnvironmentDiffuseScale = 1
+		Lighting.EnvironmentSpecularScale = 1
+		Lighting.GlobalShadows = true
+		Lighting.ShadowSoftness = 0.1
+		Lighting.ClockTime = 14.0 -- Midday so the custom skybox is actually visible!
+		Lighting.GeographicLatitude = 80 -- Pushes the hidden sun down to the horizon for long shadows!
+		Lighting.ExposureCompensation = 0
+		
+		-- Sky "NIGHT"
+		local Sky1 = Instance.new("Sky")
+		Sky1.Name = "NIGHT"
+		Sky1.MoonAngularSize = 11
+		Sky1.MoonTextureId = "rbxasset://sky/moon.jpg"
+		Sky1.SkyboxBk = "rbxassetid://12064107"
+		Sky1.SkyboxDn = "rbxassetid://12064152"
+		Sky1.SkyboxFt = "rbxassetid://12064121"
+		Sky1.SkyboxLf = "rbxassetid://12063984"
+		Sky1.SkyboxRt = "rbxassetid://12064115"
+		Sky1.SkyboxUp = "rbxassetid://12064131"
+		Sky1.StarCount = 1000
+		Sky1.SunAngularSize = 0
+		Sky1.SunTextureId = "rbxasset://sky/moon.jpg"
+		Sky1.CelestialBodiesShown = true
+		Sky1.Parent = Lighting
+		
+		-- Atmosphere (Thick, moody cinematic night fog for RTX vibe)
+		local Atmo1 = Instance.new("Atmosphere")
+		Atmo1.Name = "Atmosphere"
+		Atmo1.Density = 0.25
+		Atmo1.Offset = 0.25
+		Atmo1.Color = Color3.fromRGB(30, 30, 40)
+		Atmo1.Decay = Color3.fromRGB(15, 15, 25)
+		Atmo1.Glare = 0.1
+		Atmo1.Haze = 0.2
+		Atmo1.Parent = Lighting
+		
+		-- Bloom (Sharp and crisp for stars and lights)
+		local Bloom = Instance.new("BloomEffect")
+		Bloom.Enabled = true
+		Bloom.Intensity = 1.0
+		Bloom.Size = 16
+		Bloom.Threshold = 1.5
+		Bloom.Parent = Lighting
+		
+		-- Depth of Field (DSLR RTX focus)
+		local DepthOfField = Instance.new("DepthOfFieldEffect")
+		DepthOfField.Enabled = true
+		DepthOfField.FarIntensity = 0.1
+		DepthOfField.NearIntensity = 0.75
+		DepthOfField.FocusDistance = 0.05
+		DepthOfField.InFocusRadius = 30
+		DepthOfField.Parent = Lighting
+		
+		-- Color Correction (Desaturated, cinematic night)
+		local ColorCorrection = Instance.new("ColorCorrectionEffect")
+		ColorCorrection.Enabled = true
+		ColorCorrection.Brightness = 0.02
+		ColorCorrection.Contrast = 0.1
+		ColorCorrection.Saturation = -0.1
+		ColorCorrection.TintColor = Color3.fromRGB(200, 220, 255) -- Dark blue typish tint for the whole scene
+		ColorCorrection.Parent = Lighting
+		
+		-- SunRays (Very subtle for moon rays)
+		local SunRays = Instance.new("SunRaysEffect")
+		SunRays.Enabled = true
+		SunRays.Intensity = 0.05
+		SunRays.Spread = 0.5
+		SunRays.Parent = Lighting
+		
+		-- RTX Terrain & Volumetric Clouds
+		if Workspace:FindFirstChildOfClass("Terrain") then
+		    Workspace.Terrain.Decoration = true
+		    
+		    for _, c in ipairs(Workspace.Terrain:GetChildren()) do
+		        if c:IsA("Clouds") then c:Destroy() end
+		    end
+		    
+		    local Clouds = Instance.new("Clouds")
+		    Clouds.Name = "RTX_Clouds"
+		    Clouds.Cover = 1.0 -- Extremely high
+		    Clouds.Density = 1.0 -- Thicker
+		    Clouds.Color = Color3.fromRGB(80, 90, 110)
+		    Clouds.Parent = Workspace.Terrain
+		end
+	end,
+	["pink.lua"] = function()
+		local Players   = game:GetService("Players")
+		local Lighting  = game:GetService("Lighting")
+		local Workspace = game:GetService("Workspace")
+		
+		-- Wipe any old snapshot first
+		getgenv().ORIGINAL_COLORS   = setmetatable({}, {__mode = "k"})
+		getgenv().ORIGINAL_LIGHTING = {}
+		getgenv().ORIGINAL_WATER    = nil
+		getgenv().ORIGINAL_SKY      = nil
+		getgenv().ORIGINAL_ATMO     = nil
+		
+		local function isCharacterPart(part)
+		    local model = part:FindFirstAncestorOfClass("Model")
+		    return model and model:FindFirstChildOfClass("Humanoid") ~= nil
+		end
+		
+		-- ------------------------------------------------
+		-- Snapshot every BasePart color in the workspace
+		-- ------------------------------------------------
+		local colorCount = 0
+		for _, obj in ipairs(Workspace:GetDescendants()) do
+		    if obj:IsA("BasePart") and not isCharacterPart(obj) then
+		        pcall(function()
+		            getgenv().ORIGINAL_COLORS[obj] = obj.Color
+		            colorCount += 1
+		        end)
+		    end
+		end
+		
+		-- Also snapshot colors of parts that load in later
+		Workspace.DescendantAdded:Connect(function(obj)
+		    if obj:IsA("BasePart") and not isCharacterPart(obj) then
+		        pcall(function()
+		            if not getgenv().ORIGINAL_COLORS[obj] then
+		                getgenv().ORIGINAL_COLORS[obj] = obj.Color
+		            end
+		        end)
+		    end
+		end)
+		
+		-- ------------------------------------------------
+		-- Snapshot all Lighting properties
+		-- ------------------------------------------------
+		local L = getgenv().ORIGINAL_LIGHTING
+		L.Technology               = Lighting.Technology
+		L.Ambient                  = Lighting.Ambient
+		L.OutdoorAmbient           = Lighting.OutdoorAmbient
+		L.Brightness               = Lighting.Brightness
+		L.ColorShift_Bottom        = Lighting.ColorShift_Bottom
+		L.ColorShift_Top           = Lighting.ColorShift_Top
+		L.FogColor                 = Lighting.FogColor
+		L.FogEnd                   = Lighting.FogEnd
+		L.FogStart                 = Lighting.FogStart
+		L.GlobalShadows            = Lighting.GlobalShadows
+		L.ShadowSoftness           = Lighting.ShadowSoftness
+		L.EnvironmentDiffuseScale  = Lighting.EnvironmentDiffuseScale
+		L.EnvironmentSpecularScale = Lighting.EnvironmentSpecularScale
+		L.ExposureCompensation     = Lighting.ExposureCompensation
+		L.ClockTime                = Lighting.ClockTime
+		L.GeographicLatitude       = Lighting.GeographicLatitude
+		
+		-- ------------------------------------------------
+		-- Snapshot existing Sky if present
+		-- ------------------------------------------------
+		local existingSky = Lighting:FindFirstChildOfClass("Sky")
+		if existingSky then
+		    getgenv().ORIGINAL_SKY = {
+		        SkyboxBk             = existingSky.SkyboxBk,
+		        SkyboxDn             = existingSky.SkyboxDn,
+		        SkyboxFt             = existingSky.SkyboxFt,
+		        SkyboxLf             = existingSky.SkyboxLf,
+		        SkyboxRt             = existingSky.SkyboxRt,
+		        SkyboxUp             = existingSky.SkyboxUp,
+		        CelestialBodiesShown = existingSky.CelestialBodiesShown,
+		        StarCount            = existingSky.StarCount,
+		    }
+		end
+		
+		-- ------------------------------------------------
+		-- Snapshot existing Atmosphere if present
+		-- ------------------------------------------------
+		local existingAtmo = Lighting:FindFirstChildOfClass("Atmosphere")
+		if existingAtmo then
+		    getgenv().ORIGINAL_ATMO = {
+		        Density = existingAtmo.Density,
+		        Offset  = existingAtmo.Offset,
+		        Color   = existingAtmo.Color,
+		        Decay   = existingAtmo.Decay,
+		        Glare   = existingAtmo.Glare,
+		        Haze    = existingAtmo.Haze,
+		    }
+		end
+		
+		-- ------------------------------------------------
+		-- Snapshot Terrain water
+		-- ------------------------------------------------
+		local Terrain = Workspace:FindFirstChildOfClass("Terrain")
+		if Terrain then
+		    getgenv().ORIGINAL_WATER = {
+		        WaterColor        = Terrain.WaterColor,
+		        WaterReflectance  = Terrain.WaterReflectance,
+		        WaterTransparency = Terrain.WaterTransparency,
+		        WaterWaveSize     = Terrain.WaterWaveSize,
+		        WaterWaveSpeed    = Terrain.WaterWaveSpeed,
+		    }
+		end
+		
+		print(string.format("[Snapshot] Ready. Saved %d part colors, lighting, sky, atmosphere & water. Safe to run shaders.", colorCount))
+		
+		-- LocalScript in StarterPlayerScripts
+		
+		local Workspace = game:GetService("Workspace")
+		
+		local function applyLightPink(part)
+		    if part:IsA("BasePart") or part:IsA("Terrain") then
+		        if isCharacterPart(part) then return end
+		        if part.Name == "ZenTile" then return end
+		
+		        if part:IsA("Terrain") then
+		            part.WaterColor = Color3.fromRGB(255, 200, 220)
+		        else
+		            local c = part.Color
+		            local lum = 0.299 * c.R + 0.587 * c.G + 0.114 * c.B
+		            part.Color = Color3.new(
+		                0.85 + lum * 0.15,  -- R: very high
+		                0.65 + lum * 0.15,  -- G: medium-high
+		                0.70 + lum * 0.15   -- B: medium-high
+		            )
+		        end
+		    end
+		end
+		
+		for _, obj in ipairs(Workspace:GetDescendants()) do
+		    applyLightPink(obj)
+		end
+		
+		Workspace.DescendantAdded:Connect(applyLightPink)
+		
+		-- PINK SHADER WITH RTX LIGHTING V2 (from Empty Tools)
+		
+		local Lighting = game:GetService("Lighting")
+		
+		-- Clear old lighting
+		Lighting:ClearAllChildren()
+		
+		-- Lighting Properties
+		Lighting.Ambient = Color3.fromRGB(100, 65, 115)
+		Lighting.OutdoorAmbient = Color3.fromRGB(160, 110, 180)
+		Lighting.Brightness = 2.4  -- slightly dimmed from 3
+		Lighting.ColorShift_Bottom = Color3.fromRGB(255, 160, 210)
+		Lighting.ColorShift_Top = Color3.fromRGB(200, 130, 240)
+		Lighting.EnvironmentDiffuseScale = 1
+		Lighting.EnvironmentSpecularScale = 1
+		Lighting.GlobalShadows = true
+		Lighting.ShadowSoftness = 0.25
+		Lighting.ClockTime = 14
+		Lighting.GeographicLatitude = 25
+		Lighting.ExposureCompensation = -0.2  -- subtle exposure pull-down
+		
+		-- Skybox
+		local Skybox = Instance.new("Sky")
+		Skybox.SkyboxBk = "http://www.roblox.com/asset/?id=271042516"
+		Skybox.SkyboxDn = "http://www.roblox.com/asset/?id=271077243"
+		Skybox.SkyboxFt = "http://www.roblox.com/asset/?id=271042556"
+		Skybox.SkyboxLf = "http://www.roblox.com/asset/?id=271042310"
+		Skybox.SkyboxRt = "http://www.roblox.com/asset/?id=271042467"
+		Skybox.SkyboxUp = "http://www.roblox.com/asset/?id=271077958"
+		Skybox.CelestialBodiesShown = true
+		Skybox.StarCount = 5000
+		Skybox.Parent = Lighting
+		
+		-- Atmosphere (RTX-style haze & scatter)
+		local Atmosphere = Instance.new("Atmosphere")
+		Atmosphere.Density = 0.45
+		Atmosphere.Offset = 0.3
+		Atmosphere.Color = Color3.fromRGB(255, 170, 215)
+		Atmosphere.Decay = Color3.fromRGB(160, 85, 145)
+		Atmosphere.Glare = 0.55
+		Atmosphere.Haze = 0.2
+		Atmosphere.Parent = Lighting
+		
+		-- Bloom (punchy glow)
+		local Bloom = Instance.new("BloomEffect")
+		Bloom.Enabled = true
+		Bloom.Intensity = 0.6
+		Bloom.Size = 28
+		Bloom.Threshold = 0.85
+		Bloom.Parent = Lighting
+		
+		-- Color Correction
+		local ColorCorrection = Instance.new("ColorCorrectionEffect")
+		ColorCorrection.Contrast = 0.05
+		ColorCorrection.TintColor = Color3.fromRGB(245, 220, 255)
+		ColorCorrection.Saturation = 0.35
+		ColorCorrection.Brightness = 0.02
+		ColorCorrection.Enabled = true
+		ColorCorrection.Parent = Lighting
+		
+		-- Sun Rays (volumetric light shafts)
+		local SunRays = Instance.new("SunRaysEffect")
+		SunRays.Enabled = true
+		SunRays.Intensity = 0.35
+		SunRays.Spread = 0.75
+		SunRays.Parent = Lighting
+		
+		-- Depth of Field (cinematic blur)
+		local DepthOfField = Instance.new("DepthOfFieldEffect")
+		DepthOfField.Enabled = false
+		DepthOfField.FarIntensity = 0.55
+		DepthOfField.NearIntensity = 0.15
+		DepthOfField.FocusDistance = 45
+		DepthOfField.InFocusRadius = 30
+		DepthOfField.Parent = Lighting
+		
+		-- Motion Blur (movement feel)
+		local MotionBlur = Instance.new("BlurEffect")
+		MotionBlur.Enabled = false
+		MotionBlur.Size = 6
+		MotionBlur.Parent = Lighting
+		
+		-- Film Grain (cinematic texture)
+		-- Simulated via a subtle ColorCorrectionEffect layered on top
+		local FilmGrain = Instance.new("ColorCorrectionEffect")
+		FilmGrain.Contrast = 0.08
+		FilmGrain.Saturation = 0.1
+		FilmGrain.TintColor = Color3.fromRGB(255, 235, 255)
+		FilmGrain.Enabled = true
+		FilmGrain.Parent = Lighting
+		
+		-- Optional Clouds
+		if not workspace.Terrain:FindFirstChildOfClass("Clouds") then
+			local Clouds = Instance.new("Clouds")
+			Clouds.Cover = 0.72
+			Clouds.Density = 0.62
+			Clouds.Color = Color3.fromRGB(255, 140, 200)
+			Clouds.Parent = workspace.Terrain
+		end
+	end,
+	["red_cosmos.lua"] = function()
+		local Players   = game:GetService("Players")
+		local Lighting  = game:GetService("Lighting")
+		local Workspace = game:GetService("Workspace")
+		
+		-- Wipe any old snapshot first
+		getgenv().ORIGINAL_COLORS   = setmetatable({}, {__mode = "k"})
+		getgenv().ORIGINAL_LIGHTING = {}
+		getgenv().ORIGINAL_WATER    = nil
+		getgenv().ORIGINAL_SKY      = nil
+		getgenv().ORIGINAL_ATMO     = nil
+		
+		local function isCharacterPart(part)
+		    local model = part:FindFirstAncestorOfClass("Model")
+		    return model and model:FindFirstChildOfClass("Humanoid") ~= nil
+		end
+		
+		-- ------------------------------------------------
+		-- Snapshot every BasePart color in the workspace
+		-- ------------------------------------------------
+		local colorCount = 0
+		for _, obj in ipairs(Workspace:GetDescendants()) do
+		    if obj:IsA("BasePart") and not isCharacterPart(obj) then
+		        pcall(function()
+		            getgenv().ORIGINAL_COLORS[obj] = obj.Color
+		            colorCount += 1
+		        end)
+		    end
+		end
+		
+		Workspace.DescendantAdded:Connect(function(obj)
+		    if obj:IsA("BasePart") and not isCharacterPart(obj) then
+		        pcall(function()
+		            if not getgenv().ORIGINAL_COLORS[obj] then
+		                getgenv().ORIGINAL_COLORS[obj] = obj.Color
+		            end
+		        end)
+		    end
+		end)
+		
+		-- ------------------------------------------------
+		-- Snapshot all Lighting properties
+		-- ------------------------------------------------
+		local L = getgenv().ORIGINAL_LIGHTING
+		L.Technology               = Lighting.Technology
+		L.Ambient                  = Lighting.Ambient
+		L.OutdoorAmbient           = Lighting.OutdoorAmbient
+		L.Brightness               = Lighting.Brightness
+		L.ColorShift_Bottom        = Lighting.ColorShift_Bottom
+		L.ColorShift_Top           = Lighting.ColorShift_Top
+		L.FogColor                 = Lighting.FogColor
+		L.FogEnd                   = Lighting.FogEnd
+		L.FogStart                 = Lighting.FogStart
+		L.GlobalShadows            = Lighting.GlobalShadows
+		L.ShadowSoftness           = Lighting.ShadowSoftness
+		L.EnvironmentDiffuseScale  = Lighting.EnvironmentDiffuseScale
+		L.EnvironmentSpecularScale = Lighting.EnvironmentSpecularScale
+		L.ExposureCompensation     = Lighting.ExposureCompensation
+		L.ClockTime                = Lighting.ClockTime
+		L.GeographicLatitude       = Lighting.GeographicLatitude
+		
+		-- ------------------------------------------------
+		-- Snapshot existing Sky & Atmo
+		-- ------------------------------------------------
+		local existingSky = Lighting:FindFirstChildOfClass("Sky")
+		if existingSky then
+		    getgenv().ORIGINAL_SKY = {
+		        SkyboxBk             = existingSky.SkyboxBk,
+		        SkyboxDn             = existingSky.SkyboxDn,
+		        SkyboxFt             = existingSky.SkyboxFt,
+		        SkyboxLf             = existingSky.SkyboxLf,
+		        SkyboxRt             = existingSky.SkyboxRt,
+		        SkyboxUp             = existingSky.SkyboxUp,
+		        CelestialBodiesShown = existingSky.CelestialBodiesShown,
+		        StarCount            = existingSky.StarCount,
+		    }
+		end
+		
+		local existingAtmo = Lighting:FindFirstChildOfClass("Atmosphere")
+		if existingAtmo then
+		    getgenv().ORIGINAL_ATMO = {
+		        Density = existingAtmo.Density,
+		        Offset  = existingAtmo.Offset,
+		        Color   = existingAtmo.Color,
+		        Decay   = existingAtmo.Decay,
+		        Glare   = existingAtmo.Glare,
+		        Haze    = existingAtmo.Haze,
+		    }
+		end
+		
+		-- ------------------------------------------------
+		-- Snapshot Terrain water
+		-- ------------------------------------------------
+		local Terrain = Workspace:FindFirstChildOfClass("Terrain")
+		if Terrain then
+		    getgenv().ORIGINAL_WATER = {
+		        WaterColor        = Terrain.WaterColor,
+		        WaterReflectance  = Terrain.WaterReflectance,
+		        WaterTransparency = Terrain.WaterTransparency,
+		        WaterWaveSize     = Terrain.WaterWaveSize,
+		        WaterWaveSpeed    = Terrain.WaterWaveSpeed,
+		    }
+		end
+		
+		print(string.format("[Snapshot] Ready. Saved %d part colors, lighting, sky, atmosphere & water. Safe to run shaders.", colorCount))
+		
+		-- ------------------------------------------------
+		-- Apply Red Cosmos Colors
+		-- ------------------------------------------------
+		local function toRedTint(c)
+		    local lum = 0.299 * c.R + 0.587 * c.G + 0.114 * c.B
+		    -- A much softer, desaturated red/gray tint
+		    return Color3.new(lum * 0.9, lum * 0.65, lum * 0.65)
+		end
+		
+		local colorCache = {}
+		
+		local function applyTint(part)
+		    if not part:IsA('BasePart') and not part:IsA('Terrain') then return end
+		    if part.Name == "ZenTile" then return end
+		    if colorCache[part] then return end
+		    if isCharacterPart(part) then return end
+		
+		    colorCache[part] = true
+		    
+		    if part:IsA("Terrain") then
+		        part.WaterColor = Color3.fromRGB(180, 20, 20)
+		    else
+		        part.Color = toRedTint(part.Color)
+		    end
+		end
+		
+		for _, obj in ipairs(workspace:GetDescendants()) do
+		    pcall(applyTint, obj)
+		end
+		
+		workspace.DescendantAdded:Connect(function(inst)
+		    task.defer(function()
+		        pcall(applyTint, inst)
+		    end)
+		end)
+		
+		local function protectAvatar(char)
+		    if not char then return end
+		
+		    for _, part in ipairs(char:GetDescendants()) do
+		        pcall(function()
+		            if part:IsA('BasePart') and colorCache[part] then
+		                colorCache[part] = nil
+		            end
+		        end)
+		    end
+		
+		    char.DescendantAdded:Connect(function(inst)
+		        task.defer(function()
+		            pcall(function()
+		                if inst:IsA('BasePart') then
+		                    colorCache[inst] = nil
+		                end
+		            end)
+		        end)
+		    end)
+		end
+		
+		for _, plr in ipairs(Players:GetPlayers()) do
+		    protectAvatar(plr.Character)
+		    plr.CharacterAdded:Connect(protectAvatar)
+		end
+		
+		Players.PlayerAdded:Connect(function(plr)
+		    protectAvatar(plr.Character)
+		    plr.CharacterAdded:Connect(protectAvatar)
+		end)
+		
+		-- ------------------------------------------------
+		-- Apply Red Cosmos Lighting & Skybox
+		-- ------------------------------------------------
+		Lighting:ClearAllChildren()
+		
+		local sky = Instance.new('Sky')
+		sky.SkyboxBk = 'http://www.roblox.com/asset/?id=15542476630'
+		sky.SkyboxDn = 'http://www.roblox.com/asset/?id=15542477272'
+		sky.SkyboxFt = 'http://www.roblox.com/asset/?id=15542481240'
+		sky.SkyboxLf = 'http://www.roblox.com/asset/?id=15542482020'
+		sky.SkyboxRt = 'http://www.roblox.com/asset/?id=15542483287'
+		sky.SkyboxUp = 'http://www.roblox.com/asset/?id=15542484852'
+		sky.StarCount = 3000
+		sky.SunAngularSize = 21
+		sky.SunTextureId = "rbxassetid://1084351190"
+		sky.Parent = Lighting
+		
+		local atmo = Instance.new('Atmosphere')
+		atmo.Density = 0.25
+		atmo.Offset = 0.15
+		atmo.Color = Color3.fromRGB(180, 80, 80)
+		atmo.Decay = Color3.fromRGB(80, 30, 40)
+		atmo.Glare = 0.05
+		atmo.Haze = 0.05
+		atmo.Parent = Lighting
+		
+		Lighting.Ambient = Color3.fromRGB(110, 80, 80)
+		Lighting.OutdoorAmbient = Color3.fromRGB(130, 90, 90)
+		Lighting.ColorShift_Top = Color3.fromRGB(255, 190, 190)
+		Lighting.ColorShift_Bottom = Color3.fromRGB(80, 50, 50)
+		Lighting.FogColor = Color3.fromRGB(30, 10, 15)
+		Lighting.FogEnd = 999999
+		Lighting.Brightness = 1.8
+		Lighting.ExposureCompensation = 0
+		Lighting.GlobalShadows = true
+		Lighting.ClockTime = 12 -- 90-degree angle (directly overhead)
+		Lighting.GeographicLatitude = 0
+		Lighting.ShadowSoftness = 0.2
+		Lighting.EnvironmentDiffuseScale = 1
+		Lighting.EnvironmentSpecularScale = 1
+		
+		local bloom = Instance.new('BloomEffect')
+		bloom.Enabled = true
+		bloom.Intensity = 0.3
+		bloom.Size = 42
+		bloom.Threshold = 0.95
+		bloom.Parent = Lighting
+		
+		local sunrays = Instance.new('SunRaysEffect')
+		sunrays.Enabled = true
+		sunrays.Intensity = 0.15
+		sunrays.Spread = 0.8
+		sunrays.Parent = Lighting
+		
+		local colorCorrection = Instance.new('ColorCorrectionEffect')
+		colorCorrection.Saturation = 0.1
+		colorCorrection.Brightness = 0.05
+		colorCorrection.Contrast = 0.2
+		colorCorrection.TintColor = Color3.fromRGB(255, 230, 230)
+		colorCorrection.Enabled = true
+		colorCorrection.Parent = Lighting
+		
+		print("[Red Cosmos] Shader successfully applied!")
+	end,
+	["reset.lua"] = function()
+		-- ================================================
+		--   STEP 2: FULL RESET (Glow + Fog Fix)
+		-- ================================================
+		
+		local Players    = game:GetService("Players")
+		local Lighting   = game:GetService("Lighting")
+		local Workspace  = game:GetService("Workspace")
+		local RunService = game:GetService("RunService")
+		
+		-- ================================================
+		-- STEP 1: KILL ALL SHADER CONNECTIONS FIRST
+		-- ================================================
+		pcall(function() Workspace.DescendantAdded:DisconnectAll() end)
+		pcall(function() RunService.RenderStepped:DisconnectAll() end)
+		pcall(function() getgenv().GI_SYSTEM = nil end)
+		
+		-- ================================================
+		-- STEP 2: DISABLE + DESTROY EVERY EFFECT
+		-- Disable first, then destroy — belt and suspenders
+		-- ================================================
+		for _, child in ipairs(Lighting:GetChildren()) do
+		    pcall(function()
+		        -- Disable before destroying so effect stops instantly
+		        if child:FindFirstProperty("Enabled") then
+		            child.Enabled = false
+		        end
+		        child:Destroy()
+		    end)
+		end
+		
+		-- Double-check — destroy anything that survived
+		task.wait(0.05)
+		for _, child in ipairs(Lighting:GetChildren()) do
+		    pcall(function() child:Destroy() end)
+		end
+		
+		-- ================================================
+		-- STEP 3: RESTORE LIGHTING PROPERTIES
+		-- ================================================
+		local L = getgenv().ORIGINAL_LIGHTING
+		
+		if L and next(L) then
+		    Lighting.Technology               = L.Technology
+		    Lighting.Ambient                  = L.Ambient
+		    Lighting.OutdoorAmbient           = L.OutdoorAmbient
+		    Lighting.Brightness               = L.Brightness
+		    Lighting.ColorShift_Bottom        = L.ColorShift_Bottom
+		    Lighting.ColorShift_Top           = L.ColorShift_Top
+		    Lighting.FogColor                 = L.FogColor
+		    Lighting.FogEnd                   = L.FogEnd
+		    Lighting.FogStart                 = L.FogStart
+		    Lighting.GlobalShadows            = L.GlobalShadows
+		    Lighting.ShadowSoftness           = L.ShadowSoftness
+		    Lighting.EnvironmentDiffuseScale  = L.EnvironmentDiffuseScale
+		    Lighting.EnvironmentSpecularScale = L.EnvironmentSpecularScale
+		    Lighting.ExposureCompensation     = L.ExposureCompensation
+		    Lighting.ClockTime                = L.ClockTime
+		    Lighting.GeographicLatitude       = L.GeographicLatitude
+		    print("[Reset] Lighting restored from snapshot.")
+		else
+		    Lighting.Technology               = Enum.Technology.Compatibility
+		    Lighting.Ambient                  = Color3.fromRGB(127, 127, 127)
+		    Lighting.OutdoorAmbient           = Color3.fromRGB(127, 127, 127)
+		    Lighting.Brightness               = 2.0
+		    Lighting.ColorShift_Bottom        = Color3.fromRGB(0, 0, 0)
+		    Lighting.ColorShift_Top           = Color3.fromRGB(0, 0, 0)
+		    Lighting.FogColor                 = Color3.fromRGB(191, 191, 191)
+		    Lighting.FogEnd                   = 100000
+		    Lighting.FogStart                 = 0
+		    Lighting.GlobalShadows            = true
+		    Lighting.ShadowSoftness           = 0.2
+		    Lighting.EnvironmentDiffuseScale  = 1
+		    Lighting.EnvironmentSpecularScale = 1
+		    Lighting.ExposureCompensation     = 0
+		    Lighting.ClockTime                = 14
+		    Lighting.GeographicLatitude       = 41.733
+		    print("[Reset] No snapshot — Roblox defaults applied.")
+		end
+		
+		-- ================================================
+		-- STEP 4: RESTORE SKY
+		-- ================================================
+		local skyData = getgenv().ORIGINAL_SKY
+		if skyData then
+		    local Sky = Instance.new("Sky")
+		    Sky.SkyboxBk             = skyData.SkyboxBk
+		    Sky.SkyboxDn             = skyData.SkyboxDn
+		    Sky.SkyboxFt             = skyData.SkyboxFt
+		    Sky.SkyboxLf             = skyData.SkyboxLf
+		    Sky.SkyboxRt             = skyData.SkyboxRt
+		    Sky.SkyboxUp             = skyData.SkyboxUp
+		    Sky.CelestialBodiesShown = skyData.CelestialBodiesShown
+		    Sky.StarCount            = skyData.StarCount
+		    Sky.Parent = Lighting
+		else
+		    print("[Reset] No sky snapshot — leaving default procedural sky.")
+		end
+		
+		-- ================================================
+		-- STEP 5: RESTORE ATMOSPHERE
+		-- ================================================
+		local atmoData = getgenv().ORIGINAL_ATMO
+		if atmoData then
+		    local Atmo = Instance.new("Atmosphere")
+		    Atmo.Density = atmoData.Density
+		    Atmo.Offset  = atmoData.Offset
+		    Atmo.Color   = atmoData.Color
+		    Atmo.Decay   = atmoData.Decay
+		    Atmo.Glare   = atmoData.Glare
+		    Atmo.Haze    = atmoData.Haze
+		    Atmo.Parent = Lighting
+		    print("[Reset] Atmosphere restored from snapshot.")
+		else
+		    print("[Reset] No snapshot — leaving default lighting without Atmosphere.")
+		end
+		
+		-- Explicit extra kill on bloom just in case anything re-added it
+		task.wait(0.05)
+		for _, child in ipairs(Lighting:GetChildren()) do
+		    if child:IsA("BloomEffect") or child:IsA("ColorCorrectionEffect")
+		    or child:IsA("SunRaysEffect") or child:IsA("DepthOfFieldEffect")
+		    or child:IsA("BlurEffect") then
+		        child.Enabled = false
+		        child:Destroy()
+		    end
+		end
+		
+		-- ================================================
+		-- STEP 6: RESTORE TERRAIN WATER + REMOVE CLOUDS
+		-- ================================================
+		local Terrain = Workspace:FindFirstChildOfClass("Terrain")
+		if Terrain then
+		    local W = getgenv().ORIGINAL_WATER
+		    if W then
+		        Terrain.WaterColor        = W.WaterColor
+		        Terrain.WaterReflectance  = W.WaterReflectance
+		        Terrain.WaterTransparency = W.WaterTransparency
+		        Terrain.WaterWaveSize     = W.WaterWaveSize
+		        Terrain.WaterWaveSpeed    = W.WaterWaveSpeed
+		    else
+		        Terrain.WaterColor        = Color3.fromRGB(16, 150, 203)
+		        Terrain.WaterReflectance  = 1
+		        Terrain.WaterTransparency = 0.3
+		        Terrain.WaterWaveSize     = 0.15
+		        Terrain.WaterWaveSpeed    = 10
+		    end
+		    for _, child in ipairs(Terrain:GetChildren()) do
+		        if child:IsA("Clouds") then child:Destroy() end
+		    end
+		end
+		
+		-- ================================================
+		-- STEP 7: RESTORE PART COLORS FROM SNAPSHOT
+		-- ================================================
+		local function isCharacterPart(part)
+		    local model = part:FindFirstAncestorOfClass("Model")
+		    return model and model:FindFirstChildOfClass("Humanoid") ~= nil
+		end
+		
+		local snapshot = getgenv().ORIGINAL_COLORS
+		local restored, skipped = 0, 0
+		
+		for _, obj in ipairs(Workspace:GetDescendants()) do
+		    if obj:IsA("BasePart") and not isCharacterPart(obj) then
+		        pcall(function()
+		            if snapshot and snapshot[obj] then
+		                obj.Color = snapshot[obj]
+		                restored += 1
+		            else
+		                skipped += 1
+		            end
+		        end)
+		    end
+		end
+		
+		-- ================================================
+		-- STEP 8: CLEAR ALL SNAPSHOT MEMORY
+		-- ================================================
+		getgenv().ORIGINAL_COLORS   = nil
+		getgenv().ORIGINAL_LIGHTING = nil
+		getgenv().ORIGINAL_WATER    = nil
+		getgenv().ORIGINAL_SKY      = nil
+		getgenv().ORIGINAL_ATMO     = nil
+		
+		print(string.format("[Reset] DONE. %d parts restored, %d skipped. Glow and fog removed.", restored, skipped))
+	end,
+	["space.lua"] = function()
+		local Players   = game:GetService("Players")
+		local Lighting  = game:GetService("Lighting")
+		local Workspace = game:GetService("Workspace")
+		
+		-- Wipe any old snapshot first
+		getgenv().ORIGINAL_COLORS   = setmetatable({}, {__mode = "k"})
+		getgenv().ORIGINAL_LIGHTING = {}
+		getgenv().ORIGINAL_WATER    = nil
+		getgenv().ORIGINAL_SKY      = nil
+		getgenv().ORIGINAL_ATMO     = nil
+		
+		local function isCharacterPart(part)
+		    local model = part:FindFirstAncestorOfClass("Model")
+		    return model and model:FindFirstChildOfClass("Humanoid") ~= nil
+		end
+		
+		-- ------------------------------------------------
+		-- Snapshot every BasePart color in the workspace
+		-- ------------------------------------------------
+		local colorCount = 0
+		for _, obj in ipairs(Workspace:GetDescendants()) do
+		    if obj:IsA("BasePart") and not isCharacterPart(obj) then
+		        pcall(function()
+		            getgenv().ORIGINAL_COLORS[obj] = obj.Color
+		            colorCount += 1
+		        end)
+		    end
+		end
+		
+		-- Also snapshot colors of parts that load in later
+		Workspace.DescendantAdded:Connect(function(obj)
+		    if obj:IsA("BasePart") and not isCharacterPart(obj) then
+		        pcall(function()
+		            if not getgenv().ORIGINAL_COLORS[obj] then
+		                getgenv().ORIGINAL_COLORS[obj] = obj.Color
+		            end
+		        end)
+		    end
+		end)
+		
+		-- ------------------------------------------------
+		-- Snapshot all Lighting properties
+		-- ------------------------------------------------
+		local L = getgenv().ORIGINAL_LIGHTING
+		L.Technology               = Lighting.Technology
+		L.Ambient                  = Lighting.Ambient
+		L.OutdoorAmbient           = Lighting.OutdoorAmbient
+		L.Brightness               = Lighting.Brightness
+		L.ColorShift_Bottom        = Lighting.ColorShift_Bottom
+		L.ColorShift_Top           = Lighting.ColorShift_Top
+		L.FogColor                 = Lighting.FogColor
+		L.FogEnd                   = Lighting.FogEnd
+		L.FogStart                 = Lighting.FogStart
+		L.GlobalShadows            = Lighting.GlobalShadows
+		L.ShadowSoftness           = Lighting.ShadowSoftness
+		L.EnvironmentDiffuseScale  = Lighting.EnvironmentDiffuseScale
+		L.EnvironmentSpecularScale = Lighting.EnvironmentSpecularScale
+		L.ExposureCompensation     = Lighting.ExposureCompensation
+		L.ClockTime                = Lighting.ClockTime
+		L.GeographicLatitude       = Lighting.GeographicLatitude
+		
+		-- ------------------------------------------------
+		-- Snapshot existing Sky if present
+		-- ------------------------------------------------
+		local existingSky = Lighting:FindFirstChildOfClass("Sky")
+		if existingSky then
+		    getgenv().ORIGINAL_SKY = {
+		        SkyboxBk             = existingSky.SkyboxBk,
+		        SkyboxDn             = existingSky.SkyboxDn,
+		        SkyboxFt             = existingSky.SkyboxFt,
+		        SkyboxLf             = existingSky.SkyboxLf,
+		        SkyboxRt             = existingSky.SkyboxRt,
+		        SkyboxUp             = existingSky.SkyboxUp,
+		        CelestialBodiesShown = existingSky.CelestialBodiesShown,
+		        StarCount            = existingSky.StarCount,
+		    }
+		end
+		
+		-- ------------------------------------------------
+		-- Snapshot existing Atmosphere if present
+		-- ------------------------------------------------
+		local existingAtmo = Lighting:FindFirstChildOfClass("Atmosphere")
+		if existingAtmo then
+		    getgenv().ORIGINAL_ATMO = {
+		        Density = existingAtmo.Density,
+		        Offset  = existingAtmo.Offset,
+		        Color   = existingAtmo.Color,
+		        Decay   = existingAtmo.Decay,
+		        Glare   = existingAtmo.Glare,
+		        Haze    = existingAtmo.Haze,
+		    }
+		end
+		
+		-- ------------------------------------------------
+		-- Snapshot Terrain water
+		-- ------------------------------------------------
+		local Terrain = Workspace:FindFirstChildOfClass("Terrain")
+		if Terrain then
+		    getgenv().ORIGINAL_WATER = {
+		        WaterColor        = Terrain.WaterColor,
+		        WaterReflectance  = Terrain.WaterReflectance,
+		        WaterTransparency = Terrain.WaterTransparency,
+		        WaterWaveSize     = Terrain.WaterWaveSize,
+		        WaterWaveSpeed    = Terrain.WaterWaveSpeed,
+		    }
+		end
+		
+		print(string.format("[Snapshot] Ready. Saved %d part colors, lighting, sky, atmosphere & water. Safe to run shaders.", colorCount))
+		
+		local Players = game:GetService('Players')
+		local Lighting = game:GetService('Lighting')
+		local localPlayer = Players.LocalPlayer
+		
+		local function toGray(c)
+		    local lum = 0.299 * c.R + 0.587 * c.G + 0.114 * c.B
+		    return Color3.new(lum, lum, lum)
+		end
+		
+		
+		local function isAvatarPart(part)
+		    for _, plr in ipairs(Players:GetPlayers()) do
+		        local char = plr.Character
+		        if char and part:IsDescendantOf(char) then
+		            return true
+		        end
+		    end
+		    return false
+		end
+		
+		local grayCache = {}
+		
+		local function makeGray(part)
+		    if not part:IsA('BasePart') then return end
+		    if part.Name == "ZenTile" then return end
+		    if grayCache[part] then return end
+		    if isAvatarPart(part) then return end
+		
+		    grayCache[part] = true
+		    part.Color = toGray(part.Color)
+		end
+		
+		for _, obj in ipairs(workspace:GetDescendants()) do
+		    pcall(makeGray, obj)
+		end
+		
+		workspace.DescendantAdded:Connect(function(inst)
+		    task.defer(function()
+		        pcall(makeGray, inst)
+		    end)
+		end)
+		
+		
+		local function protectAvatar(char)
+		    if not char then return end
+		
+		    for _, part in ipairs(char:GetDescendants()) do
+		        pcall(function()
+		            if part:IsA('BasePart') and grayCache[part] then
+		                grayCache[part] = nil
+		            end
+		        end)
+		    end
+		
+		    char.DescendantAdded:Connect(function(inst)
+		        task.defer(function()
+		            pcall(function()
+		                if inst:IsA('BasePart') then
+		                    grayCache[inst] = nil
+		                end
+		            end)
+		        end)
+		    end)
+		end
+		
+		for _, plr in ipairs(Players:GetPlayers()) do
+		    protectAvatar(plr.Character)
+		    plr.CharacterAdded:Connect(protectAvatar)
+		end
+		
+		Players.PlayerAdded:Connect(function(plr)
+		    protectAvatar(plr.Character)
+		    plr.CharacterAdded:Connect(protectAvatar)
+		end)
+		
+		
+		Lighting:ClearAllChildren()
+		
+		local sky = Instance.new('Sky')
+		sky.SkyboxBk = 'http://www.roblox.com/asset/?id=16262356578'
+		sky.SkyboxDn = 'http://www.roblox.com/asset/?id=16262358026'
+		sky.SkyboxFt = 'http://www.roblox.com/asset/?id=16262360469'
+		sky.SkyboxLf = 'http://www.roblox.com/asset/?id=16262362003'
+		sky.SkyboxRt = 'http://www.roblox.com/asset/?id=16262363873'
+		sky.SkyboxUp = 'http://www.roblox.com/asset/?id=16262366016'
+		sky.StarCount = 6000
+		sky.Parent = Lighting
+		
+		local atmo = Instance.new('Atmosphere')
+		atmo.Density = 0.7
+		atmo.Offset = 0.1
+		atmo.Color = Color3.fromRGB(130, 130, 130)
+		atmo.Decay = Color3.fromRGB(40, 40, 40)
+		atmo.Glare = 0
+		atmo.Haze = 1
+		atmo.Parent = Lighting
+		
+		Lighting.Ambient = Color3.fromRGB(90, 90, 90)
+		Lighting.OutdoorAmbient = Color3.fromRGB(90, 90, 90)
+		Lighting.ColorShift_Top = Color3.fromRGB(160, 160, 160)
+		Lighting.ColorShift_Bottom = Color3.fromRGB(160, 160, 160)
+		Lighting.FogColor = Color3.fromRGB(20, 20, 20)
+		Lighting.FogEnd = 100000
+		Lighting.Brightness = 2.0
+		
+		
+		local bloom = Instance.new('BloomEffect')
+		bloom.Enabled = true
+		bloom.Intensity = 1.5
+		bloom.Size = 64
+		bloom.Threshold = 0.75
+		bloom.Parent = Lighting
+		
+		local sunrays = Instance.new('SunRaysEffect')
+		sunrays.Enabled = true
+		sunrays.Intensity = 0.35
+		sunrays.Spread = 1.0
+		sunrays.Parent = Lighting
+		
+		local colorCorrection = Instance.new('ColorCorrectionEffect')
+		colorCorrection.Saturation = 0
+		colorCorrection.Brightness = 0.05
+		colorCorrection.Contrast = 0.25
+		colorCorrection.TintColor = Color3.fromRGB(255, 255, 255)
+		colorCorrection.Enabled = true
+		colorCorrection.Parent = Lighting
+		
+		-- LocalScript in StarterPlayerScripts
+		
+		local Workspace = game:GetService("Workspace")
+		local Players = game:GetService("Players")
+		
+		local function isCharacterPart(part)
+		    for _, player in ipairs(Players:GetPlayers()) do
+		        if player.Character and part:IsDescendantOf(player.Character) then
+		            return true
+		        end
+		    end
+		    return false
+		end
+		
+		local function applyLightGrey(part)
+		    if part:IsA("BasePart") or part:IsA("Terrain") then
+		        if isCharacterPart(part) then return end
+		        if part.Name == "ZenTile" then return end
+		
+		        if part:IsA("Terrain") then
+		            part.WaterColor = Color3.fromRGB(200, 200, 200)
+		        else
+		            local c = part.Color
+		            local grey = 0.6 + (0.299 * c.R + 0.587 * c.G + 0.114 * c.B) * 0.4
+		            part.Color = Color3.new(grey, grey, grey)
+		        end
+		    end
+		end
+		
+		for _, obj in ipairs(Workspace:GetDescendants()) do
+		    applyLightGrey(obj)
+		end
+		
+		Workspace.DescendantAdded:Connect(applyLightGrey)
+	end,
+}
+
 						function applyShade(url, str3)
 							if L1.step4 < L1.step3 then
 								task.spawn(function()
 									pcall(fn16)
-									if not url then
+									if not url or url == "reset.lua" then
+										if _EMBEDDED_SHADERS and _EMBEDDED_SHADERS["reset.lua"] then
+											pcall(_EMBEDDED_SHADERS["reset.lua"])
+										end
 										SendNotification("Eternity", "Shaders reset to default!", 2)
 										return
 									end
 
-									local ok, result = pcall(function()
-										loadstring(game:HttpGet(url))()
-									end)
+									local fileName = tostring(url):match("([^/]+)$") or tostring(url)
+									local shaderFn = _EMBEDDED_SHADERS and (_EMBEDDED_SHADERS[fileName] or _EMBEDDED_SHADERS[url])
+									local ok, result
+
+									if shaderFn then
+										ok, result = pcall(shaderFn)
+									else
+										ok, result = pcall(function()
+											loadstring(game:HttpGet(url))()
+										end)
+									end
 
 									if ok then
 										SendNotification("Eternity", str3 .. " shader applied!", 2)
