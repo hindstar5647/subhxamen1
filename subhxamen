@@ -435,13 +435,13 @@ do
 				twelkr = {
 					customName = "DADDY",
 					type = "gif",
-					imageUrl = "https://klipy.com/gifs/l-light-yagami-1",
+					imageUrl = "https://raw.githubusercontent.com/hindstar5647/kai/main/frame_%d_delay-0.1s.png",
 					gifConfig = {
 						mode = "frames",
-						baseUrl = "https://klipy.com/gifs/l-light-yagami-1",
+						baseUrl = "https://raw.githubusercontent.com/hindstar5647/kai/main/frame_%d_delay-0.1s.png",
 						rows = 4,
 						cols = 4,
-						frames = 27,
+						frames = 5,
 						fps = 15,
 					},
 					strokeColor = "#000000",
