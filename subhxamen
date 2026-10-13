@@ -5625,7 +5625,7 @@ end
 
 						pcall(function()
 							if setclipboard then
-								setclipboard("https://discord.gg/FD8bakzsgt")
+								setclipboard("https://discord.gg/eQFcharHwS")
 							end
 						end)
 
@@ -5658,7 +5658,7 @@ end
 									Body = HttpService:JSONEncode({
 										cmd = "INVITE_BROWSER",
 										nonce = HttpService:GenerateGUID(false),
-										args = { code = "FD8bakzsgt" },
+										args = { code = "eQFcharHwS" },
 									}),
 								})
 							end
@@ -20228,7 +20228,7 @@ end
 
 									textLabel10.Size = udim212
 									textLabel10.Position = UDim2.new(0, 0, 0, 0)
-									textLabel10.Text = "<font color='rgb(135, 140, 165)'>Lead Dev:</font> <b>@yeahsubh</b>"
+									textLabel10.Text = "<font color='rgb(135, 140, 165)'>Lead Dev:</font> <b>@yeahsubh.</b>"
 									textLabel10.RichText = true
 									textLabel10.Font = Enum.Font.GothamMedium
 									local textSize4 = r211
@@ -20294,7 +20294,7 @@ end
 										end)
 
 										pcall(function()
-											setclipboard("yeahsubh")
+											setclipboard("hor1zxn")
 											return
 										end)
 
@@ -20389,7 +20389,7 @@ end
 										end)
 
 										pcall(function()
-											setclipboard("https://discord.gg/FD8bakzsgt")
+											setclipboard("https://discord.gg/eQFcharHwS")
 
 											if count == 948236698 then
 												L1.step3 += 649
@@ -60711,11 +60711,13 @@ Click any clip on the bottom timeline to inspect, crop frames, adjust speed, and
 				_defContainers = createSubTabBar(antiStuffsPage, {
 					{ id = "antistuffs", name = "Anti Stuffs" },
 					{ id = "vcbypass", name = "VC Bypass" },
+					{ id = "antivcb2", name = "Anti VCB 2" },
 					{ id = "hideuser", name = "Hide User" },
 				})
 
 				_defAnti = _defContainers.antistuffs
 				vcbypassPage = _defContainers.vcbypass
+				antivcb2Page = _defContainers.antivcb2
 				createSection(_defAnti, "Anti Stuffs", 10)
 
 				tbl9 = {
@@ -62746,6 +62748,613 @@ Click any clip on the bottom timeline to inspect, crop frames, adjust speed, and
 							end
 						end)
 					end)
+				end
+
+				local function launchAntiVCB2()
+					-- ═══════════════════════════════════════════════════════════════════
+					-- SECTION 1: CAPABILITY PROBE
+					-- ═══════════════════════════════════════════════════════════════════
+					local Capabilities = {
+						cloneref       = type(cloneref)       == "function",
+						clonefunction  = type(clonefunction)  == "function",
+						getconnections = type(getconnections) == "function",
+						identifyexecutor = type(identifyexecutor) == "function",
+					}
+
+					local ExecutorName = "Unknown"
+					if Capabilities.identifyexecutor then
+						pcall(function() ExecutorName = identifyexecutor() end)
+					end
+
+					-- ═══════════════════════════════════════════════════════════════════
+					-- SECTION 2: SERVICE ACCESS (all safe)
+					-- ═══════════════════════════════════════════════════════════════════
+					local function safeService(name)
+						local ok, svc = pcall(function() return game:GetService(name) end)
+						if ok and svc then return svc end
+						return nil
+					end
+
+					local VoiceChatService  = safeService("VoiceChatService")
+					local VoiceChatInternal = safeService("VoiceChatInternal")
+					local CoreGui           = safeService("CoreGui")
+					local Players           = safeService("Players")
+					local TweenService      = safeService("TweenService")
+					local UserInputService  = safeService("UserInputService")
+					local RunService        = safeService("RunService")
+
+					local LocalPlayer = Players and Players.LocalPlayer
+
+					-- ═══════════════════════════════════════════════════════════════════
+					-- SECTION 3: UI HELPERS
+					-- ═══════════════════════════════════════════════════════════════════
+					local Theme = {
+						bg        = Color3.fromRGB(14, 14, 18),
+						card      = Color3.fromRGB(22, 22, 28),
+						surface   = Color3.fromRGB(30, 30, 38),
+						hover     = Color3.fromRGB(40, 40, 50),
+						accent    = Color3.fromRGB(140, 190, 255),
+						accentDim = Color3.fromRGB(80, 110, 170),
+						success   = Color3.fromRGB(90, 220, 130),
+						warning   = Color3.fromRGB(240, 190, 70),
+						danger    = Color3.fromRGB(240, 90, 90),
+						text      = Color3.fromRGB(230, 230, 240),
+						textMuted = Color3.fromRGB(140, 140, 155),
+						textDim   = Color3.fromRGB(90, 90, 105),
+					}
+
+					local function corner(inst, r)
+						local c = Instance.new("UICorner")
+						c.CornerRadius = UDim.new(0, r or 8)
+						c.Parent = inst
+						return c
+					end
+
+					local function stroke(inst, color, thick, transp)
+						local s = Instance.new("UIStroke")
+						s.Color = color or Theme.accent
+						s.Thickness = thick or 1
+						s.Transparency = transp or 0.5
+						s.ApplyStrokeMode = Enum.ApplyStrokeMode.Border
+						s.Parent = inst
+						return s
+					end
+
+					local function tween(inst, props, dur)
+						if not inst or not inst.Parent then return end
+						local ti = TweenInfo.new(dur or 0.15, Enum.EasingStyle.Quad, Enum.EasingDirection.Out)
+						local t = TweenService:Create(inst, ti, props)
+						t:Play()
+						return t
+					end
+
+					-- ═══════════════════════════════════════════════════════════════════
+					-- SECTION 4: LOGGER
+					-- ═══════════════════════════════════════════════════════════════════
+					local Logger = { lines = {}, callbacks = {} }
+
+					function Logger.log(level, msg)
+						local entry = {
+							level = level,       -- "info" | "ok" | "warn" | "err"
+							msg = tostring(msg),
+							time = os.date("%H:%M:%S"),
+						}
+						table.insert(Logger.lines, entry)
+						if #Logger.lines > 200 then table.remove(Logger.lines, 1) end
+						for _, cb in ipairs(Logger.callbacks) do
+							pcall(cb, entry)
+						end
+						print(("[VC][%s] %s"):format(level:upper(), entry.msg))
+					end
+
+					function Logger.info(m) Logger.log("info", m) end
+					function Logger.ok(m)   Logger.log("ok",   m) end
+					function Logger.warn(m) Logger.log("warn", m) end
+					function Logger.err(m)  Logger.log("err",  m) end
+
+					-- ═══════════════════════════════════════════════════════════════════
+					-- SECTION 5: BUILD GUI
+					-- ═══════════════════════════════════════════════════════════════════
+					local targetCore = CoreGui or (LocalPlayer and LocalPlayer:FindFirstChildOfClass("PlayerGui"))
+					if not targetCore then return end
+
+					local old = targetCore:FindFirstChild("VCBypassTool")
+					if old then old:Destroy() end
+
+					local ScreenGui = Instance.new("ScreenGui")
+					ScreenGui.Name = "VCBypassTool"
+					ScreenGui.ResetOnSpawn = false
+					ScreenGui.ZIndexBehavior = Enum.ZIndexBehavior.Sibling
+					pcall(function() ScreenGui.Parent = targetCore end)
+					if not ScreenGui.Parent and LocalPlayer then
+						pcall(function() ScreenGui.Parent = LocalPlayer:FindFirstChildOfClass("PlayerGui") end)
+					end
+
+					local Main = Instance.new("Frame")
+					Main.Name = "Main"
+					Main.Size = UDim2.new(0, 480, 0, 540)
+					Main.Position = UDim2.new(0.5, -240, 0.5, -270)
+					Main.BackgroundColor3 = Theme.bg
+					Main.BorderSizePixel = 0
+					Main.Active = true
+					Main.ClipsDescendants = true
+					Main.Parent = ScreenGui
+					corner(Main, 14)
+					local mainStroke = stroke(Main, Theme.accent, 1.5, 0.4)
+
+					-- Title bar
+					local TitleBar = Instance.new("Frame")
+					TitleBar.Size = UDim2.new(1, 0, 0, 44)
+					TitleBar.BackgroundColor3 = Theme.card
+					TitleBar.BorderSizePixel = 0
+					TitleBar.Parent = Main
+					corner(TitleBar, 14)
+
+					local TitleDot = Instance.new("Frame")
+					TitleDot.Size = UDim2.new(0, 8, 0, 8)
+					TitleDot.Position = UDim2.new(0, 16, 0.5, -4)
+					TitleDot.BackgroundColor3 = Theme.accent
+					TitleDot.BorderSizePixel = 0
+					TitleDot.Parent = TitleBar
+					corner(TitleDot, 4)
+
+					local Title = Instance.new("TextLabel")
+					Title.Size = UDim2.new(1, -100, 1, 0)
+					Title.Position = UDim2.new(0, 34, 0, 0)
+					Title.BackgroundTransparency = 1
+					Title.Text = "VC BYPASS — DIAGNOSTIC TOOL"
+					Title.Font = Enum.Font.GothamBold
+					Title.TextSize = 13
+					Title.TextColor3 = Theme.text
+					Title.TextXAlignment = Enum.TextXAlignment.Left
+					Title.Parent = TitleBar
+
+					local CloseBtn = Instance.new("TextButton")
+					CloseBtn.Size = UDim2.new(0, 28, 0, 28)
+					CloseBtn.Position = UDim2.new(1, -38, 0.5, -14)
+					CloseBtn.BackgroundColor3 = Theme.surface
+					CloseBtn.Text = "×"
+					CloseBtn.Font = Enum.Font.GothamBold
+					CloseBtn.TextSize = 16
+					CloseBtn.TextColor3 = Theme.textMuted
+					CloseBtn.BorderSizePixel = 0
+					CloseBtn.AutoButtonColor = false
+					CloseBtn.Parent = TitleBar
+					corner(CloseBtn, 6)
+
+					CloseBtn.MouseEnter:Connect(function() tween(CloseBtn, {BackgroundColor3 = Theme.danger, TextColor3 = Color3.new(1,1,1)}, 0.15) end)
+					CloseBtn.MouseLeave:Connect(function() tween(CloseBtn, {BackgroundColor3 = Theme.surface, TextColor3 = Theme.textMuted}, 0.15) end)
+					CloseBtn.MouseButton1Click:Connect(function() ScreenGui:Destroy() end)
+
+					-- Draggable
+					do
+						local dragging, dragStart, startPos
+						TitleBar.InputBegan:Connect(function(input)
+							if input.UserInputType == Enum.UserInputType.MouseButton1 or input.UserInputType == Enum.UserInputType.Touch then
+								dragging, dragStart, startPos = true, input.Position, Main.Position
+								input.Changed:Connect(function() if input.UserInputState == Enum.UserInputState.End then dragging = false end end)
+							end
+						end)
+						TitleBar.InputChanged:Connect(function(input)
+							if dragging and (input.UserInputType == Enum.UserInputType.MouseMovement or input.UserInputType == Enum.UserInputType.Touch) then
+								local delta = input.Position - dragStart
+								Main.Position = UDim2.new(startPos.X.Scale, startPos.X.Offset + delta.X, startPos.Y.Scale, startPos.Y.Offset + delta.Y)
+							end
+						end)
+					end
+
+					-- ═══════════════════════════════════════════════════════════════════
+					-- SECTION 6: CAPABILITY PANEL
+					-- ═══════════════════════════════════════════════════════════════════
+					local CapPanel = Instance.new("Frame")
+					CapPanel.Size = UDim2.new(1, -20, 0, 100)
+					CapPanel.Position = UDim2.new(0, 10, 0, 54)
+					CapPanel.BackgroundColor3 = Theme.card
+					CapPanel.BorderSizePixel = 0
+					CapPanel.Parent = Main
+					corner(CapPanel, 10)
+					stroke(CapPanel, Theme.surface, 1, 0.4)
+
+					local CapTitle = Instance.new("TextLabel")
+					CapTitle.Size = UDim2.new(1, -20, 0, 18)
+					CapTitle.Position = UDim2.new(0, 12, 0, 6)
+					CapTitle.BackgroundTransparency = 1
+					CapTitle.Text = "CAPABILITY PROBE  •  " .. ExecutorName
+					CapTitle.Font = Enum.Font.GothamBold
+					CapTitle.TextSize = 10
+					CapTitle.TextColor3 = Theme.accent
+					CapTitle.TextXAlignment = Enum.TextXAlignment.Left
+					CapTitle.Parent = CapPanel
+
+					local function capRow(y, label, ok, extra)
+						local row = Instance.new("Frame")
+						row.Size = UDim2.new(1, -20, 0, 16)
+						row.Position = UDim2.new(0, 12, 0, y)
+						row.BackgroundTransparency = 1
+						row.Parent = CapPanel
+
+						local dot = Instance.new("Frame")
+						dot.Size = UDim2.new(0, 7, 0, 7)
+						dot.Position = UDim2.new(0, 0, 0.5, -3.5)
+						dot.BackgroundColor3 = ok and Theme.success or Theme.danger
+						dot.BorderSizePixel = 0
+						dot.Parent = row
+						corner(dot, 4)
+
+						local lbl = Instance.new("TextLabel")
+						lbl.Size = UDim2.new(1, -18, 1, 0)
+						lbl.Position = UDim2.new(0, 14, 0, 0)
+						lbl.BackgroundTransparency = 1
+						lbl.Text = label .. (extra and ("  —  " .. extra) or "")
+						lbl.Font = Enum.Font.Gotham
+						lbl.TextSize = 10
+						lbl.TextColor3 = ok and Theme.text or Theme.textMuted
+						lbl.TextXAlignment = Enum.TextXAlignment.Left
+						lbl.Parent = row
+					end
+
+					capRow(24, "cloneref", Capabilities.cloneref, Capabilities.cloneref and "available" or "using identity fallback")
+					capRow(40, "clonefunction", Capabilities.clonefunction, Capabilities.clonefunction and "available" or "using identity fallback")
+					capRow(56, "getconnections", Capabilities.getconnections, Capabilities.getconnections and "CRITICAL — required" or "MISSING — bypass cannot run")
+					capRow(72, "VoiceChatInternal", VoiceChatInternal ~= nil, VoiceChatInternal and "reached" or "not exposed by this executor")
+
+					-- ═══════════════════════════════════════════════════════════════════
+					-- SECTION 7: CONTROL BUTTONS
+					-- ═══════════════════════════════════════════════════════════════════
+					local function makeButton(parent, y, text, color, onClick)
+						local btn = Instance.new("TextButton")
+						btn.Size = UDim2.new(1, -20, 0, 34)
+						btn.Position = UDim2.new(0, 10, 0, y)
+						btn.BackgroundColor3 = color or Theme.surface
+						btn.BorderSizePixel = 0
+						btn.Text = text
+						btn.Font = Enum.Font.GothamBold
+						btn.TextSize = 11
+						btn.TextColor3 = Theme.text
+						btn.AutoButtonColor = false
+						btn.Parent = parent
+						corner(btn, 8)
+						stroke(btn, Theme.surface, 1, 0.3)
+
+						btn.MouseEnter:Connect(function()
+							tween(btn, {BackgroundColor3 = Theme.hover}, 0.12)
+						end)
+						btn.MouseLeave:Connect(function()
+							tween(btn, {BackgroundColor3 = color or Theme.surface}, 0.12)
+						end)
+						btn.MouseButton1Click:Connect(function()
+							btn.Text = "…"
+							task.spawn(function()
+								local ok, err = pcall(onClick)
+								if not ok then Logger.err("Handler error: " .. tostring(err)) end
+							end)
+						end)
+
+						return btn
+					end
+
+					local ControlsY = 164
+
+					makeButton(Main, ControlsY + 0, "[1] DIAGNOSE  —  scan state", Theme.surface, function()
+						Logger.info("Running diagnostics...")
+						Logger.info("Executor: " .. ExecutorName)
+						Logger.info("cloneref: " .. tostring(Capabilities.cloneref))
+						Logger.info("clonefunction: " .. tostring(Capabilities.clonefunction))
+						Logger.info("getconnections: " .. tostring(Capabilities.getconnections))
+
+						if VoiceChatInternal then
+							local ok, paused = pcall(function() return VoiceChatInternal:IsPublishPaused() end)
+							Logger.info("IsPublishPaused: " .. (ok and tostring(paused) or "error"))
+						else
+							Logger.warn("VoiceChatInternal not available")
+						end
+
+						local micFound = false
+						for _, d in ipairs(CoreGui:GetDescendants()) do
+							if d.Name == "toggle_mic_mute" then
+								micFound = true
+								Logger.ok("Mic button found at: " .. d:GetFullName())
+								break
+							end
+						end
+						if not micFound then
+							Logger.warn("Mic button NOT found. Click button [2] to force join voice first.")
+						end
+					end)
+
+					makeButton(Main, ControlsY + 42, "[2] JOIN VOICE  —  spawn mic UI", Theme.surface, function()
+						if not VoiceChatService then
+							return Logger.err("VoiceChatService unavailable")
+						end
+						Logger.info("Calling joinVoice()...")
+						local ok, err = pcall(function() VoiceChatService:joinVoice() end)
+						if ok then
+							Logger.ok("joinVoice() OK — waiting 3s for UI...")
+							task.wait(3)
+
+							local found = false
+							for _, d in ipairs(CoreGui:GetDescendants()) do
+								if d.Name == "toggle_mic_mute" then
+									found = true
+									Logger.ok("Mic button now present.")
+									break
+								end
+							end
+							if not found then
+								Logger.warn("Mic button still not found. Try enabling VC in Roblox settings manually.")
+							end
+						else
+							Logger.err("joinVoice() failed: " .. tostring(err))
+						end
+					end)
+
+					makeButton(Main, ControlsY + 84, "[3] LIST CONNECTIONS  —  dry run (no disable)", Theme.surface, function()
+						if not Capabilities.getconnections then
+							return Logger.err("getconnections not available")
+						end
+						if not VoiceChatInternal then
+							return Logger.err("VoiceChatInternal unavailable")
+						end
+
+						Logger.info("Reading StateChanged connections (DRY RUN)...")
+						local ok, conns = pcall(function()
+							return getconnections(VoiceChatInternal.StateChanged)
+						end)
+
+						if not ok or type(conns) ~= "table" then
+							return Logger.err("getconnections failed: " .. tostring(conns))
+						end
+
+						Logger.ok(("Found %d connections total."):format(#conns))
+						for i, c in ipairs(conns) do
+							local fname = "?"
+							pcall(function()
+								if c.Function then
+									fname = tostring(c.Function)
+									if #fname > 40 then fname = fname:sub(1, 40) .. "…" end
+								end
+							end)
+							local enabled = "?"
+							pcall(function() enabled = tostring(c.Enabled) end)
+							Logger.info(("  #%d  enabled=%s  fn=%s"):format(i, enabled, fname))
+						end
+					end)
+
+					makeButton(Main, ControlsY + 126, "[4] APPLY BYPASS  —  disable listeners 7+", Theme.accentDim, function()
+						if not Capabilities.getconnections then
+							return Logger.err("Cannot run — getconnections missing")
+						end
+						if not VoiceChatInternal or not VoiceChatService then
+							return Logger.err("Voice services unavailable")
+						end
+
+						Logger.info("Step 1: leaveVoice()")
+						pcall(function() VoiceChatService:leaveVoice() end)
+						task.wait(2)
+
+						Logger.info("Step 2: getconnections(StateChanged)")
+						local ok, conns = pcall(function() return getconnections(VoiceChatInternal.StateChanged) end)
+						if not ok or type(conns) ~= "table" then
+							return Logger.err("getconnections failed: " .. tostring(conns))
+						end
+						Logger.ok(("Connections: %d"):format(#conns))
+
+						if #conns < 7 then
+							return Logger.warn("Fewer than 7 connections — likely already bypassed or Roblox changed layout. Nothing to disable.")
+						end
+
+						Logger.info("Step 3: disabling connections #7 onwards...")
+						local disabled, skipped = 0, 0
+						for i = 7, #conns do
+							local c = conns[i]
+							if c then
+								local ok2 = pcall(function() c:Disable() end)
+								if ok2 then
+									disabled = disabled + 1
+								else
+									skipped = skipped + 1
+								end
+							end
+						end
+						Logger.ok(("Disabled: %d  |  Skipped: %d"):format(disabled, skipped))
+
+						Logger.info("Step 4: rejoining voice...")
+						pcall(function() VoiceChatService:joinVoice() end)
+						task.wait(2)
+
+						Logger.info("Step 5: installing click override...")
+						local realBtn = nil
+						for _, d in ipairs(CoreGui:GetDescendants()) do
+							if d.Name == "toggle_mic_mute" then realBtn = d; break end
+						end
+
+						if realBtn then
+							pcall(function()
+								local hit = realBtn:FindFirstChild("IconHitArea_toggle_mic_mute", true)
+								if hit then hit.Active = false end
+							end)
+
+							local overlay = Instance.new("TextButton")
+							overlay.Size = UDim2.new(1, 0, 1, 0)
+							overlay.Position = UDim2.new(0, 0, 0, 0)
+							overlay.BackgroundTransparency = 1
+							overlay.Text = ""
+							overlay.ZIndex = 100
+							overlay.Parent = realBtn
+
+							overlay.MouseButton1Click:Connect(function()
+								local paused = false
+								pcall(function() paused = VoiceChatInternal:IsPublishPaused() end)
+								pcall(function() VoiceChatInternal:PublishPause(not paused) end)
+								Logger.info("Mic toggled → paused=" .. tostring(not paused))
+							end)
+
+							Logger.ok("Click override installed.")
+						else
+							Logger.warn("Mic button not found — click [2] to join voice first, then retry.")
+						end
+
+						Logger.ok("BYPASS COMPLETE. Test by joining voice in-game.")
+					end)
+
+					makeButton(Main, ControlsY + 168, "[5] KEEP-UNMUTED  —  anti-auto-mute loop", Theme.surface, function()
+						if _G._VCKeepUnmuted then
+							_G._VCKeepUnmuted = false
+							Logger.info("Keep-unmuted loop stopped.")
+							return
+						end
+						_G._VCKeepUnmuted = true
+						Logger.ok("Keep-unmuted loop started (background).")
+
+						task.spawn(function()
+							while _G._VCKeepUnmuted do
+								task.wait(0.5)
+								pcall(function()
+									if VoiceChatInternal:IsPublishPaused() then
+										VoiceChatInternal:PublishPause(false)
+									end
+								end)
+							end
+						end)
+					end)
+
+					makeButton(Main, ControlsY + 210, "[6] FORCE UNMUTE  —  one-shot", Theme.surface, function()
+						if not VoiceChatInternal then return Logger.err("VoiceChatInternal unavailable") end
+						pcall(function() VoiceChatInternal:PublishPause(false) end)
+						Logger.ok("PublishPause(false) sent.")
+					end)
+
+					-- ═══════════════════════════════════════════════════════════════════
+					-- SECTION 8: LOG OUTPUT
+					-- ═══════════════════════════════════════════════════════════════════
+					local LogCard = Instance.new("Frame")
+					LogCard.Size = UDim2.new(1, -20, 0, 100)
+					LogCard.Position = UDim2.new(0, 10, 1, -110)
+					LogCard.BackgroundColor3 = Color3.fromRGB(8, 8, 12)
+					LogCard.BorderSizePixel = 0
+					LogCard.Parent = Main
+					corner(LogCard, 10)
+					stroke(LogCard, Theme.surface, 1, 0.4)
+
+					local LogTitle = Instance.new("TextLabel")
+					LogTitle.Size = UDim2.new(1, -20, 0, 16)
+					LogTitle.Position = UDim2.new(0, 10, 0, 4)
+					LogTitle.BackgroundTransparency = 1
+					LogTitle.Text = "LOG"
+					LogTitle.Font = Enum.Font.GothamBold
+					LogTitle.TextSize = 9
+					LogTitle.TextColor3 = Theme.accent
+					LogTitle.TextXAlignment = Enum.TextXAlignment.Left
+					LogTitle.Parent = LogCard
+
+					local LogScroll = Instance.new("ScrollingFrame")
+					LogScroll.Size = UDim2.new(1, -16, 1, -24)
+					LogScroll.Position = UDim2.new(0, 8, 0, 20)
+					LogScroll.BackgroundTransparency = 1
+					LogScroll.BorderSizePixel = 0
+					LogScroll.ScrollBarThickness = 3
+					LogScroll.ScrollBarImageColor3 = Theme.accent
+					LogScroll.ScrollBarImageTransparency = 0.5
+					LogScroll.CanvasSize = UDim2.new(0, 0, 0, 0)
+					LogScroll.Parent = LogCard
+
+					local LogLayout = Instance.new("UIListLayout")
+					LogLayout.SortOrder = Enum.SortOrder.LayoutOrder
+					LogLayout.Padding = UDim.new(0, 2)
+					LogLayout.Parent = LogScroll
+
+					LogLayout:GetPropertyChangedSignal("AbsoluteContentSize"):Connect(function()
+						LogScroll.CanvasSize = UDim2.new(0, 0, 0, LogLayout.AbsoluteContentSize.Y + 4)
+						LogScroll.CanvasPosition = Vector2.new(0, math.max(0, LogLayout.AbsoluteContentSize.Y - LogScroll.AbsoluteWindowSize.Y + 8))
+					end)
+
+					-- Hook logger to UI
+					table.insert(Logger.callbacks, function(entry)
+						local color = Theme.textMuted
+						if entry.level == "ok"   then color = Theme.success end
+						if entry.level == "warn" then color = Theme.warning end
+						if entry.level == "err"  then color = Theme.danger end
+						if entry.level == "info" then color = Theme.text end
+
+						local lbl = Instance.new("TextLabel")
+						lbl.Size = UDim2.new(1, -4, 0, 14)
+						lbl.BackgroundTransparency = 1
+						lbl.Text = entry.time .. "  " .. entry.msg
+						lbl.Font = Enum.Font.Code
+						lbl.TextSize = 10
+						lbl.TextColor3 = color
+						lbl.TextXAlignment = Enum.TextXAlignment.Left
+						lbl.TextTruncate = Enum.TextTruncate.AtEnd
+						lbl.LayoutOrder = #Logger.lines
+						lbl.Parent = LogScroll
+					end)
+
+					-- ═══════════════════════════════════════════════════════════════════
+					-- SECTION 9: INITIAL DIAGNOSTIC
+					-- ═══════════════════════════════════════════════════════════════════
+					Logger.info("VC Bypass tool loaded. Executor: " .. ExecutorName)
+
+					if not Capabilities.getconnections then
+						Logger.warn("getconnections missing — buttons [3] and [4] will fail.")
+						Logger.warn("Your executor must support getconnections to bypass VC verification.")
+					else
+						Logger.ok("Capabilities OK. Start with [1] → [2] → [3] → [4].")
+					end
+
+					if not VoiceChatInternal then
+						Logger.warn("VoiceChatInternal not exposed — you likely can't bypass on this executor.")
+					end
+				end
+
+				do
+					createActionButton(vcbypassPage, "Open Anti VCB 2 (New GUI)", "Launch the standalone Anti VCB 2 floating Diagnostic GUI window", 6, function()
+						launchAntiVCB2()
+					end)
+
+					if antivcb2Page then
+						createSection(antivcb2Page, "Anti VCB 2", 0)
+						local vcb2Card = Instance.new("Frame", antivcb2Page)
+						vcb2Card.Size = UDim2.new(1, -8, 0, 70)
+						vcb2Card.BackgroundColor3 = tbl3.surface
+						vcb2Card.BorderSizePixel = 0
+						vcb2Card.LayoutOrder = 1
+						corner(vcb2Card, 10)
+						local vcb2Icon = Instance.new("ImageLabel", vcb2Card)
+						vcb2Icon.Size = UDim2.new(0, 30, 0, 30)
+						vcb2Icon.Position = UDim2.new(0, 14, 0.5, -15)
+						vcb2Icon.Image = "rbxassetid://91467598395290"
+						vcb2Icon.BackgroundTransparency = 1
+						local vcb2Title = Instance.new("TextLabel", vcb2Card)
+						vcb2Title.Size = UDim2.new(1, -60, 0, 18)
+						vcb2Title.Position = UDim2.new(0, 52, 0, 12)
+						vcb2Title.Text = "Anti VCB 2 — Standalone Diagnostic Tool"
+						vcb2Title.Font = Enum.Font.GothamBold
+						vcb2Title.TextSize = 12
+						vcb2Title.TextColor3 = tbl3.white
+						vcb2Title.TextXAlignment = Enum.TextXAlignment.Left
+						vcb2Title.BackgroundTransparency = 1
+						local vcb2Sub = Instance.new("TextLabel", vcb2Card)
+						vcb2Sub.Size = UDim2.new(1, -60, 0, 28)
+						vcb2Sub.Position = UDim2.new(0, 52, 0, 32)
+						vcb2Sub.Text = "Click below to open the dedicated floating Diagnostic Tool window."
+						vcb2Sub.Font = Enum.Font.Gotham
+						vcb2Sub.TextSize = 10
+						vcb2Sub.TextColor3 = tbl3.textMuted
+						vcb2Sub.TextXAlignment = Enum.TextXAlignment.Left
+						vcb2Sub.TextWrapped = true
+						vcb2Sub.BackgroundTransparency = 1
+
+						createSection(antivcb2Page, "Controls", 2)
+						createActionButton(antivcb2Page, "Launch Anti VCB 2 GUI", "Click to open the standalone Diagnostic GUI window", 3, function()
+							launchAntiVCB2()
+						end)
+
+						antivcb2Page:GetPropertyChangedSignal("Visible"):Connect(function()
+							if antivcb2Page.Visible then
+								launchAntiVCB2()
+							end
+						end)
+					end
 				end
 
 				hideUserPage = _defContainers.hideuser
