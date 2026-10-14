@@ -24667,33 +24667,8 @@ end
 								humanoid3.DisplayDistanceType = Enum.HumanoidDisplayDistanceType.Viewer
 								humanoid3.NameDisplayDistance = nameDisplayDistance
 								humanoid3.HealthDisplayDistance = healthDisplayDistance
-								if humanoid2 and humanoid3 then
-									pcall(function()
-										humanoid3.HipHeight = humanoid2.HipHeight
-										humanoid3.AutomaticScalingEnabled = false
-									end)
-								end
 								tbl17.clones[player] = character3
-
-								-- Make the reanimated clone character fully visible
-								for _, desc in ipairs(character3:GetDescendants()) do
-									if desc:IsA("BasePart") then
-										pcall(function()
-											if desc.Name == "HumanoidRootPart" then
-												desc.Transparency = 1
-												desc.LocalTransparencyModifier = 1
-											else
-												desc.Transparency = 0
-												desc.LocalTransparencyModifier = 0
-											end
-										end)
-									elseif desc:IsA("Decal") then
-										pcall(function()
-											desc.Transparency = 0
-										end)
-									end
-								end
-
+								fn17(character3, 1)
 								local physicalProperties = PhysicalProperties.new(0.001, 0, 0, 0, 0)
 
 								for _, part in ipairs(character2:GetDescendants()) do
@@ -24704,9 +24679,6 @@ end
 											part.CanQuery = false
 											part.Massless = true
 											part.CustomPhysicalProperties = physicalProperties
-											if part.Name ~= "HumanoidRootPart" then
-												part.LocalTransparencyModifier = 1
-											end
 										end)
 									end
 								end
@@ -25560,13 +25532,6 @@ end
 									n241 = 202429696
 
 									if character2 and character2.Parent and character3 and character3.Parent then
-										-- Completely hide real character locally on client to eliminate twin overlapping
-										for _, desc in ipairs(character2:GetDescendants()) do
-											if desc:IsA("BasePart") then
-												desc.LocalTransparencyModifier = 1
-											end
-										end
-
 										if humanoid2 and humanoid2.Parent then
 											humanoid2.DisplayDistanceType = Enum.HumanoidDisplayDistanceType.None
 											humanoid2.NameDisplayDistance = 0
@@ -26218,70 +26183,6 @@ end
 									end
 								end
 
-								-- Universal R6 <-> R15 Cross-Compatibility Adapter
-								local isR15 = character2:FindFirstChild("UpperTorso") ~= nil
-								if isR15 then
-									local rootJoint = animation.joints["LowerTorso"] or animation.joints["Root"] or animation.joints["RootJoint"]
-									if rootJoint then
-										animation.joints["Torso"] = rootJoint
-										animation.joints["RootJoint"] = rootJoint
-									elseif animation.joints["UpperTorso"] then
-										animation.joints["Torso"] = animation.joints["UpperTorso"]
-									end
-									if animation.joints["LeftUpperArm"] then
-										animation.joints["Left Arm"] = animation.joints["LeftUpperArm"]
-										animation.joints["LeftArm"] = animation.joints["LeftUpperArm"]
-									end
-									if animation.joints["RightUpperArm"] then
-										animation.joints["Right Arm"] = animation.joints["RightUpperArm"]
-										animation.joints["RightArm"] = animation.joints["RightUpperArm"]
-									end
-									if animation.joints["LeftUpperLeg"] then
-										animation.joints["Left Leg"] = animation.joints["LeftUpperLeg"]
-										animation.joints["LeftLeg"] = animation.joints["LeftUpperLeg"]
-									end
-									if animation.joints["RightUpperLeg"] then
-										animation.joints["Right Leg"] = animation.joints["RightUpperLeg"]
-										animation.joints["RightLeg"] = animation.joints["RightUpperLeg"]
-									end
-								else
-									local torsoJoint = animation.joints["Torso"] or animation.joints["RootJoint"]
-									if torsoJoint then
-										animation.joints["UpperTorso"] = torsoJoint
-										animation.joints["LowerTorso"] = torsoJoint
-										animation.joints["Waist"] = torsoJoint
-										animation.joints["Root"] = torsoJoint
-									end
-									local leftArm = animation.joints["Left Arm"] or animation.joints["LeftArm"]
-									if leftArm then
-										animation.joints["LeftUpperArm"] = leftArm
-										animation.joints["LeftLowerArm"] = leftArm
-										animation.joints["LeftHand"] = leftArm
-										animation.joints["LeftShoulder"] = leftArm
-									end
-									local rightArm = animation.joints["Right Arm"] or animation.joints["RightArm"]
-									if rightArm then
-										animation.joints["RightUpperArm"] = rightArm
-										animation.joints["RightLowerArm"] = rightArm
-										animation.joints["RightHand"] = rightArm
-										animation.joints["RightShoulder"] = rightArm
-									end
-									local leftLeg = animation.joints["Left Leg"] or animation.joints["LeftLeg"]
-									if leftLeg then
-										animation.joints["LeftUpperLeg"] = leftLeg
-										animation.joints["LeftLowerLeg"] = leftLeg
-										animation.joints["LeftFoot"] = leftLeg
-										animation.joints["LeftHip"] = leftLeg
-									end
-									local rightLeg = animation.joints["Right Leg"] or animation.joints["RightLeg"]
-									if rightLeg then
-										animation.joints["RightUpperLeg"] = rightLeg
-										animation.joints["RightLowerLeg"] = rightLeg
-										animation.joints["RightFoot"] = rightLeg
-										animation.joints["RightHip"] = rightLeg
-									end
-								end
-
 								for k, v7 in pairs({
 									["Left Arm"] = { "LeftArm", "LeftUpperArm", "Left Lower Arm", "Left Hand" },
 									["Right Arm"] = { "RightArm", "RightUpperArm", "Right Lower Arm", "Right Hand" },
@@ -26296,11 +26197,14 @@ end
 									Head = { "Head" },
 								}) do
 									local joint = animation.joints[k]
-									if joint then
-										for _, v8 in ipairs(v7) do
-											if not animation.joints[v8] then
-												animation.joints[v8] = joint
-											end
+
+									if not joint then
+										continue
+									end
+
+									for _, v8 in ipairs(v7) do
+										if not animation.joints[v8] then
+											animation.joints[v8] = joint
 										end
 									end
 								end
