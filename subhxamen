@@ -617,6 +617,21 @@ do
 					titleColor = "#ffffff",
 					titleColor2 = "#000000",
 				},
+                                iblame_uuu = {
+					customName = "BLAME|ADMIN",
+					type = "gif",
+					imageUrl = "https://raw.githubusercontent.com/hindstar5647/kai/main/car",
+					gifConfig = {
+						mode = "frames",
+						baseUrl = "https://raw.githubusercontent.com/hindstar5647/kai/tree/main/car",
+						frames = 59,
+						fps = 30,
+					},
+					strokeColor = "#000000",
+					textAnimation = "shimmer",
+					titleColor = "#ffffff",
+					titleColor2 = "#000000",
+				},
 			}
 
 			if not getgenv().EternityCustomTags then
