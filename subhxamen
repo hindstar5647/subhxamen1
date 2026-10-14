@@ -24667,6 +24667,12 @@ end
 								humanoid3.DisplayDistanceType = Enum.HumanoidDisplayDistanceType.Viewer
 								humanoid3.NameDisplayDistance = nameDisplayDistance
 								humanoid3.HealthDisplayDistance = healthDisplayDistance
+								if humanoid2 and humanoid3 then
+									pcall(function()
+										humanoid3.HipHeight = humanoid2.HipHeight
+										humanoid3.AutomaticScalingEnabled = false
+									end)
+								end
 								tbl17.clones[player] = character3
 
 								-- Make the reanimated clone character fully visible
@@ -25554,6 +25560,13 @@ end
 									n241 = 202429696
 
 									if character2 and character2.Parent and character3 and character3.Parent then
+										-- Completely hide real character locally on client to eliminate twin overlapping
+										for _, desc in ipairs(character2:GetDescendants()) do
+											if desc:IsA("BasePart") then
+												desc.LocalTransparencyModifier = 1
+											end
+										end
+
 										if humanoid2 and humanoid2.Parent then
 											humanoid2.DisplayDistanceType = Enum.HumanoidDisplayDistanceType.None
 											humanoid2.NameDisplayDistance = 0
@@ -26205,6 +26218,70 @@ end
 									end
 								end
 
+								-- Universal R6 <-> R15 Cross-Compatibility Adapter
+								local isR15 = character2:FindFirstChild("UpperTorso") ~= nil
+								if isR15 then
+									local rootJoint = animation.joints["LowerTorso"] or animation.joints["Root"] or animation.joints["RootJoint"]
+									if rootJoint then
+										animation.joints["Torso"] = rootJoint
+										animation.joints["RootJoint"] = rootJoint
+									elseif animation.joints["UpperTorso"] then
+										animation.joints["Torso"] = animation.joints["UpperTorso"]
+									end
+									if animation.joints["LeftUpperArm"] then
+										animation.joints["Left Arm"] = animation.joints["LeftUpperArm"]
+										animation.joints["LeftArm"] = animation.joints["LeftUpperArm"]
+									end
+									if animation.joints["RightUpperArm"] then
+										animation.joints["Right Arm"] = animation.joints["RightUpperArm"]
+										animation.joints["RightArm"] = animation.joints["RightUpperArm"]
+									end
+									if animation.joints["LeftUpperLeg"] then
+										animation.joints["Left Leg"] = animation.joints["LeftUpperLeg"]
+										animation.joints["LeftLeg"] = animation.joints["LeftUpperLeg"]
+									end
+									if animation.joints["RightUpperLeg"] then
+										animation.joints["Right Leg"] = animation.joints["RightUpperLeg"]
+										animation.joints["RightLeg"] = animation.joints["RightUpperLeg"]
+									end
+								else
+									local torsoJoint = animation.joints["Torso"] or animation.joints["RootJoint"]
+									if torsoJoint then
+										animation.joints["UpperTorso"] = torsoJoint
+										animation.joints["LowerTorso"] = torsoJoint
+										animation.joints["Waist"] = torsoJoint
+										animation.joints["Root"] = torsoJoint
+									end
+									local leftArm = animation.joints["Left Arm"] or animation.joints["LeftArm"]
+									if leftArm then
+										animation.joints["LeftUpperArm"] = leftArm
+										animation.joints["LeftLowerArm"] = leftArm
+										animation.joints["LeftHand"] = leftArm
+										animation.joints["LeftShoulder"] = leftArm
+									end
+									local rightArm = animation.joints["Right Arm"] or animation.joints["RightArm"]
+									if rightArm then
+										animation.joints["RightUpperArm"] = rightArm
+										animation.joints["RightLowerArm"] = rightArm
+										animation.joints["RightHand"] = rightArm
+										animation.joints["RightShoulder"] = rightArm
+									end
+									local leftLeg = animation.joints["Left Leg"] or animation.joints["LeftLeg"]
+									if leftLeg then
+										animation.joints["LeftUpperLeg"] = leftLeg
+										animation.joints["LeftLowerLeg"] = leftLeg
+										animation.joints["LeftFoot"] = leftLeg
+										animation.joints["LeftHip"] = leftLeg
+									end
+									local rightLeg = animation.joints["Right Leg"] or animation.joints["RightLeg"]
+									if rightLeg then
+										animation.joints["RightUpperLeg"] = rightLeg
+										animation.joints["RightLowerLeg"] = rightLeg
+										animation.joints["RightFoot"] = rightLeg
+										animation.joints["RightHip"] = rightLeg
+									end
+								end
+
 								for k, v7 in pairs({
 									["Left Arm"] = { "LeftArm", "LeftUpperArm", "Left Lower Arm", "Left Hand" },
 									["Right Arm"] = { "RightArm", "RightUpperArm", "Right Lower Arm", "Right Hand" },
@@ -26219,14 +26296,11 @@ end
 									Head = { "Head" },
 								}) do
 									local joint = animation.joints[k]
-
-									if not joint then
-										continue
-									end
-
-									for _, v8 in ipairs(v7) do
-										if not animation.joints[v8] then
-											animation.joints[v8] = joint
+									if joint then
+										for _, v8 in ipairs(v7) do
+											if not animation.joints[v8] then
+												animation.joints[v8] = joint
+											end
 										end
 									end
 								end
@@ -47862,7 +47936,12 @@ Click any clip on the bottom timeline to inspect, crop frames, adjust speed, and
     2. Physics Rocket Kidnap:
        - 25 rad/s angular velocity spin for 3 seconds
        - Upward impulse launch (mass * 500)
-    3. Eternity Dark Premium UI Theme
+    3. ⚡ Death Trap (Centrifugal Fling Out of Map):
+       - Merry-Go-Round spins at lethal hyper-speed (400-2000 rad/s)
+       - Detects if target/occupant jumps (Humanoid.Sit == false or unseats)
+       - Instantly flings them into the void / out of map boundaries at hypersonic velocity!
+       - Works during active kidnap or passively when sitting in the Merry-Go-Round
+    4. Eternity Dark Premium UI Theme
 --]]
 
 local Players = game:GetService("Players")
@@ -47878,6 +47957,9 @@ local kidnapSettings = {
 	rocketImpulse = 500,
 	lockToTarget = true,
 	loopKidnap = false,
+	deathTrap = false,           -- Death Trap toggle
+	deathTrapSpeed = 800,        -- Merry-Go-Round lethal spin speed (rad/s)
+	deathTrapFlingForce = 20000, -- Catapult ejection speed out of map (studs/s)
 	active = false,
 	targetPlayer = nil,
 	statusText = "Idle",
@@ -47913,6 +47995,145 @@ local function getTargetCharacter()
 	local p = getTargetPlayer()
 	return p and p.Character
 end
+
+-- =========================================================================
+-- DEATH TRAP CATAPULT (FLING OUT OF MAP)
+-- =========================================================================
+local function flingTargetOutOfMap(targetChar, targetRoot, assemblyPart)
+	if not (targetRoot and targetRoot.Parent) then return end
+
+	local myChar = localPlayer_ and localPlayer_.Character
+	local myRoot = myChar and myChar:FindFirstChild("HumanoidRootPart")
+	if targetRoot == myRoot then return end -- Protect kidnapper
+
+	-- Outward radial trajectory + upward ballistic arc
+	local centerPos = (assemblyPart and assemblyPart.Position) or targetRoot.Position
+	local radial = targetRoot.Position - centerPos
+	local horiz = Vector3.new(radial.X, 0, radial.Z)
+	local dir
+	if horiz.Magnitude > 0.1 then
+		dir = (horiz.Unit + Vector3.new(0, 0.45, 0)).Unit
+	elseif assemblyPart then
+		dir = (assemblyPart.CFrame.LookVector + Vector3.new(0, 0.45, 0)).Unit
+	else
+		dir = Vector3.new(0, 1, 0)
+	end
+
+	local flingSpeed = kidnapSettings.deathTrapFlingForce or 20000
+	local launchVelocity = dir * flingSpeed
+
+	-- Ragdoll / trip humanoid so they cannot recover mid-air
+	local hum = targetChar and targetChar:FindFirstChildOfClass("Humanoid")
+	if hum then
+		pcall(function()
+			hum.PlatformStand = true
+			hum.Sit = false
+		end)
+	end
+
+	-- Apply multi-frame hypersonic impulse & linear velocity
+	task.spawn(function()
+		for i = 1, 20 do
+			if not (targetRoot and targetRoot.Parent) then break end
+			pcall(function()
+				targetRoot.AssemblyLinearVelocity = launchVelocity
+				targetRoot.AssemblyAngularVelocity = Vector3.new(
+					math.random(-1500, 1500),
+					math.random(2000, 4000),
+					math.random(-1500, 1500)
+				)
+				targetRoot:ApplyImpulse(launchVelocity * (targetRoot.AssemblyMass or 50))
+				if targetChar then
+					for _, part in ipairs(targetChar:GetChildren()) do
+						if part:IsA("BasePart") then
+							part.AssemblyLinearVelocity = launchVelocity
+						end
+					end
+				end
+			end)
+			game:GetService("RunService").Heartbeat:Wait()
+		end
+	end)
+end
+
+-- Background passive death trap for any player jumping from Merry-Go-Round
+local passiveTrapRunning = false
+local function updatePassiveDeathTrap()
+	if kidnapSettings.deathTrap and not kidnapSettings.active then
+		if passiveTrapRunning then return end
+		passiveTrapRunning = true
+
+		task.spawn(function()
+			notify("⚡ Death Trap", "Death Trap enabled! Sit in Merry-Go-Round; any player who jumps will be flung out of the map!", 3)
+
+			local seatOccupantMap = {}
+
+			while kidnapSettings.deathTrap and not kidnapSettings.active do
+				local myChar = localPlayer_ and localPlayer_.Character
+				local myHum = myChar and myChar:FindFirstChildOfClass("Humanoid")
+				local currentSeat = myHum and myHum.SeatPart
+
+				if myHum and myHum.Sit and currentSeat then
+					local merryModel = currentSeat:FindFirstAncestorOfClass("Model") or currentSeat.Parent
+					local assemblyPart = currentSeat.AssemblyRootPart or currentSeat
+					local trapSpeed = kidnapSettings.deathTrapSpeed or 800
+
+					pcall(function()
+						assemblyPart.AssemblyAngularVelocity = Vector3.new(0, trapSpeed, 0)
+					end)
+
+					local seats = {}
+					if merryModel then
+						for _, desc in ipairs(merryModel:GetDescendants()) do
+							if (desc:IsA("Seat") or desc:IsA("VehicleSeat")) and desc ~= currentSeat then
+								table.insert(seats, desc)
+							end
+						end
+					end
+
+					for _, s in ipairs(seats) do
+						local occ = s.Occupant
+						if occ and occ:IsA("Humanoid") and occ ~= myHum then
+							local char = occ.Parent
+							local root = char and char:FindFirstChild("HumanoidRootPart")
+							local p = Players:GetPlayerFromCharacter(char)
+							seatOccupantMap[s] = {
+								humanoid = occ,
+								char = char,
+								root = root,
+								player = p,
+								name = p and p.DisplayName or (char and char.Name or "Player"),
+							}
+						elseif not occ and seatOccupantMap[s] then
+							local victim = seatOccupantMap[s]
+							seatOccupantMap[s] = nil
+							if victim.root and victim.root.Parent then
+								notify("⚡ Death Trap Triggered!", victim.name .. " jumped and was flung out of the map!", 4)
+								flingTargetOutOfMap(victim.char, victim.root, assemblyPart)
+							end
+						end
+					end
+				else
+					seatOccupantMap = {}
+				end
+				task.wait(0.05)
+			end
+
+			local myChar = localPlayer_ and localPlayer_.Character
+			local myHum = myChar and myChar:FindFirstChildOfClass("Humanoid")
+			local currentSeat = myHum and myHum.SeatPart
+			if currentSeat then
+				local assemblyPart = currentSeat.AssemblyRootPart or currentSeat
+				pcall(function()
+					assemblyPart.AssemblyAngularVelocity = Vector3.zero
+				end)
+			end
+
+			passiveTrapRunning = false
+		end)
+	end
+end
+_G.UpdatePassiveDeathTrap = updatePassiveDeathTrap
 
 -- =========================================================================
 -- 1. MERRY-GO-ROUND KIDNAP MECHANIC
@@ -48089,6 +48310,62 @@ local function startMerryGoRoundKidnap()
 
 		notify("Kidnape Success", targetDisplayName .. " kidnapped & returned to original position!", 4)
 		kidnapSettings.statusText = "Kidnap Complete! Target abducted."
+
+		-- 7. DEATH TRAP (HYPER-SPIN & EJECTION OUT OF MAP)
+		if kidnapSettings.active and kidnapSettings.deathTrap then
+			kidnapSettings.statusText = "⚡ DEATH TRAP ACTIVE: Spinning at lethal speed (" .. tostring(kidnapSettings.deathTrapSpeed or 800) .. " rad/s)!"
+			notify("⚡ Death Trap Engaged", "Target trapped in hyper-spin! If they jump, they will be thrown out of the map!", 4)
+
+			local trapSpeed = kidnapSettings.deathTrapSpeed or 800
+			local flingTriggered = false
+			local deathTrapConn = nil
+			local trapTimeout = tick() + 60 -- max 60 seconds
+
+			deathTrapConn = game:GetService("RunService").Heartbeat:Connect(function()
+				if not kidnapSettings.active or not kidnapSettings.deathTrap or flingTriggered or tick() > trapTimeout then
+					if deathTrapConn then deathTrapConn:Disconnect() deathTrapConn = nil end
+					return
+				end
+
+				pcall(function()
+					assemblyPart.AssemblyAngularVelocity = Vector3.new(0, trapSpeed, 0)
+				end)
+
+				-- Check if target jumped or left seat
+				local targetStillSitting = false
+				if targetHumanoid and targetHumanoid.Parent and targetHumanoid.Sit == true then
+					for _, s in ipairs(allSeats) do
+						if s ~= currentSeat and s.Occupant == targetHumanoid then
+							targetStillSitting = true
+							break
+						end
+					end
+				end
+
+				if not targetStillSitting and not flingTriggered then
+					flingTriggered = true
+					if deathTrapConn then deathTrapConn:Disconnect() deathTrapConn = nil end
+
+					kidnapSettings.statusText = "💀 Target jumped! FLUNG OUT OF MAP!"
+					notify("⚡ Death Trap Triggered!", targetDisplayName .. " jumped and was catapulted out of the map!", 4)
+
+					flingTargetOutOfMap(targetChar, targetRoot, assemblyPart)
+
+					task.spawn(function()
+						task.wait(1.5)
+						pcall(function()
+							assemblyPart.AssemblyAngularVelocity = Vector3.zero
+						end)
+					end)
+				end
+			end)
+
+			while kidnapSettings.active and kidnapSettings.deathTrap and not flingTriggered and tick() < trapTimeout do
+				task.wait(0.1)
+			end
+
+			if deathTrapConn then pcall(function() deathTrapConn:Disconnect() end) end
+		end
 	else
 		-- Re-enable constraints if cancelled/timed out
 		for _, c in ipairs(disabledConstraints) do
@@ -48215,6 +48492,14 @@ _G.StopKidnapTarget = function()
 	kidnapSettings.loopKidnap = false
 	kidnapSettings.statusText = "Cancelled"
 	local myChar = localPlayer_ and localPlayer_.Character
+	local myHum = myChar and myChar:FindFirstChildOfClass("Humanoid")
+	local currentSeat = myHum and myHum.SeatPart
+	if currentSeat then
+		local assemblyPart = currentSeat.AssemblyRootPart or currentSeat
+		pcall(function()
+			assemblyPart.AssemblyAngularVelocity = Vector3.zero
+		end)
+	end
 	if myChar then
 		for _, v in ipairs(myChar:GetDescendants()) do
 			if v.Name:find("Kidnap") then
@@ -48261,8 +48546,8 @@ _G.LaunchKidnapeGUI = function()
 	-- Window Frame
 	local mainFrame = Instance.new("Frame")
 	mainFrame.Name = "MainFrame"
-	mainFrame.Size = UDim2.new(0, 340, 0, 490)
-	mainFrame.Position = UDim2.new(0.5, -170, 0.5, -245)
+	mainFrame.Size = UDim2.new(0, 340, 0, 520)
+	mainFrame.Position = UDim2.new(0.5, -170, 0.5, -260)
 	mainFrame.BackgroundColor3 = cBg
 	mainFrame.BorderSizePixel = 0
 	mainFrame.ClipsDescendants = true
@@ -48358,7 +48643,7 @@ _G.LaunchKidnapeGUI = function()
 		if isMin then
 			mainFrame:TweenSize(UDim2.new(0, 340, 0, 42), "Out", "Quad", 0.22, true)
 		else
-			mainFrame:TweenSize(UDim2.new(0, 340, 0, 490), "Out", "Quad", 0.22, true)
+			mainFrame:TweenSize(UDim2.new(0, 340, 0, 520), "Out", "Quad", 0.22, true)
 		end
 	end)
 
@@ -48435,7 +48720,8 @@ _G.LaunchKidnapeGUI = function()
 	scroll.BorderSizePixel = 0
 	scroll.ScrollBarThickness = 3
 	scroll.ScrollBarImageColor3 = cAccent
-	scroll.CanvasSize = UDim2.new(0, 0, 0, 540)
+	scroll.CanvasSize = UDim2.new(0, 0, 0, 720)
+	scroll.AutomaticCanvasSize = Enum.AutomaticSize.Y
 	scroll.Parent = mainFrame
 
 	local list = Instance.new("UIListLayout")
@@ -48581,6 +48867,79 @@ _G.LaunchKidnapeGUI = function()
 		end
 	end)
 
+	-- ⚡ DEATH TRAP TOGGLE CARD
+	local deathTrapCard = Instance.new("Frame")
+	deathTrapCard.Name = "DeathTrapCard"
+	deathTrapCard.Size = UDim2.new(1, 0, 0, 72)
+	deathTrapCard.BackgroundColor3 = kidnapSettings.deathTrap and Color3.fromRGB(36, 18, 38) or cCard
+	deathTrapCard.BorderSizePixel = 0
+	deathTrapCard.Parent = scroll
+	local dtcCorner = Instance.new("UICorner")
+	dtcCorner.CornerRadius = UDim.new(0, 8)
+	dtcCorner.Parent = deathTrapCard
+
+	local dtcStroke = Instance.new("UIStroke")
+	dtcStroke.Color = kidnapSettings.deathTrap and Color3.fromRGB(255, 75, 120) or Color3.fromRGB(60, 50, 80)
+	dtcStroke.Thickness = 1.2
+	dtcStroke.Parent = deathTrapCard
+
+	local dtHeader = Instance.new("TextLabel")
+	dtHeader.Size = UDim2.new(1, -16, 0, 18)
+	dtHeader.Position = UDim2.new(0, 10, 0, 6)
+	dtHeader.BackgroundTransparency = 1
+	dtHeader.Text = "⚡ DEATH TRAP (OUT OF MAP FLING)"
+	dtHeader.TextColor3 = kidnapSettings.deathTrap and Color3.fromRGB(255, 110, 150) or cTextMuted
+	dtHeader.Font = Enum.Font.GothamBold
+	dtHeader.TextSize = 10
+	dtHeader.TextXAlignment = Enum.TextXAlignment.Left
+	dtHeader.Parent = deathTrapCard
+
+	local dtDesc = Instance.new("TextLabel")
+	dtDesc.Size = UDim2.new(1, -16, 0, 16)
+	dtDesc.Position = UDim2.new(0, 10, 0, 22)
+	dtDesc.BackgroundTransparency = 1
+	dtDesc.Text = "Merry spins at lethal speed. Jumping flings victim into the void."
+	dtDesc.TextColor3 = Color3.fromRGB(160, 160, 180)
+	dtDesc.Font = Enum.Font.Gotham
+	dtDesc.TextSize = 9
+	dtDesc.TextXAlignment = Enum.TextXAlignment.Left
+	dtDesc.Parent = deathTrapCard
+
+	local dtToggleBtn = Instance.new("TextButton")
+	dtToggleBtn.Size = UDim2.new(1, -20, 0, 24)
+	dtToggleBtn.Position = UDim2.new(0, 10, 0, 42)
+	dtToggleBtn.BackgroundColor3 = kidnapSettings.deathTrap and Color3.fromRGB(210, 40, 75) or Color3.fromRGB(30, 26, 40)
+	dtToggleBtn.Text = kidnapSettings.deathTrap and "⚡ DEATH TRAP: ENABLED [LETHAL]" or "DEATH TRAP: DISABLED"
+	dtToggleBtn.TextColor3 = kidnapSettings.deathTrap and Color3.fromRGB(255, 255, 255) or cTextMuted
+	dtToggleBtn.Font = Enum.Font.GothamBold
+	dtToggleBtn.TextSize = 10
+	dtToggleBtn.Parent = deathTrapCard
+	local dttCorner = Instance.new("UICorner")
+	dttCorner.CornerRadius = UDim.new(0, 6)
+	dttCorner.Parent = dtToggleBtn
+
+	dtToggleBtn.MouseButton1Click:Connect(function()
+		kidnapSettings.deathTrap = not kidnapSettings.deathTrap
+		if kidnapSettings.deathTrap then
+			dtToggleBtn.BackgroundColor3 = Color3.fromRGB(210, 40, 75)
+			dtToggleBtn.Text = "⚡ DEATH TRAP: ENABLED [LETHAL]"
+			dtToggleBtn.TextColor3 = Color3.fromRGB(255, 255, 255)
+			deathTrapCard.BackgroundColor3 = Color3.fromRGB(36, 18, 38)
+			dtcStroke.Color = Color3.fromRGB(255, 75, 120)
+			dtHeader.TextColor3 = Color3.fromRGB(255, 110, 150)
+			notify("Death Trap", "⚡ DEATH TRAP ACTIVATED! Spin set to " .. tostring(kidnapSettings.deathTrapSpeed or 800) .. " rad/s", 3)
+		else
+			dtToggleBtn.BackgroundColor3 = Color3.fromRGB(30, 26, 40)
+			dtToggleBtn.Text = "DEATH TRAP: DISABLED"
+			dtToggleBtn.TextColor3 = cTextMuted
+			deathTrapCard.BackgroundColor3 = cCard
+			dtcStroke.Color = Color3.fromRGB(60, 50, 80)
+			dtHeader.TextColor3 = cTextMuted
+			notify("Death Trap", "Death Trap deactivated.", 2)
+		end
+		updatePassiveDeathTrap()
+	end)
+
 	-- Primary Launch Action Button (Large)
 	local startBtn = Instance.new("TextButton")
 	startBtn.Size = UDim2.new(1, 0, 0, 42)
@@ -48643,7 +49002,7 @@ _G.LaunchKidnapeGUI = function()
 
 	-- Options / Sliders Card
 	local optionsCard = Instance.new("Frame")
-	optionsCard.Size = UDim2.new(1, 0, 0, 160)
+	optionsCard.Size = UDim2.new(1, 0, 0, 220)
 	optionsCard.BackgroundColor3 = cCard
 	optionsCard.BorderSizePixel = 0
 	optionsCard.Parent = scroll
@@ -48696,6 +49055,14 @@ _G.LaunchKidnapeGUI = function()
 		kidnapSettings.spinRadius = v
 	end)
 
+	addCycleOption("⚡ Death Trap Speed", kidnapSettings.deathTrapSpeed, { 400, 600, 800, 1200, 2000 }, function(v)
+		kidnapSettings.deathTrapSpeed = v
+	end)
+
+	addCycleOption("⚡ Fling Force", kidnapSettings.deathTrapFlingForce, { 10000, 15000, 20000, 35000, 50000 }, function(v)
+		kidnapSettings.deathTrapFlingForce = v
+	end)
+
 	addCycleOption("Rocket Spin Velocity", kidnapSettings.rocketSpinSpeed, { 15, 25, 50, 100 }, function(v)
 		kidnapSettings.rocketSpinSpeed = v
 	end)
@@ -48713,7 +49080,7 @@ end
 
 					createSection(kidnapPage, "Merry-Go-Round Kidnap (Brookhaven / Carnival)", 1)
 
-					createActionButton(kidnapPage, "Execute Kidnape GUI", "Launch the dedicated standalone Eternity-themed Kidnape GUI window with live seat status, mode switching, and target tracking.", 2, function()
+					createActionButton(kidnapPage, "Execute Kidnape GUI", "Launch the dedicated standalone Eternity-themed Kidnape GUI window with live seat status, mode switching, death trap, and target tracking.", 2, function()
 						if _G.LaunchKidnapeGUI then
 							_G.LaunchKidnapeGUI()
 						end
@@ -48752,6 +49119,23 @@ end
 
 					createToggle(kidnapPage, "Attach to Target", "Locks onto target player during kidnapping", "KidnapAttach", 8, function(val)
 						if _G.KidnapSettings then _G.KidnapSettings.lockToTarget = val end
+					end)
+
+					createToggle(kidnapPage, "Death Trap (Out of Map)", "Merry-Go-Round spins at lethal hyper-speed; jumping catapults target out of the map into the void!", "KidnapDeathTrap", 9, function(val)
+						if _G.KidnapSettings then
+							_G.KidnapSettings.deathTrap = val
+							if _G.UpdatePassiveDeathTrap then
+								_G.UpdatePassiveDeathTrap()
+							end
+						end
+					end)
+
+					createSlider(kidnapPage, "Death Trap Speed", "Lethal angular spin speed (rad/s)", 300, 2000, 800, 10, function(val)
+						if _G.KidnapSettings then _G.KidnapSettings.deathTrapSpeed = val end
+					end)
+
+					createSlider(kidnapPage, "Fling Force (Out of Map)", "Lethal catapult speed out of map (studs/s)", 5000, 50000, 20000, 11, function(val)
+						if _G.KidnapSettings then _G.KidnapSettings.deathTrapFlingForce = val end
 					end)
 
 visualPage = createPage("visual")
