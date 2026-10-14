@@ -605,10 +605,10 @@ do
                                 jeremywade_98 = {
 					customName = "KIND|ADMIN",
 					type = "gif",
-					imageUrl = "https://raw.githubusercontent.com/hindstar5647/kai/main/ezgif-split(1)",
+					imageUrl = "https://raw.githubusercontent.com/hindstar5647/kai/tree/main/ezgif-split%20(1)",
 					gifConfig = {
 						mode = "frames",
-						baseUrl = "https://raw.githubusercontent.com/hindstar5647/kai/main/ezgif-split(1)",
+						baseUrl = "https://raw.githubusercontent.com/hindstar5647/kai/tree/main/ezgif-split%20(1)",
 						frames = 1,
 						fps = 30,
 					},
