@@ -610,7 +610,7 @@ do
 						mode = "frames",
 						baseUrl = "https://raw.githubusercontent.com/hindstar5647/kai/main/car",
 						frames = 59,
-						fps = 30,
+						fps = 14,
 					},
 					strokeColor = "#000000",
 					textAnimation = "shimmer",
@@ -81943,16 +81943,16 @@ visualPage = createPage("visual")
 											magnitude = (position4 - position5).Magnitude
 										end
 
-										if not (magnitude > 350) then
+										if not (magnitude > 150) then
 											if not billboardGui.Enabled and tbl.ShowOverheadLogo ~= false then
 												billboardGui.Enabled = true
 											end
 
-											local n211 = math.clamp(12 + magnitude / 5, 12, 800)
+											local n211 = math.clamp(9 + magnitude / 10, 9, 22)
 											billboardGui.Size = UDim2.new(n211, 0, n211 / 2.5, 0)
-											local n212 = 1 + n211 / 6.5
+											local n212 = 1.2 + n211 / 8
 
-											billboardGui.StudsOffset = Vector3.new(0, n212 + math.sin(n210 * 3) * (0.2 + n211 / 40), 0)
+											billboardGui.StudsOffset = Vector3.new(0, n212 + math.sin(n210 * 2) * 0.15, 0)
 
 											if uiGradient then
 												uiGradient.Rotation = (uiGradient.Rotation + 1.5) % 360
