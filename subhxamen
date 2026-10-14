@@ -47834,17 +47834,18 @@ Click any clip on the bottom timeline to inspect, crop frames, adjust speed, and
     Features:
     1. Merry-Go-Round Kidnap:
        - Requires player to sit in Merry-Go-Round (error if not sitting)
-       - Flies merry-go-round to target
-       - Spins around target forcing them into an empty seat
-       - Automatically transports merry-go-round back to original position
-    2. Physics Rocket Kidnap:
-       - 25 rad/s angular velocity spin for 3 seconds
-       - Upward impulse launch (mass * 500)
-    3. ⚡ Death Trap (Centrifugal Fling Out of Map):
+       - Teleports character & merry-go-round to target (replicates across server & target!)
+       - Spins around target with seat proximity & firetouchinterest to force target into seat
+       - Transports back to original position with target
+    2. ⚡ Death Trap (Centrifugal Fling Out of Map):
        - Merry-Go-Round spins at lethal hyper-speed (400-2000 rad/s)
+       - Locked strictly in ONE PLACE: zero linear velocity, pinned center CFrame, CanCollide off (no drifting!)
        - Detects if target/occupant jumps (Humanoid.Sit == false or unseats)
        - Instantly flings them into the void / out of map boundaries at hypersonic velocity!
        - Works during active kidnap or passively when sitting in the Merry-Go-Round
+    3. Physics Rocket Kidnap:
+       - 25 rad/s angular velocity spin for 3 seconds
+       - Upward impulse launch (mass * 500)
     4. Eternity Dark Premium UI Theme
 --]]
 
@@ -47961,6 +47962,7 @@ local function flingTargetOutOfMap(targetChar, targetRoot, assemblyPart)
 end
 
 -- Background passive death trap for any player jumping from Merry-Go-Round
+-- Locked in ONE PLACE: stays strictly at fixedPosition with zero linear velocity
 local passiveTrapRunning = false
 local function updatePassiveDeathTrap()
 	if kidnapSettings.deathTrap and not kidnapSettings.active then
@@ -47968,9 +47970,10 @@ local function updatePassiveDeathTrap()
 		passiveTrapRunning = true
 
 		task.spawn(function()
-			notify("⚡ Death Trap", "Death Trap enabled! Sit in Merry-Go-Round; any player who jumps will be flung out of the map!", 3)
+			notify("⚡ Death Trap", "Death Trap active! Spinning in place; any player who jumps will be flung out of the map!", 3)
 
 			local seatOccupantMap = {}
+			local fixedCenterPos = nil
 
 			while kidnapSettings.deathTrap and not kidnapSettings.active do
 				local myChar = localPlayer_ and localPlayer_.Character
@@ -47982,7 +47985,35 @@ local function updatePassiveDeathTrap()
 					local assemblyPart = currentSeat.AssemblyRootPart or currentSeat
 					local trapSpeed = kidnapSettings.deathTrapSpeed or 800
 
+					-- Find fixed center pivot position once so it NEVER moves across the map
+					if not fixedCenterPos then
+						if merryModel then
+							for _, p in ipairs(merryModel:GetDescendants()) do
+								if p:IsA("BasePart") and p.Anchored then
+									fixedCenterPos = p.Position + Vector3.new(0, 1.2, 0)
+									break
+								end
+							end
+						end
+						if not fixedCenterPos then
+							fixedCenterPos = assemblyPart.Position
+						end
+					end
+
+					-- Disable collisions on merry parts to eliminate ground friction/bouncing
+					if merryModel then
+						for _, p in ipairs(merryModel:GetDescendants()) do
+							if p:IsA("BasePart") and p.CanCollide then
+								pcall(function() p.CanCollide = false end)
+							end
+						end
+					end
+
+					-- Lock in ONE place: pin position strictly to fixedCenterPos, zero linear velocity, pure Y-axis spin
 					pcall(function()
+						local curRot = assemblyPart.CFrame - assemblyPart.CFrame.Position
+						assemblyPart.CFrame = CFrame.new(fixedCenterPos) * curRot
+						assemblyPart.AssemblyLinearVelocity = Vector3.zero
 						assemblyPart.AssemblyAngularVelocity = Vector3.new(0, trapSpeed, 0)
 					end)
 
@@ -48019,8 +48050,9 @@ local function updatePassiveDeathTrap()
 					end
 				else
 					seatOccupantMap = {}
+					fixedCenterPos = nil
 				end
-				task.wait(0.05)
+				task.wait(0.04)
 			end
 
 			local myChar = localPlayer_ and localPlayer_.Character
@@ -48030,6 +48062,7 @@ local function updatePassiveDeathTrap()
 				local assemblyPart = currentSeat.AssemblyRootPart or currentSeat
 				pcall(function()
 					assemblyPart.AssemblyAngularVelocity = Vector3.zero
+					assemblyPart.AssemblyLinearVelocity = Vector3.zero
 				end)
 			end
 
@@ -48040,7 +48073,7 @@ end
 _G.UpdatePassiveDeathTrap = updatePassiveDeathTrap
 
 -- =========================================================================
--- 1. MERRY-GO-ROUND KIDNAP MECHANIC
+-- 1. MERRY-GO-ROUND KIDNAP MECHANIC (REPLICATED TO TARGET + PINNED IN PLACE)
 -- =========================================================================
 local function startMerryGoRoundKidnap()
 	local myChar = localPlayer_ and localPlayer_.Character
@@ -48059,6 +48092,20 @@ local function startMerryGoRoundKidnap()
 	local merryModel = currentSeat:FindFirstAncestorOfClass("Model") or currentSeat.Parent
 	local assemblyPart = currentSeat.AssemblyRootPart or currentSeat
 
+	-- Pinpoint fixed anchor center
+	local fixedCenterPos = nil
+	if merryModel then
+		for _, p in ipairs(merryModel:GetDescendants()) do
+			if p:IsA("BasePart") and p.Anchored then
+				fixedCenterPos = p.Position + Vector3.new(0, 1.2, 0)
+				break
+			end
+		end
+	end
+	if not fixedCenterPos then
+		fixedCenterPos = assemblyPart.Position
+	end
+
 	local originalCFrame = nil
 	if merryModel and merryModel:IsA("Model") and merryModel.PrimaryPart then
 		originalCFrame = merryModel.PrimaryPart.CFrame
@@ -48067,6 +48114,9 @@ local function startMerryGoRoundKidnap()
 	else
 		originalCFrame = currentSeat.CFrame
 	end
+
+	local originalAssemblyCFrame = assemblyPart.CFrame
+	local originalMyRootCFrame = myRoot and myRoot.CFrame or originalAssemblyCFrame
 
 	-- Gather all seats on the merry-go-round
 	local allSeats = {}
@@ -48096,22 +48146,7 @@ local function startMerryGoRoundKidnap()
 	kidnapSettings.active = true
 	local targetDisplayName = targetP.DisplayName or targetP.Name
 	kidnapSettings.statusText = "Flying to " .. targetDisplayName .. " with Merry-Go-Round..."
-	notify("Kidnape", "Flying Merry-Go-Round to " .. targetDisplayName .. "!", 3)
-
-	local originalAssemblyCFrame = assemblyPart.CFrame
-
-	-- Disable constraints (like motorized HingeConstraints to stationary base) temporarily
-	local disabledConstraints = {}
-	if merryModel then
-		for _, c in ipairs(merryModel:GetDescendants()) do
-			if c:IsA("Constraint") and c.Enabled then
-				pcall(function()
-					c.Enabled = false
-					table.insert(disabledConstraints, c)
-				end)
-			end
-		end
-	end
+	notify("Kidnape", "Flying to " .. targetDisplayName .. "!", 3)
 
 	-- Disable collision on merry parts for smooth travel
 	for _, p in ipairs(merryModel:GetDescendants()) do
@@ -48120,16 +48155,21 @@ local function startMerryGoRoundKidnap()
 		end
 	end
 
-	-- 4. TRANSPORT MERRY-GO-ROUND TO TARGET
+	-- 4. TRANSPORT TO TARGET (MOVE BOTH MYROOT AND ASSEMBLY SO TARGET SEES IT!)
 	local travelPos = targetRoot.Position + Vector3.new(0, 1.5, 0)
 	pcall(function()
+		-- Moving myRoot ensures client-to-server replication so target ACTUALLY sees you!
+		if myRoot then
+			myRoot.CFrame = CFrame.new(travelPos)
+			myRoot.AssemblyLinearVelocity = Vector3.zero
+		end
 		assemblyPart.CFrame = CFrame.new(travelPos)
 		assemblyPart.AssemblyLinearVelocity = Vector3.zero
 		assemblyPart.AssemblyAngularVelocity = Vector3.zero
 	end)
 	task.wait(0.2)
 
-	-- 5. SPIN AROUND TARGET UNTIL THEY SIT
+	-- 5. SPIN AROUND TARGET UNTIL THEY SIT (OR CAPTURE TIMEOUT)
 	kidnapSettings.statusText = "Spinning around " .. targetDisplayName .. "... Forcing into seat!"
 	local spinRadius = kidnapSettings.spinRadius or 3.5
 	local spinAngle = 0
@@ -48158,23 +48198,32 @@ local function startMerryGoRoundKidnap()
 			break
 		end
 
-		-- Spin the merry-go-round assembly around target
+		-- Spin around target (moving BOTH myRoot and assembly so it replicates to target!)
 		spinAngle = spinAngle + math.rad(spinSpeed)
 		local offset = Vector3.new(math.cos(spinAngle) * spinRadius, 0.5, math.sin(spinAngle) * spinRadius)
 		local currentTargetPos = targetRoot.Position
 		local lookCFrame = CFrame.new(currentTargetPos + offset, currentTargetPos)
 
 		pcall(function()
+			if myRoot then
+				myRoot.CFrame = lookCFrame
+				myRoot.AssemblyLinearVelocity = Vector3.zero
+			end
 			assemblyPart.CFrame = lookCFrame
 			assemblyPart.AssemblyLinearVelocity = Vector3.new(0, 0.1, 0)
 			assemblyPart.AssemblyAngularVelocity = Vector3.new(0, spinSpeed, 0)
 		end)
 
-		-- Push empty seats towards target to trigger seat prompt / touch
+		-- Push empty seats towards target and fire touch interest to force seat prompt / sit
 		for _, s in ipairs(allSeats) do
 			if s ~= currentSeat and not s.Occupant then
 				pcall(function()
 					s.CFrame = targetRoot.CFrame * CFrame.new(0, 0, 0.2)
+					if type(firetouchinterest) == "function" and targetRoot then
+						firetouchinterest(s, targetRoot, 0)
+						task.wait()
+						firetouchinterest(s, targetRoot, 1)
+					end
 				end)
 			end
 		end
@@ -48182,12 +48231,16 @@ local function startMerryGoRoundKidnap()
 		task.wait(0.03)
 	end
 
-	-- 6. RETURN MERRY-GO-ROUND TO ORIGINAL POSITION
+	-- 6. RETURN TO ORIGINAL MERRY-GO-ROUND POSITION
 	if kidnapSettings.active and (originalAssemblyCFrame or originalCFrame) then
-		kidnapSettings.statusText = "Returning Merry-Go-Round to original position..."
+		kidnapSettings.statusText = "Returning to original position..."
 		task.wait(0.2) -- allow seat weld to stabilize
 
 		pcall(function()
+			if myRoot and originalMyRootCFrame then
+				myRoot.CFrame = originalMyRootCFrame
+				myRoot.AssemblyLinearVelocity = Vector3.zero
+			end
 			if originalAssemblyCFrame then
 				assemblyPart.CFrame = originalAssemblyCFrame
 			elseif originalCFrame then
@@ -48205,19 +48258,12 @@ local function startMerryGoRoundKidnap()
 			end
 		end)
 
-		-- Re-enable constraints
-		for _, c in ipairs(disabledConstraints) do
-			pcall(function()
-				c.Enabled = true
-			end)
-		end
-
-		notify("Kidnape Success", targetDisplayName .. " kidnapped & returned to original position!", 4)
+		notify("Kidnape Success", targetDisplayName .. " abducted & brought to Merry-Go-Round!", 4)
 		kidnapSettings.statusText = "Kidnap Complete! Target abducted."
 
-		-- 7. DEATH TRAP (HYPER-SPIN & EJECTION OUT OF MAP)
+		-- 7. DEATH TRAP (HYPER-SPIN IN ONE PLACE & CATAPULT OUT OF MAP)
 		if kidnapSettings.active and kidnapSettings.deathTrap then
-			kidnapSettings.statusText = "⚡ DEATH TRAP ACTIVE: Spinning at lethal speed (" .. tostring(kidnapSettings.deathTrapSpeed or 800) .. " rad/s)!"
+			kidnapSettings.statusText = "⚡ DEATH TRAP ACTIVE: Spinning in place at " .. tostring(kidnapSettings.deathTrapSpeed or 800) .. " rad/s!"
 			notify("⚡ Death Trap Engaged", "Target trapped in hyper-spin! If they jump, they will be thrown out of the map!", 4)
 
 			local trapSpeed = kidnapSettings.deathTrapSpeed or 800
@@ -48225,13 +48271,24 @@ local function startMerryGoRoundKidnap()
 			local deathTrapConn = nil
 			local trapTimeout = tick() + 60 -- max 60 seconds
 
+			-- Disable collision so it NEVER collides with ground/obstacles
+			for _, p in ipairs(merryModel:GetDescendants()) do
+				if p:IsA("BasePart") then
+					pcall(function() p.CanCollide = false end)
+				end
+			end
+
 			deathTrapConn = game:GetService("RunService").Heartbeat:Connect(function()
 				if not kidnapSettings.active or not kidnapSettings.deathTrap or flingTriggered or tick() > trapTimeout then
 					if deathTrapConn then deathTrapConn:Disconnect() deathTrapConn = nil end
 					return
 				end
 
+				-- PINNED IN ONE PLACE: Keep position locked to fixedCenterPos, linear velocity strictly zero
 				pcall(function()
+					local curRot = assemblyPart.CFrame - assemblyPart.CFrame.Position
+					assemblyPart.CFrame = CFrame.new(fixedCenterPos) * curRot
+					assemblyPart.AssemblyLinearVelocity = Vector3.zero
 					assemblyPart.AssemblyAngularVelocity = Vector3.new(0, trapSpeed, 0)
 				end)
 
@@ -48259,6 +48316,7 @@ local function startMerryGoRoundKidnap()
 						task.wait(1.5)
 						pcall(function()
 							assemblyPart.AssemblyAngularVelocity = Vector3.zero
+							assemblyPart.AssemblyLinearVelocity = Vector3.zero
 						end)
 					end)
 				end
@@ -48271,12 +48329,6 @@ local function startMerryGoRoundKidnap()
 			if deathTrapConn then pcall(function() deathTrapConn:Disconnect() end) end
 		end
 	else
-		-- Re-enable constraints if cancelled/timed out
-		for _, c in ipairs(disabledConstraints) do
-			pcall(function()
-				c.Enabled = true
-			end)
-		end
 		kidnapSettings.statusText = "Kidnap Stopped / Timed Out."
 	end
 
@@ -48402,6 +48454,7 @@ _G.StopKidnapTarget = function()
 		local assemblyPart = currentSeat.AssemblyRootPart or currentSeat
 		pcall(function()
 			assemblyPart.AssemblyAngularVelocity = Vector3.zero
+			assemblyPart.AssemblyLinearVelocity = Vector3.zero
 		end)
 	end
 	if myChar then
@@ -48802,7 +48855,7 @@ _G.LaunchKidnapeGUI = function()
 	dtDesc.Size = UDim2.new(1, -16, 0, 16)
 	dtDesc.Position = UDim2.new(0, 10, 0, 22)
 	dtDesc.BackgroundTransparency = 1
-	dtDesc.Text = "Merry spins at lethal speed. Jumping flings victim into the void."
+	dtDesc.Text = "Spins in one place at lethal speed. Jumping flings victim out of map."
 	dtDesc.TextColor3 = Color3.fromRGB(160, 160, 180)
 	dtDesc.Font = Enum.Font.Gotham
 	dtDesc.TextSize = 9
@@ -48831,7 +48884,7 @@ _G.LaunchKidnapeGUI = function()
 			deathTrapCard.BackgroundColor3 = Color3.fromRGB(36, 18, 38)
 			dtcStroke.Color = Color3.fromRGB(255, 75, 120)
 			dtHeader.TextColor3 = Color3.fromRGB(255, 110, 150)
-			notify("Death Trap", "⚡ DEATH TRAP ACTIVATED! Spin set to " .. tostring(kidnapSettings.deathTrapSpeed or 800) .. " rad/s", 3)
+			notify("Death Trap", "⚡ DEATH TRAP ACTIVATED! Spin set to " .. tostring(kidnapSettings.deathTrapSpeed or 800) .. " rad/s in place", 3)
 		else
 			dtToggleBtn.BackgroundColor3 = Color3.fromRGB(30, 26, 40)
 			dtToggleBtn.Text = "DEATH TRAP: DISABLED"
@@ -49025,7 +49078,7 @@ end
 						if _G.KidnapSettings then _G.KidnapSettings.lockToTarget = val end
 					end)
 
-					createToggle(kidnapPage, "Death Trap (Out of Map)", "Merry-Go-Round spins at lethal hyper-speed; jumping catapults target out of the map into the void!", "KidnapDeathTrap", 9, function(val)
+					createToggle(kidnapPage, "Death Trap (Out of Map)", "Merry-Go-Round spins at lethal hyper-speed in one place; jumping catapults target out of the map into the void!", "KidnapDeathTrap", 9, function(val)
 						if _G.KidnapSettings then
 							_G.KidnapSettings.deathTrap = val
 							if _G.UpdatePassiveDeathTrap then
