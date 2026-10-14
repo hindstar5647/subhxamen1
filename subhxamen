@@ -418,10 +418,10 @@ do
 				pagalkuta99 = {
 					customName = "ETERNITY | ADMIN",
 					type = "gif",
-					imageUrl = "https://raw.githubusercontent.com/hor1zencodes/gif-tags/main/mine",
+					imageUrl = "https://raw.githubusercontent.com/hindstar5647/kai/main/car",
 					gifConfig = {
 						mode = "frames",
-						baseUrl = "https://raw.githubusercontent.com/hor1zencodes/gif-tags/main/mine",
+						baseUrl = "https://raw.githubusercontent.com/hindstar5647/kai/main/car",
 						rows = 5,
 						cols = 6,
 						frames = 68,
@@ -605,11 +605,11 @@ do
                                 jeremywade_98 = {
 					customName = "KIND|ADMIN",
 					type = "gif",
-					imageUrl = "https://raw.githubusercontent.com/hindstar5647/kai/main/ezgif-split%20(1)",
+					imageUrl = "https://raw.githubusercontent.com/hindstar5647/kai/main/car",
 					gifConfig = {
 						mode = "frames",
-						baseUrl = "https://raw.githubusercontent.com/hindstar5647/kai/main/ezgif-split%20(1)",
-						frames = 1,
+						baseUrl = "https://raw.githubusercontent.com/hindstar5647/kai/tree/main/car",
+						frames = 59,
 						fps = 30,
 					},
 					strokeColor = "#000000",
