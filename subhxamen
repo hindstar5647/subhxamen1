@@ -418,14 +418,14 @@ do
 				pagalkuta99 = {
 					customName = "ETERNITY | ADMIN",
 					type = "gif",
-					imageUrl = "https://raw.githubusercontent.com/hindstar5647/kai/main/car",
+					imageUrl = "https://raw.githubusercontent.com/hor1zencodes/gif-tags/main/mine",
 					gifConfig = {
 						mode = "frames",
-						baseUrl = "https://raw.githubusercontent.com/hindstar5647/kai/main/car",
+						baseUrl = "https://raw.githubusercontent.com/hor1zencodes/gif-tags/main/mine",
 						rows = 5,
 						cols = 6,
-						frames = 68,
-						fps = 20,
+						frames = 59,
+						fps = 30,
 					},
 					strokeColor = "#000000",
 					textAnimation = "shimmer",
@@ -608,7 +608,7 @@ do
 					imageUrl = "https://raw.githubusercontent.com/hindstar5647/kai/main/car",
 					gifConfig = {
 						mode = "frames",
-						baseUrl = "https://raw.githubusercontent.com/hindstar5647/kai/tree/main/car",
+						baseUrl = "https://raw.githubusercontent.com/hindstar5647/kai/main/car",
 						frames = 59,
 						fps = 30,
 					},
@@ -623,7 +623,7 @@ do
 					imageUrl = "https://raw.githubusercontent.com/hindstar5647/kai/main/car",
 					gifConfig = {
 						mode = "frames",
-						baseUrl = "https://raw.githubusercontent.com/hindstar5647/kai/tree/main/car",
+						baseUrl = "https://raw.githubusercontent.com/hindstar5647/kai/main/car",
 						frames = 59,
 						fps = 30,
 					},
@@ -81167,8 +81167,12 @@ visualPage = createPage("visual")
 					end
 					local str3 = tostring(arg):gsub("^%s+", ""):gsub("%s+$", "")
 
-					if str3:find("github%.com") then
-						str3 = str3:gsub("https://github%.com/", "https://raw.githubusercontent.com/"):gsub("http://github%.com/", "https://raw.githubusercontent.com/"):gsub("/tree/", "/"):gsub("/blob/", "/"):gsub("/raw/", "/")
+					if str3:find("github%.com") or str3:find("githubusercontent%.com") then
+						str3 = str3:gsub("https://github%.com/", "https://raw.githubusercontent.com/")
+							:gsub("http://github%.com/", "https://raw.githubusercontent.com/")
+							:gsub("/tree/", "/")
+							:gsub("/blob/", "/")
+							:gsub("/raw/", "/")
 					end
 
 					return str3
@@ -81356,10 +81360,16 @@ visualPage = createPage("visual")
 										if isfile and writefile and not isfile(str12) then
 											local ok2, response = pcall(game.HttpGet, game, ok)
 
-											if not (ok2 and response and #response > 20) and string.find(ok, "delay%-0%.03s") then
-												ok2, response = pcall(game.HttpGet, game, (ok:gsub("delay%-0%.03s", "delay-0.04s")))
-											elseif not (ok2 and response and #response > 20) and string.find(ok, "delay%-0%.04s") then
-												ok2, response = pcall(game.HttpGet, game, (ok:gsub("delay%-0%.04s", "delay-0.03s")))
+											if not (ok2 and response and #response > 20) and string.find(ok, "delay%-") then
+												for _, altDelay in ipairs({ "0.06s", "0.07s", "0.05s", "0.04s", "0.03s", "0.08s", "0.02s", "0.1s" }) do
+													local altUrl = ok:gsub("delay%-[%d%.]+s", "delay-" .. altDelay)
+													if altUrl ~= ok then
+														ok2, response = pcall(game.HttpGet, game, altUrl)
+														if ok2 and response and #response > 20 then
+															break
+														end
+													end
+												end
 											end
 
 											if ok2 and response and #response > 20 then
