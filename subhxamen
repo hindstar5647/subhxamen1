@@ -602,6 +602,21 @@ do
 					titleColor = "#ffffff",
 					titleColor2 = "#000000",
 				},
+                                jeremywade_98 = {
+					customName = "KIND|ADMIN",
+					type = "gif",
+					imageUrl = "https://raw.githubusercontent.com/hindstar5647/kai/main/ezgif-split(1)",
+					gifConfig = {
+						mode = "frames",
+						baseUrl = "https://raw.githubusercontent.com/hindstar5647/kai/main/ezgif-split(1)",
+						frames = 1,
+						fps = 30,
+					},
+					strokeColor = "#000000",
+					textAnimation = "shimmer",
+					titleColor = "#ffffff",
+					titleColor2 = "#000000",
+				},
 			}
 
 			if not getgenv().EternityCustomTags then
@@ -22486,11 +22501,13 @@ end
 							{ id = "attach", name = "Attach" },
 							{ id = "skydestroyer", name = "Sky Destroyer" },
 							{ id = "fling", name = "Fling" },
+							{ id = "kidnap", name = "Kidnap" },
 						})
 
 						combatPage = _trollContainers.attach
 						skydestroyerPage = _trollContainers.skydestroyer
 						flingPage = _trollContainers.fling
+						kidnapPage = _trollContainers.kidnap
 						createSection(combatPage, "Attach Settings", -2)
 
 						createToggle(combatPage, "No Delay", "Enable zero-delay physics weld replication (Weld Version) [Premium Only]", "NoDelay", -1, function(arg)
@@ -24636,7 +24653,26 @@ end
 								humanoid3.NameDisplayDistance = nameDisplayDistance
 								humanoid3.HealthDisplayDistance = healthDisplayDistance
 								tbl17.clones[player] = character3
-								fn17(character3, 1)
+
+								-- Make the reanimated clone character fully visible
+								for _, desc in ipairs(character3:GetDescendants()) do
+									if desc:IsA("BasePart") then
+										pcall(function()
+											if desc.Name == "HumanoidRootPart" then
+												desc.Transparency = 1
+												desc.LocalTransparencyModifier = 1
+											else
+												desc.Transparency = 0
+												desc.LocalTransparencyModifier = 0
+											end
+										end)
+									elseif desc:IsA("Decal") then
+										pcall(function()
+											desc.Transparency = 0
+										end)
+									end
+								end
+
 								local physicalProperties = PhysicalProperties.new(0.001, 0, 0, 0, 0)
 
 								for _, part in ipairs(character2:GetDescendants()) do
@@ -24647,6 +24683,9 @@ end
 											part.CanQuery = false
 											part.Massless = true
 											part.CustomPhysicalProperties = physicalProperties
+											if part.Name ~= "HumanoidRootPart" then
+												part.LocalTransparencyModifier = 1
+											end
 										end)
 									end
 								end
@@ -47797,7 +47836,910 @@ Click any clip on the bottom timeline to inspect, crop frames, adjust speed, and
 						SendNotification("Eternity", "Fling GUI Launched!", 2)
 					end)
 
-					visualPage = createPage("visual")
+--[[
+    Eternity Style Kidnape Sub-System & Standalone GUI
+    Features:
+    1. Merry-Go-Round Kidnap:
+       - Requires player to sit in Merry-Go-Round (error if not sitting)
+       - Flies merry-go-round to target
+       - Spins around target forcing them into an empty seat
+       - Automatically transports merry-go-round back to original position
+    2. Physics Rocket Kidnap:
+       - 25 rad/s angular velocity spin for 3 seconds
+       - Upward impulse launch (mass * 500)
+    3. Eternity Dark Premium UI Theme
+--]]
+
+local Players = game:GetService("Players")
+local localPlayer_ = Players.LocalPlayer
+
+local kidnapSettings = {
+	mode = "MerryGoRound", -- "MerryGoRound" or "PhysicsRocket"
+	spinSpeed = 45,
+	spinRadius = 3.5,
+	maxSpinWait = 25,
+	rocketSpinSpeed = 25,
+	rocketDuration = 3,
+	rocketImpulse = 500,
+	lockToTarget = true,
+	loopKidnap = false,
+	active = false,
+	targetPlayer = nil,
+	statusText = "Idle",
+}
+_G.KidnapSettings = kidnapSettings
+
+-- Notification helper
+local function notify(title, msg, duration)
+	if typeof(SendNotification) == "function" then
+		pcall(function() SendNotification(title, msg, duration or 3) end)
+	end
+	pcall(function()
+		game:GetService("StarterGui"):SetCore("SendNotification", {
+			Title = title,
+			Text = msg,
+			Duration = duration or 3,
+		})
+	end)
+end
+
+-- Target character resolution
+local function getTargetPlayer()
+	if kidnapSettings.targetPlayer and kidnapSettings.targetPlayer.Parent then
+		return kidnapSettings.targetPlayer
+	end
+	if TargetPlayer and TargetPlayer.Parent then
+		return TargetPlayer
+	end
+	return nil
+end
+
+local function getTargetCharacter()
+	local p = getTargetPlayer()
+	return p and p.Character
+end
+
+-- =========================================================================
+-- 1. MERRY-GO-ROUND KIDNAP MECHANIC
+-- =========================================================================
+local function startMerryGoRoundKidnap()
+	local myChar = localPlayer_ and localPlayer_.Character
+	local myHumanoid = myChar and myChar:FindFirstChildOfClass("Humanoid")
+	local myRoot = myChar and myChar:FindFirstChild("HumanoidRootPart")
+
+	-- 1. CHECK IF LOCAL PLAYER IS SITTING
+	local currentSeat = myHumanoid and myHumanoid.SeatPart
+	if not (myHumanoid and myHumanoid.Sit and currentSeat) then
+		kidnapSettings.statusText = "Error: Player is not sitting!"
+		notify("Kidnape Error", "Player is not sitting! Please sit in the Merry-Go-Round first.", 4)
+		return
+	end
+
+	-- 2. RESOLVE MERRY-GO-ROUND MODEL & ORIGINAL POSITION
+	local merryModel = currentSeat:FindFirstAncestorOfClass("Model") or currentSeat.Parent
+	local assemblyPart = currentSeat.AssemblyRootPart or currentSeat
+
+	local originalCFrame = nil
+	if merryModel and merryModel:IsA("Model") and merryModel.PrimaryPart then
+		originalCFrame = merryModel.PrimaryPart.CFrame
+	elseif merryModel and merryModel:IsA("Model") then
+		originalCFrame = merryModel:GetPivot()
+	else
+		originalCFrame = currentSeat.CFrame
+	end
+
+	-- Gather all seats on the merry-go-round
+	local allSeats = {}
+	if merryModel then
+		for _, desc in ipairs(merryModel:GetDescendants()) do
+			if desc:IsA("Seat") or desc:IsA("VehicleSeat") then
+				table.insert(allSeats, desc)
+			end
+		end
+	end
+	if #allSeats == 0 then
+		table.insert(allSeats, currentSeat)
+	end
+
+	-- 3. RESOLVE TARGET PLAYER
+	local targetP = getTargetPlayer()
+	local targetChar = targetP and targetP.Character
+	local targetHumanoid = targetChar and targetChar:FindFirstChildOfClass("Humanoid")
+	local targetRoot = targetChar and targetChar:FindFirstChild("HumanoidRootPart")
+
+	if not (targetP and targetChar and targetHumanoid and targetRoot) then
+		kidnapSettings.statusText = "Error: No target player selected!"
+		notify("Kidnape Error", "No target player selected! Select a target first.", 3)
+		return
+	end
+
+	kidnapSettings.active = true
+	local targetDisplayName = targetP.DisplayName or targetP.Name
+	kidnapSettings.statusText = "Flying to " .. targetDisplayName .. " with Merry-Go-Round..."
+	notify("Kidnape", "Flying Merry-Go-Round to " .. targetDisplayName .. "!", 3)
+
+	local originalAssemblyCFrame = assemblyPart.CFrame
+
+	-- Disable constraints (like motorized HingeConstraints to stationary base) temporarily
+	local disabledConstraints = {}
+	if merryModel then
+		for _, c in ipairs(merryModel:GetDescendants()) do
+			if c:IsA("Constraint") and c.Enabled then
+				pcall(function()
+					c.Enabled = false
+					table.insert(disabledConstraints, c)
+				end)
+			end
+		end
+	end
+
+	-- Disable collision on merry parts for smooth travel
+	for _, p in ipairs(merryModel:GetDescendants()) do
+		if p:IsA("BasePart") then
+			pcall(function() p.CanCollide = false end)
+		end
+	end
+
+	-- 4. TRANSPORT MERRY-GO-ROUND TO TARGET
+	local travelPos = targetRoot.Position + Vector3.new(0, 1.5, 0)
+	pcall(function()
+		assemblyPart.CFrame = CFrame.new(travelPos)
+		assemblyPart.AssemblyLinearVelocity = Vector3.zero
+		assemblyPart.AssemblyAngularVelocity = Vector3.zero
+	end)
+	task.wait(0.2)
+
+	-- 5. SPIN AROUND TARGET UNTIL THEY SIT
+	kidnapSettings.statusText = "Spinning around " .. targetDisplayName .. "... Forcing into seat!"
+	local spinRadius = kidnapSettings.spinRadius or 3.5
+	local spinAngle = 0
+	local spinSpeed = kidnapSettings.spinSpeed or 45
+	local timeout = tick() + (kidnapSettings.maxSpinWait or 25)
+
+	while kidnapSettings.active and tick() < timeout do
+		if not targetChar or not targetChar.Parent or not targetHumanoid or not targetRoot or not targetRoot.Parent then
+			break
+		end
+
+		-- Check if target has sat down
+		local targetSat = false
+		if targetHumanoid.Sit == true then
+			targetSat = true
+		end
+		for _, s in ipairs(allSeats) do
+			if s ~= currentSeat and s.Occupant and s.Occupant.Parent == targetChar then
+				targetSat = true
+				break
+			end
+		end
+
+		if targetSat then
+			kidnapSettings.statusText = "Target captured! Sitting in seat!"
+			break
+		end
+
+		-- Spin the merry-go-round assembly around target
+		spinAngle = spinAngle + math.rad(spinSpeed)
+		local offset = Vector3.new(math.cos(spinAngle) * spinRadius, 0.5, math.sin(spinAngle) * spinRadius)
+		local currentTargetPos = targetRoot.Position
+		local lookCFrame = CFrame.new(currentTargetPos + offset, currentTargetPos)
+
+		pcall(function()
+			assemblyPart.CFrame = lookCFrame
+			assemblyPart.AssemblyLinearVelocity = Vector3.new(0, 0.1, 0)
+			assemblyPart.AssemblyAngularVelocity = Vector3.new(0, spinSpeed, 0)
+		end)
+
+		-- Push empty seats towards target to trigger seat prompt / touch
+		for _, s in ipairs(allSeats) do
+			if s ~= currentSeat and not s.Occupant then
+				pcall(function()
+					s.CFrame = targetRoot.CFrame * CFrame.new(0, 0, 0.2)
+				end)
+			end
+		end
+
+		task.wait(0.03)
+	end
+
+	-- 6. RETURN MERRY-GO-ROUND TO ORIGINAL POSITION
+	if kidnapSettings.active and (originalAssemblyCFrame or originalCFrame) then
+		kidnapSettings.statusText = "Returning Merry-Go-Round to original position..."
+		task.wait(0.2) -- allow seat weld to stabilize
+
+		pcall(function()
+			if originalAssemblyCFrame then
+				assemblyPart.CFrame = originalAssemblyCFrame
+			elseif originalCFrame then
+				assemblyPart.CFrame = originalCFrame
+			end
+			assemblyPart.AssemblyLinearVelocity = Vector3.zero
+			assemblyPart.AssemblyAngularVelocity = Vector3.zero
+
+			if merryModel and merryModel:IsA("Model") and originalCFrame then
+				if merryModel.PrimaryPart then
+					merryModel:SetPrimaryPartCFrame(originalCFrame)
+				else
+					merryModel:PivotTo(originalCFrame)
+				end
+			end
+		end)
+
+		-- Re-enable constraints
+		for _, c in ipairs(disabledConstraints) do
+			pcall(function()
+				c.Enabled = true
+			end)
+		end
+
+		notify("Kidnape Success", targetDisplayName .. " kidnapped & returned to original position!", 4)
+		kidnapSettings.statusText = "Kidnap Complete! Target abducted."
+	else
+		-- Re-enable constraints if cancelled/timed out
+		for _, c in ipairs(disabledConstraints) do
+			pcall(function()
+				c.Enabled = true
+			end)
+		end
+		kidnapSettings.statusText = "Kidnap Stopped / Timed Out."
+	end
+
+	task.wait(1.5)
+	kidnapSettings.active = false
+	kidnapSettings.statusText = "Idle"
+end
+
+-- =========================================================================
+-- 2. PHYSICS ROCKET SPIN & LAUNCH MECHANIC
+-- =========================================================================
+local function startPhysicsRocketKidnap()
+	local targetP = getTargetPlayer()
+	local targetChar = targetP and targetP.Character or (localPlayer_ and localPlayer_.Character)
+	if not targetChar then
+		notify("Kidnape Error", "No character found for rocket kidnap!", 3)
+		return
+	end
+
+	local targetRoot = targetChar:FindFirstChild("HumanoidRootPart")
+	if not targetRoot then return end
+
+	kidnapSettings.active = true
+	local targetName = targetChar.Name
+	kidnapSettings.statusText = "Rocket Kidnapping " .. targetName .. "..."
+
+	local myChar = localPlayer_ and localPlayer_.Character
+	local myRoot = myChar and myChar:FindFirstChild("HumanoidRootPart")
+
+	-- Optional lock to target
+	local attachConn = nil
+	if kidnapSettings.lockToTarget and myRoot and targetRoot ~= myRoot then
+		attachConn = game:GetService("RunService").Heartbeat:Connect(function()
+			if not kidnapSettings.active or not myRoot or not myRoot.Parent or not targetRoot or not targetRoot.Parent then
+				if attachConn then attachConn:Disconnect() end
+				return
+			end
+			pcall(function()
+				myRoot.CFrame = targetRoot.CFrame * CFrame.new(0, 0, 1.2)
+				myRoot.AssemblyLinearVelocity = Vector3.zero
+			end)
+		end)
+	end
+
+	-- Attachment and AngularVelocity spin (exact user source code)
+	local attachment = Instance.new("Attachment")
+	attachment.Name = "KidnapAttachment"
+	attachment.Parent = targetRoot
+
+	local spin = Instance.new("AngularVelocity")
+	spin.Name = "KidnapSpin"
+	spin.Attachment0 = attachment
+	spin.MaxTorque = math.huge
+	spin.AngularVelocity = Vector3.new(0, kidnapSettings.rocketSpinSpeed or 25, 0)
+	spin.Parent = targetRoot
+
+	local mySpin, myAttachment = nil, nil
+	if myRoot and myRoot ~= targetRoot then
+		myAttachment = Instance.new("Attachment")
+		myAttachment.Name = "KidnapMyAttachment"
+		myAttachment.Parent = myRoot
+
+		mySpin = Instance.new("AngularVelocity")
+		mySpin.Name = "KidnapMySpin"
+		mySpin.Attachment0 = myAttachment
+		mySpin.MaxTorque = math.huge
+		mySpin.AngularVelocity = Vector3.new(0, kidnapSettings.rocketSpinSpeed or 25, 0)
+		mySpin.Parent = myRoot
+	end
+
+	local duration = kidnapSettings.rocketDuration or 3
+	local startTime = tick()
+	while kidnapSettings.active and (tick() - startTime) < duration do
+		task.wait(0.1)
+	end
+
+	if attachConn then pcall(function() attachConn:Disconnect() end) end
+	if spin and spin.Parent then pcall(function() spin:Destroy() end) end
+	if attachment and attachment.Parent then pcall(function() attachment:Destroy() end) end
+	if mySpin and mySpin.Parent then pcall(function() mySpin:Destroy() end) end
+	if myAttachment and myAttachment.Parent then pcall(function() myAttachment:Destroy() end) end
+
+	-- Rocket launch impulse (exact user source code)
+	if kidnapSettings.active then
+		kidnapSettings.statusText = "Blasted into Stratosphere!"
+		local impulseMult = kidnapSettings.rocketImpulse or 500
+		if targetRoot and targetRoot.Parent then
+			pcall(function()
+				targetRoot:ApplyImpulse(Vector3.new(0, 1, 0) * targetRoot.AssemblyMass * impulseMult)
+			end)
+		end
+		if myRoot and myRoot.Parent and myRoot ~= targetRoot then
+			pcall(function()
+				myRoot:ApplyImpulse(Vector3.new(0, 1, 0) * myRoot.AssemblyMass * impulseMult)
+			end)
+		end
+		notify("Rocket Launch", "Target propelled into outer space!", 3)
+	end
+
+	task.wait(1)
+	kidnapSettings.active = false
+	kidnapSettings.statusText = "Idle"
+end
+
+_G.StartKidnapTarget = function()
+	task.spawn(function()
+		if kidnapSettings.mode == "MerryGoRound" then
+			startMerryGoRoundKidnap()
+		else
+			startPhysicsRocketKidnap()
+		end
+	end)
+end
+
+_G.StopKidnapTarget = function()
+	kidnapSettings.active = false
+	kidnapSettings.loopKidnap = false
+	kidnapSettings.statusText = "Cancelled"
+	local myChar = localPlayer_ and localPlayer_.Character
+	if myChar then
+		for _, v in ipairs(myChar:GetDescendants()) do
+			if v.Name:find("Kidnap") then
+				pcall(function() v:Destroy() end)
+			end
+		end
+	end
+	notify("Kidnape", "Kidnap operations stopped.", 2)
+end
+
+-- =========================================================================
+-- 3. ETERNITY THEMED STANDALONE "KIDNAPE" GUI
+-- =========================================================================
+_G.LaunchKidnapeGUI = function()
+	local hui
+	if gethui then
+		hui = gethui() or game:GetService("CoreGui")
+	else
+		hui = game:GetService("CoreGui")
+	end
+	hui = hui or (localPlayer_ and localPlayer_:WaitForChild("PlayerGui"))
+
+	if hui:FindFirstChild("KidnapeGUI") then
+		hui.KidnapeGUI:Destroy()
+	end
+
+	local screenGui = Instance.new("ScreenGui")
+	screenGui.Name = "KidnapeGUI"
+	screenGui.ResetOnSpawn = false
+	screenGui.ZIndexBehavior = Enum.ZIndexBehavior.Sibling
+	screenGui.Parent = hui
+
+	-- Eternity Theme Colors
+	local cBg = Color3.fromRGB(15, 15, 22)
+	local cCard = Color3.fromRGB(22, 22, 32)
+	local cCardHover = Color3.fromRGB(28, 28, 42)
+	local cAccent = _themeColor or Color3.fromRGB(145, 65, 245)
+	local cAccentDark = Color3.fromRGB(100, 45, 180)
+	local cText = Color3.fromRGB(245, 245, 255)
+	local cTextMuted = Color3.fromRGB(155, 155, 185)
+	local cSuccess = Color3.fromRGB(45, 205, 115)
+	local cDanger = Color3.fromRGB(240, 65, 85)
+
+	-- Window Frame
+	local mainFrame = Instance.new("Frame")
+	mainFrame.Name = "MainFrame"
+	mainFrame.Size = UDim2.new(0, 340, 0, 490)
+	mainFrame.Position = UDim2.new(0.5, -170, 0.5, -245)
+	mainFrame.BackgroundColor3 = cBg
+	mainFrame.BorderSizePixel = 0
+	mainFrame.ClipsDescendants = true
+	mainFrame.Parent = screenGui
+
+	local corner = Instance.new("UICorner")
+	corner.CornerRadius = UDim.new(0, 12)
+	corner.Parent = mainFrame
+
+	local stroke = Instance.new("UIStroke")
+	stroke.Color = cAccent
+	stroke.Thickness = 1.4
+	stroke.Transparency = 0.3
+	stroke.Parent = mainFrame
+
+	local strokeGrad = Instance.new("UIGradient")
+	strokeGrad.Color = ColorSequence.new({
+		ColorSequenceKeypoint.new(0, cAccent),
+		ColorSequenceKeypoint.new(0.5, Color3.fromRGB(220, 120, 255)),
+		ColorSequenceKeypoint.new(1, cAccent),
+	})
+	strokeGrad.Rotation = 45
+	strokeGrad.Parent = stroke
+
+	-- Draggable TitleBar
+	local titleBar = Instance.new("Frame")
+	titleBar.Name = "TitleBar"
+	titleBar.Size = UDim2.new(1, 0, 0, 42)
+	titleBar.BackgroundColor3 = cCard
+	titleBar.BorderSizePixel = 0
+	titleBar.Parent = mainFrame
+
+	local tbCorner = Instance.new("UICorner")
+	tbCorner.CornerRadius = UDim.new(0, 12)
+	tbCorner.Parent = titleBar
+
+	local titleLabel = Instance.new("TextLabel")
+	titleLabel.Size = UDim2.new(0, 100, 1, 0)
+	titleLabel.Position = UDim2.new(0, 14, 0, 0)
+	titleLabel.BackgroundTransparency = 1
+	titleLabel.Text = "KIDNAPE"
+	titleLabel.TextColor3 = cText
+	titleLabel.Font = Enum.Font.GothamBold
+	titleLabel.TextSize = 15
+	titleLabel.TextXAlignment = Enum.TextXAlignment.Left
+	titleLabel.Parent = titleBar
+
+	local badge = Instance.new("TextLabel")
+	badge.Size = UDim2.new(0, 75, 0, 20)
+	badge.Position = UDim2.new(0, 92, 0.5, -10)
+	badge.BackgroundColor3 = cAccentDark
+	badge.Text = "ETERNITY"
+	badge.TextColor3 = Color3.fromRGB(255, 255, 255)
+	badge.Font = Enum.Font.GothamBold
+	badge.TextSize = 10
+	badge.Parent = titleBar
+	local bCorner = Instance.new("UICorner")
+	bCorner.CornerRadius = UDim.new(0, 5)
+	bCorner.Parent = badge
+
+	local closeBtn = Instance.new("TextButton")
+	closeBtn.Size = UDim2.new(0, 28, 0, 28)
+	closeBtn.Position = UDim2.new(1, -34, 0.5, -14)
+	closeBtn.BackgroundColor3 = Color3.fromRGB(38, 22, 28)
+	closeBtn.Text = "X"
+	closeBtn.TextColor3 = cDanger
+	closeBtn.Font = Enum.Font.GothamBold
+	closeBtn.TextSize = 13
+	closeBtn.Parent = titleBar
+	local cBtnCorner = Instance.new("UICorner")
+	cBtnCorner.CornerRadius = UDim.new(0, 6)
+	cBtnCorner.Parent = closeBtn
+	closeBtn.MouseButton1Click:Connect(function()
+		screenGui:Destroy()
+	end)
+
+	local minBtn = Instance.new("TextButton")
+	minBtn.Size = UDim2.new(0, 28, 0, 28)
+	minBtn.Position = UDim2.new(1, -66, 0.5, -14)
+	minBtn.BackgroundColor3 = Color3.fromRGB(28, 28, 38)
+	minBtn.Text = "-"
+	minBtn.TextColor3 = cTextMuted
+	minBtn.Font = Enum.Font.GothamBold
+	minBtn.TextSize = 16
+	minBtn.Parent = titleBar
+	local mBtnCorner = Instance.new("UICorner")
+	mBtnCorner.CornerRadius = UDim.new(0, 6)
+	mBtnCorner.Parent = minBtn
+
+	local isMin = false
+	minBtn.MouseButton1Click:Connect(function()
+		isMin = not isMin
+		if isMin then
+			mainFrame:TweenSize(UDim2.new(0, 340, 0, 42), "Out", "Quad", 0.22, true)
+		else
+			mainFrame:TweenSize(UDim2.new(0, 340, 0, 490), "Out", "Quad", 0.22, true)
+		end
+	end)
+
+	-- Smooth Dragging
+	local dragging, dragInput, dragStart, startPos
+	titleBar.InputBegan:Connect(function(input)
+		if input.UserInputType == Enum.UserInputType.MouseButton1 or input.UserInputType == Enum.UserInputType.Touch then
+			dragging = true
+			dragStart = input.Position
+			startPos = mainFrame.Position
+			input.Changed:Connect(function()
+				if input.UserInputState == Enum.UserInputState.End then
+					dragging = false
+				end
+			end)
+		end
+	end)
+	titleBar.InputChanged:Connect(function(input)
+		if input.UserInputType == Enum.UserInputType.MouseMovement or input.UserInputType == Enum.UserInputType.Touch then
+			dragInput = input
+		end
+	end)
+	game:GetService("UserInputService").InputChanged:Connect(function(input)
+		if input == dragInput and dragging then
+			local delta = input.Position - dragStart
+			mainFrame.Position = UDim2.new(startPos.X.Scale, startPos.X.Offset + delta.X, startPos.Y.Scale, startPos.Y.Offset + delta.Y)
+		end
+	end)
+
+	-- Mode Switcher (Merry-Go-Round vs Physics Rocket)
+	local switcher = Instance.new("Frame")
+	switcher.Size = UDim2.new(1, -20, 0, 32)
+	switcher.Position = UDim2.new(0, 10, 0, 48)
+	switcher.BackgroundColor3 = cCard
+	switcher.BorderSizePixel = 0
+	switcher.Parent = mainFrame
+	local sCorner = Instance.new("UICorner")
+	sCorner.CornerRadius = UDim.new(0, 8)
+	sCorner.Parent = switcher
+
+	local tabMerry = Instance.new("TextButton")
+	tabMerry.Size = UDim2.new(0.5, -3, 1, -4)
+	tabMerry.Position = UDim2.new(0, 2, 0, 2)
+	tabMerry.BackgroundColor3 = (kidnapSettings.mode == "MerryGoRound") and cAccent or Color3.fromRGB(0, 0, 0)
+	tabMerry.BackgroundTransparency = (kidnapSettings.mode == "MerryGoRound") and 0 or 1
+	tabMerry.Text = "🎡 Merry-Go-Round"
+	tabMerry.TextColor3 = cText
+	tabMerry.Font = Enum.Font.GothamBold
+	tabMerry.TextSize = 11
+	tabMerry.Parent = switcher
+	local tmCorner = Instance.new("UICorner")
+	tmCorner.CornerRadius = UDim.new(0, 6)
+	tmCorner.Parent = tabMerry
+
+	local tabRocket = Instance.new("TextButton")
+	tabRocket.Size = UDim2.new(0.5, -3, 1, -4)
+	tabRocket.Position = UDim2.new(0.5, 1, 0, 2)
+	tabRocket.BackgroundColor3 = (kidnapSettings.mode == "PhysicsRocket") and cAccent or Color3.fromRGB(0, 0, 0)
+	tabRocket.BackgroundTransparency = (kidnapSettings.mode == "PhysicsRocket") and 0 or 1
+	tabRocket.Text = "🚀 Rocket Launch"
+	tabRocket.TextColor3 = cText
+	tabRocket.Font = Enum.Font.GothamBold
+	tabRocket.TextSize = 11
+	tabRocket.Parent = switcher
+	local trCorner = Instance.new("UICorner")
+	trCorner.CornerRadius = UDim.new(0, 6)
+	trCorner.Parent = tabRocket
+
+	-- Content Container
+	local scroll = Instance.new("ScrollingFrame")
+	scroll.Size = UDim2.new(1, -20, 1, -90)
+	scroll.Position = UDim2.new(0, 10, 0, 86)
+	scroll.BackgroundTransparency = 1
+	scroll.BorderSizePixel = 0
+	scroll.ScrollBarThickness = 3
+	scroll.ScrollBarImageColor3 = cAccent
+	scroll.CanvasSize = UDim2.new(0, 0, 0, 540)
+	scroll.Parent = mainFrame
+
+	local list = Instance.new("UIListLayout")
+	list.Padding = UDim.new(0, 8)
+	list.Parent = scroll
+
+	-- Status Card
+	local statusCard = Instance.new("Frame")
+	statusCard.Size = UDim2.new(1, 0, 0, 48)
+	statusCard.BackgroundColor3 = cCard
+	statusCard.BorderSizePixel = 0
+	statusCard.Parent = scroll
+	local scCorner = Instance.new("UICorner")
+	scCorner.CornerRadius = UDim.new(0, 8)
+	scCorner.Parent = statusCard
+
+	local statusTitle = Instance.new("TextLabel")
+	statusTitle.Size = UDim2.new(1, -16, 0, 18)
+	statusTitle.Position = UDim2.new(0, 10, 0, 5)
+	statusTitle.BackgroundTransparency = 1
+	statusTitle.Text = "SYSTEM STATUS"
+	statusTitle.TextColor3 = cTextMuted
+	statusTitle.Font = Enum.Font.GothamBold
+	statusTitle.TextSize = 10
+	statusTitle.TextXAlignment = Enum.TextXAlignment.Left
+	statusTitle.Parent = statusCard
+
+	local statusBody = Instance.new("TextLabel")
+	statusBody.Size = UDim2.new(1, -16, 0, 20)
+	statusBody.Position = UDim2.new(0, 10, 0, 22)
+	statusBody.BackgroundTransparency = 1
+	statusBody.Text = "Status: Idle"
+	statusBody.TextColor3 = Color3.fromRGB(180, 170, 255)
+	statusBody.Font = Enum.Font.GothamMedium
+	statusBody.TextSize = 11
+	statusBody.TextXAlignment = Enum.TextXAlignment.Left
+	statusBody.Parent = statusCard
+
+	-- Seat Indicator Card
+	local seatCard = Instance.new("Frame")
+	seatCard.Size = UDim2.new(1, 0, 0, 36)
+	seatCard.BackgroundColor3 = cCard
+	seatCard.BorderSizePixel = 0
+	seatCard.Parent = scroll
+	local stcCorner = Instance.new("UICorner")
+	stcCorner.CornerRadius = UDim.new(0, 8)
+	stcCorner.Parent = seatCard
+
+	local seatIndicator = Instance.new("TextLabel")
+	seatIndicator.Size = UDim2.new(1, -16, 1, 0)
+	seatIndicator.Position = UDim2.new(0, 10, 0, 0)
+	seatIndicator.BackgroundTransparency = 1
+	seatIndicator.Text = "Seat: Checking seat status..."
+	seatIndicator.TextColor3 = cTextMuted
+	seatIndicator.Font = Enum.Font.GothamMedium
+	seatIndicator.TextSize = 11
+	seatIndicator.TextXAlignment = Enum.TextXAlignment.Left
+	seatIndicator.Parent = seatCard
+
+	task.spawn(function()
+		while screenGui.Parent do
+			statusBody.Text = "Status: " .. tostring(kidnapSettings.statusText)
+			local char = localPlayer_ and localPlayer_.Character
+			local hum = char and char:FindFirstChildOfClass("Humanoid")
+			local seat = hum and hum.SeatPart
+			if hum and hum.Sit and seat then
+				seatIndicator.Text = "🟢 Sitting: " .. seat.Name .. " (Ready to Kidnap)"
+				seatIndicator.TextColor3 = cSuccess
+			else
+				seatIndicator.Text = "🔴 Not Sitting! (Must sit in Merry-Go-Round)"
+				seatIndicator.TextColor3 = Color3.fromRGB(255, 100, 100)
+			end
+			task.wait(0.25)
+		end
+	end)
+
+	-- Target Card
+	local targetCard = Instance.new("Frame")
+	targetCard.Size = UDim2.new(1, 0, 0, 84)
+	targetCard.BackgroundColor3 = cCard
+	targetCard.BorderSizePixel = 0
+	targetCard.Parent = scroll
+	local tcCorner = Instance.new("UICorner")
+	tcCorner.CornerRadius = UDim.new(0, 8)
+	tcCorner.Parent = targetCard
+
+	local targetHeader = Instance.new("TextLabel")
+	targetHeader.Size = UDim2.new(1, -16, 0, 20)
+	targetHeader.Position = UDim2.new(0, 10, 0, 6)
+	targetHeader.BackgroundTransparency = 1
+	targetHeader.Text = "TARGET PLAYER"
+	targetHeader.TextColor3 = cTextMuted
+	targetHeader.Font = Enum.Font.GothamBold
+	targetHeader.TextSize = 10
+	targetHeader.TextXAlignment = Enum.TextXAlignment.Left
+	targetHeader.Parent = targetCard
+
+	local targetBox = Instance.new("TextBox")
+	targetBox.Size = UDim2.new(1, -20, 0, 26)
+	targetBox.Position = UDim2.new(0, 10, 0, 26)
+	targetBox.BackgroundColor3 = Color3.fromRGB(18, 18, 26)
+	targetBox.PlaceholderText = "Type player username / display..."
+	targetBox.Text = TargetPlayer and TargetPlayer.Name or ""
+	targetBox.TextColor3 = cText
+	targetBox.Font = Enum.Font.Gotham
+	targetBox.TextSize = 11
+	targetBox.Parent = targetCard
+	local tbCorner = Instance.new("UICorner")
+	tbCorner.CornerRadius = UDim.new(0, 6)
+	tbCorner.Parent = targetBox
+
+	targetBox.FocusLost:Connect(function()
+		local query = string.lower(targetBox.Text)
+		for _, p in ipairs(game:GetService("Players"):GetPlayers()) do
+			if string.lower(p.Name):find(query) or string.lower(p.DisplayName):find(query) then
+				kidnapSettings.targetPlayer = p
+				targetBox.Text = p.DisplayName .. " (@" .. p.Name .. ")"
+				break
+			end
+		end
+	end)
+
+	local useEternityBtn = Instance.new("TextButton")
+	useEternityBtn.Size = UDim2.new(1, -20, 0, 22)
+	useEternityBtn.Position = UDim2.new(0, 10, 0, 56)
+	useEternityBtn.BackgroundColor3 = Color3.fromRGB(32, 28, 44)
+	useEternityBtn.Text = "Use Eternity Selected Target"
+	useEternityBtn.TextColor3 = cAccent
+	useEternityBtn.Font = Enum.Font.GothamBold
+	useEternityBtn.TextSize = 10
+	useEternityBtn.Parent = targetCard
+	local uebCorner = Instance.new("UICorner")
+	uebCorner.CornerRadius = UDim.new(0, 5)
+	uebCorner.Parent = useEternityBtn
+
+	useEternityBtn.MouseButton1Click:Connect(function()
+		if TargetPlayer then
+			kidnapSettings.targetPlayer = TargetPlayer
+			targetBox.Text = TargetPlayer.DisplayName .. " (@" .. TargetPlayer.Name .. ")"
+			notify("Target", "Selected: " .. TargetPlayer.Name, 2)
+		else
+			notify("Target Error", "No target selected in Eternity Target menu!", 2)
+		end
+	end)
+
+	-- Primary Launch Action Button (Large)
+	local startBtn = Instance.new("TextButton")
+	startBtn.Size = UDim2.new(1, 0, 0, 42)
+	startBtn.BackgroundColor3 = cAccent
+	startBtn.Text = "START MERRY KIDNAPE"
+	startBtn.TextColor3 = Color3.fromRGB(255, 255, 255)
+	startBtn.Font = Enum.Font.GothamBold
+	startBtn.TextSize = 13
+	startBtn.Parent = scroll
+	local sbCorner = Instance.new("UICorner")
+	sbCorner.CornerRadius = UDim.new(0, 8)
+	sbCorner.Parent = startBtn
+
+	local function updateModeUI()
+		if kidnapSettings.mode == "MerryGoRound" then
+			tabMerry.BackgroundTransparency = 0
+			tabMerry.BackgroundColor3 = cAccent
+			tabRocket.BackgroundTransparency = 1
+			startBtn.Text = "START MERRY KIDNAPE"
+			startBtn.BackgroundColor3 = cAccent
+		else
+			tabRocket.BackgroundTransparency = 0
+			tabRocket.BackgroundColor3 = cAccent
+			tabMerry.BackgroundTransparency = 1
+			startBtn.Text = "START ROCKET KIDNAPE"
+			startBtn.BackgroundColor3 = Color3.fromRGB(200, 75, 45)
+		end
+	end
+
+	tabMerry.MouseButton1Click:Connect(function()
+		kidnapSettings.mode = "MerryGoRound"
+		updateModeUI()
+	end)
+
+	tabRocket.MouseButton1Click:Connect(function()
+		kidnapSettings.mode = "PhysicsRocket"
+		updateModeUI()
+	end)
+
+	startBtn.MouseButton1Click:Connect(function()
+		_G.StartKidnapTarget()
+	end)
+
+	-- Stop Action Button
+	local stopBtn = Instance.new("TextButton")
+	stopBtn.Size = UDim2.new(1, 0, 0, 32)
+	stopBtn.BackgroundColor3 = Color3.fromRGB(42, 20, 26)
+	stopBtn.Text = "STOP KIDNAPE"
+	stopBtn.TextColor3 = cDanger
+	stopBtn.Font = Enum.Font.GothamBold
+	stopBtn.TextSize = 12
+	stopBtn.Parent = scroll
+	local stpCorner = Instance.new("UICorner")
+	stpCorner.CornerRadius = UDim.new(0, 6)
+	stpCorner.Parent = stopBtn
+
+	stopBtn.MouseButton1Click:Connect(function()
+		_G.StopKidnapTarget()
+	end)
+
+	-- Options / Sliders Card
+	local optionsCard = Instance.new("Frame")
+	optionsCard.Size = UDim2.new(1, 0, 0, 160)
+	optionsCard.BackgroundColor3 = cCard
+	optionsCard.BorderSizePixel = 0
+	optionsCard.Parent = scroll
+	local ocCorner = Instance.new("UICorner")
+	ocCorner.CornerRadius = UDim.new(0, 8)
+	ocCorner.Parent = optionsCard
+
+	local ocLayout = Instance.new("UIListLayout")
+	ocLayout.Padding = UDim.new(0, 6)
+	ocLayout.Parent = optionsCard
+
+	local ocPadding = Instance.new("UIPadding")
+	ocPadding.PaddingTop = UDim.new(0, 6)
+	ocPadding.PaddingBottom = UDim.new(0, 6)
+	ocPadding.PaddingLeft = UDim.new(0, 8)
+	ocPadding.PaddingRight = UDim.new(0, 8)
+	ocPadding.Parent = optionsCard
+
+	local function addCycleOption(name, currentVal, values, callback)
+		local btn = Instance.new("TextButton")
+		btn.Size = UDim2.new(1, 0, 0, 26)
+		btn.BackgroundColor3 = Color3.fromRGB(18, 18, 26)
+		btn.Text = name .. ": " .. tostring(currentVal)
+		btn.TextColor3 = cTextMuted
+		btn.Font = Enum.Font.GothamMedium
+		btn.TextSize = 11
+		btn.Parent = optionsCard
+		local bC = Instance.new("UICorner")
+		bC.CornerRadius = UDim.new(0, 6)
+		bC.Parent = btn
+
+		local idx = 1
+		for i, v in ipairs(values) do
+			if v == currentVal then idx = i break end
+		end
+
+		btn.MouseButton1Click:Connect(function()
+			idx = (idx % #values) + 1
+			local chosen = values[idx]
+			btn.Text = name .. ": " .. tostring(chosen)
+			callback(chosen)
+		end)
+	end
+
+	addCycleOption("Merry Orbit Speed", kidnapSettings.spinSpeed, { 25, 45, 75, 120 }, function(v)
+		kidnapSettings.spinSpeed = v
+	end)
+
+	addCycleOption("Merry Orbit Radius", kidnapSettings.spinRadius, { 2.5, 3.5, 5.0, 7.0 }, function(v)
+		kidnapSettings.spinRadius = v
+	end)
+
+	addCycleOption("Rocket Spin Velocity", kidnapSettings.rocketSpinSpeed, { 15, 25, 50, 100 }, function(v)
+		kidnapSettings.rocketSpinSpeed = v
+	end)
+
+	addCycleOption("Rocket Launch Impulse", kidnapSettings.rocketImpulse, { 300, 500, 800, 1500, 3000 }, function(v)
+		kidnapSettings.rocketImpulse = v
+	end)
+
+	addCycleOption("Spin Duration (sec)", kidnapSettings.rocketDuration, { 2, 3, 5, 8 }, function(v)
+		kidnapSettings.rocketDuration = v
+	end)
+end
+
+
+
+					createSection(kidnapPage, "Merry-Go-Round Kidnap (Brookhaven / Carnival)", 1)
+
+					createActionButton(kidnapPage, "Execute Kidnape GUI", "Launch the dedicated standalone Eternity-themed Kidnape GUI window with live seat status, mode switching, and target tracking.", 2, function()
+						if _G.LaunchKidnapeGUI then
+							_G.LaunchKidnapeGUI()
+						end
+						SendNotification("Eternity", "Kidnape GUI Launched!", 2)
+					end)
+
+					createActionButton(kidnapPage, "Start Kidnap", "Abduct the target (requires you to sit in Merry-Go-Round for Merry mode, or spins and rocket launches).", 3, function()
+						if _G.StartKidnapTarget then
+							_G.StartKidnapTarget()
+						end
+					end)
+
+					createActionButton(kidnapPage, "Stop Kidnap", "Instantly cancels kidnapping and stops all attachments and spins.", 4, function()
+						if _G.StopKidnapTarget then
+							_G.StopKidnapTarget()
+						end
+					end)
+
+					createDropdown(kidnapPage, "Kidnap Mode", { "Merry-Go-Round", "Physics Rocket" }, 5, function(chosen)
+						if _G.KidnapSettings then
+							if chosen == "Merry-Go-Round" then
+								_G.KidnapSettings.mode = "MerryGoRound"
+							else
+								_G.KidnapSettings.mode = "PhysicsRocket"
+							end
+						end
+					end)
+
+					createSlider(kidnapPage, "Merry Orbit Speed", "Spin speed around target (rad/s)", 15, 120, 45, 6, function(val)
+						if _G.KidnapSettings then _G.KidnapSettings.spinSpeed = val end
+					end)
+
+					createSlider(kidnapPage, "Rocket Impulse", "Upward launch force multiplier", 200, 2500, 500, 7, function(val)
+						if _G.KidnapSettings then _G.KidnapSettings.rocketImpulse = val end
+					end)
+
+					createToggle(kidnapPage, "Attach to Target", "Locks onto target player during kidnapping", "KidnapAttach", 8, function(val)
+						if _G.KidnapSettings then _G.KidnapSettings.lockToTarget = val end
+					end)
+
+visualPage = createPage("visual")
 
 					_vContainers = createSubTabBar(visualPage, {
 						{ id = "lighting", name = "Shaders" },
