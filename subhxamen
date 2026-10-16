@@ -53871,7 +53871,194 @@ visualPage = createPage("visual")
 														return nil
 													end
 
-													v8 = fn16("wss://free.blr2.piesocket.com/v3/1?api_key=VgkoxhylOrsmTG5EzvHdOHRmAmFtkT5m1jNVrqin&notify_self=1")
+													local function connectRealtimeChat()
+														local HttpService = game:GetService("HttpService")
+														local sbUrl = "wss://cfmncurvjkjdlaskvrap.supabase.co/realtime/v1/websocket?apikey=sb_publishable_xv-M8R3pvECL-4tGVvPhCg_Y3eEx8FA&vsn=1.0.0"
+														local rawWs = fn16(sbUrl)
+
+														if not rawWs then
+															return fn16("wss://free.blr2.piesocket.com/v3/1?api_key=VgkoxhylOrsmTG5EzvHdOHRmAmFtkT5m1jNVrqin&notify_self=1")
+														end
+
+														local wrapper = {}
+														local onMessageHandlers = {}
+														local onCloseHandlers = {}
+														local isClosed = false
+														local heartbeatThread = nil
+
+														local function fireMessage(rawJsonStr)
+															for _, handler in ipairs(onMessageHandlers) do
+																task.spawn(pcall, handler, rawJsonStr)
+															end
+														end
+
+														local function fireClose(reason)
+															if isClosed then return end
+															isClosed = true
+															if heartbeatThread then
+																task.cancel(heartbeatThread)
+																heartbeatThread = nil
+															end
+															for _, handler in ipairs(onCloseHandlers) do
+																task.spawn(pcall, handler, reason)
+															end
+														end
+
+														local function hookRaw(obj, list, cb)
+															for _, k in ipairs(list) do
+																local ev = obj[k]
+																if ev and (type(ev) == "table" or type(ev) == "userdata") then
+																	if type(ev.Connect) == "function" then
+																		ev:Connect(cb)
+																		return true
+																	elseif type(ev.connect) == "function" then
+																		ev:connect(cb)
+																		return true
+																	end
+																end
+															end
+															for _, k in ipairs(list) do
+																pcall(function() obj[k] = cb end)
+															end
+														end
+
+														hookRaw(rawWs, { "OnMessage", "onMessage", "onmessage", "Message", "message" }, function(msg)
+															local ok, data = pcall(function() return HttpService:JSONDecode(msg) end)
+															if not ok or type(data) ~= "table" then return end
+
+															if data.event == "phx_reply" then return end
+
+															if data.event == "broadcast" and type(data.payload) == "table" then
+																local p = data.payload
+																local unwrapped = {
+																	event = p.event or "client-message",
+																	data = p.payload or p.data or p
+																}
+																fireMessage(HttpService:JSONEncode(unwrapped))
+																return
+															end
+
+															if data.event then
+																fireMessage(msg)
+															end
+														end)
+
+														hookRaw(rawWs, { "OnClose", "onClose", "onclose", "Close", "close" }, function(err)
+															fireClose(err)
+														end)
+														hookRaw(rawWs, { "OnError", "onError", "onerror", "Error", "error" }, function(err)
+															fireClose(err)
+														end)
+
+														pcall(function()
+															local joinMsg = HttpService:JSONEncode({
+																topic = "realtime:scriptchat",
+																event = "phx_join",
+																payload = {
+																	config = {
+																		broadcast = { ack = false, self = true }
+																	}
+																},
+																ref = "1",
+																join_ref = "1"
+															})
+															if type(rawWs.Send) == "function" then
+																rawWs:Send(joinMsg)
+															elseif type(rawWs.send) == "function" then
+																rawWs:send(joinMsg)
+															end
+														end)
+
+														heartbeatThread = task.spawn(function()
+															local refNum = 10
+															while not isClosed do
+																task.wait(25)
+																if isClosed then break end
+																pcall(function()
+																	refNum = refNum + 1
+																	local hb = HttpService:JSONEncode({
+																		topic = "phoenix",
+																		event = "heartbeat",
+																		payload = {},
+																		ref = tostring(refNum)
+																	})
+																	if type(rawWs.Send) == "function" then
+																		rawWs:Send(hb)
+																	elseif type(rawWs.send) == "function" then
+																		rawWs:send(hb)
+																	end
+																end)
+															end
+														end)
+
+														function wrapper:Send(payload)
+															if isClosed then return false end
+															return pcall(function()
+																local decoded = payload
+																if type(payload) == "string" then
+																	decoded = HttpService:JSONDecode(payload)
+																end
+																local evt = (type(decoded) == "table" and decoded.event) or "client-message"
+																local dt = (type(decoded) == "table" and (decoded.data or decoded)) or decoded
+
+																local bcastMsg = HttpService:JSONEncode({
+																	topic = "realtime:scriptchat",
+																	event = "broadcast",
+																	payload = {
+																		type = "broadcast",
+																		event = evt,
+																		payload = dt
+																	},
+																	ref = tostring(tick())
+																})
+																if type(rawWs.Send) == "function" then
+																	rawWs:Send(bcastMsg)
+																elseif type(rawWs.send) == "function" then
+																	rawWs:send(bcastMsg)
+																end
+															end)
+														end
+														wrapper.send = wrapper.Send
+
+														function wrapper:Close()
+															fireClose("closed")
+															pcall(function()
+																if type(rawWs.Close) == "function" then
+																	rawWs:Close()
+																elseif type(rawWs.close) == "function" then
+																	rawWs:close()
+																end
+															end)
+														end
+														wrapper.close = wrapper.Close
+
+														local function makeSignal(handlerTable)
+															local sig = {}
+															function sig:Connect(fn)
+																table.insert(handlerTable, fn)
+																return {
+																	Disconnect = function()
+																		for i, v in ipairs(handlerTable) do
+																			if v == fn then table.remove(handlerTable, i); break end
+																		end
+																	end
+																}
+															end
+															sig.connect = sig.Connect
+															return sig
+														end
+
+														wrapper.OnMessage = makeSignal(onMessageHandlers)
+														wrapper.onMessage = wrapper.OnMessage
+														wrapper.OnClose = makeSignal(onCloseHandlers)
+														wrapper.onClose = wrapper.OnClose
+														wrapper.OnError = makeSignal(onCloseHandlers)
+														wrapper.onError = wrapper.OnError
+
+														return wrapper
+													end
+
+													v8 = connectRealtimeChat()
 
 													if not v8 then
 														task.delay(3, function()
@@ -53884,6 +54071,7 @@ visualPage = createPage("visual")
 													end
 
 													spawnGlobalMessage("[SYSTEM]", "Connected!", true)
+													globalWebSocket = v8
 
 													task.delay(0.5, function()
 														pcall(function()
@@ -54060,6 +54248,7 @@ visualPage = createPage("visual")
 													local function fn18()
 														spawnGlobalMessage("[SYSTEM]", "Disconnected from Global Chat.", true)
 														v8 = nil
+														globalWebSocket = nil
 
 														if n36 == 754205280 then
 															task.delay(5, function()
