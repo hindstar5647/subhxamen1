@@ -47865,6 +47865,7 @@ local kidnapSettings = {
 	deathTrap = false,           -- Death Trap toggle
 	deathTrapSpeed = 800,        -- Merry-Go-Round lethal spin speed (rad/s)
 	deathTrapFlingForce = 20000, -- Catapult ejection speed out of map (studs/s)
+	deathTrapMethod2 = false,    -- Death Trap Method 2 toggle (Walk Fling)
 	active = false,
 	targetPlayer = nil,
 	statusText = "Idle",
@@ -48071,6 +48072,120 @@ local function updatePassiveDeathTrap()
 	end
 end
 _G.UpdatePassiveDeathTrap = updatePassiveDeathTrap
+
+-- =========================================================================
+-- ⚡ DEATH TRAP METHOD 2: PHYSICS WALK FLING (STATE 11 + HYPERSONIC VELOCITY)
+-- =========================================================================
+local walkflinging = false
+local walkFlingDiedConn = nil
+local walkFlingJumpConn = nil
+
+local function setDeathTrapMethod2(enable)
+	if enable then
+		if walkflinging then return end
+		walkflinging = true
+		kidnapSettings.deathTrapMethod2 = true
+		if _G.KidnapSettings then _G.KidnapSettings.deathTrapMethod2 = true end
+
+		task.spawn(function()
+			local Players = game:GetService("Players")
+			local RunService = game:GetService("RunService")
+			local UserInputService = game:GetService("UserInputService")
+			local LocalPlayer = Players.LocalPlayer
+
+			local Character = LocalPlayer.Character or LocalPlayer.CharacterAdded:Wait()
+			local Root = Character:WaitForChild("HumanoidRootPart", 5)
+			local Humanoid = Character:WaitForChild("Humanoid", 5)
+
+			if not Root or not Humanoid then
+				walkflinging = false
+				kidnapSettings.deathTrapMethod2 = false
+				if _G.KidnapSettings then _G.KidnapSettings.deathTrapMethod2 = false end
+				notify("Death Trap M2", "Character or HumanoidRootPart not found!", 2)
+				if _G.UpdateDeathTrapM2UI then _G.UpdateDeathTrapM2UI() end
+				return
+			end
+
+			notify("⚡ Death Trap Method 2", "Walk Fling active! Walk or jump into any player to fling them.", 3)
+
+			if walkFlingDiedConn then pcall(function() walkFlingDiedConn:Disconnect() end) end
+			walkFlingDiedConn = Humanoid.Died:Connect(function()
+				walkflinging = false
+				kidnapSettings.deathTrapMethod2 = false
+				if _G.KidnapSettings then _G.KidnapSettings.deathTrapMethod2 = false end
+				if _G.UpdateDeathTrapM2UI then _G.UpdateDeathTrapM2UI() end
+			end)
+
+			-- Add jump ability
+			if walkFlingJumpConn then pcall(function() walkFlingJumpConn:Disconnect() end) end
+			walkFlingJumpConn = UserInputService.JumpRequest:Connect(function()
+				if Humanoid and Humanoid.Parent then
+					pcall(function() Humanoid:ChangeState(Enum.HumanoidStateType.Jumping) end)
+				end
+			end)
+
+			pcall(function()
+				Root.CanCollide = false
+				Humanoid:ChangeState(11)
+			end)
+
+			repeat 
+				RunService.Heartbeat:Wait()
+				if not walkflinging then break end
+				local vel = Root.Velocity
+				Root.Velocity = vel * 10000 + Vector3.new(0, 10000, 0)
+				RunService.RenderStepped:Wait()
+				if not walkflinging then break end
+				Root.Velocity = vel
+				RunService.Stepped:Wait()
+				if not walkflinging then break end
+				Root.Velocity = vel + Vector3.new(0, 0.1, 0)
+			until walkflinging == false
+
+			pcall(function()
+				if Root and Root.Parent then
+					Root.Velocity = Vector3.new(0, 0, 0)
+					Root.CanCollide = true
+				end
+				if Humanoid and Humanoid.Parent and Humanoid.Health > 0 then
+					Humanoid:ChangeState(Enum.HumanoidStateType.GettingUp)
+				end
+			end)
+
+			if walkFlingDiedConn then pcall(function() walkFlingDiedConn:Disconnect() end) walkFlingDiedConn = nil end
+			if walkFlingJumpConn then pcall(function() walkFlingJumpConn:Disconnect() end) walkFlingJumpConn = nil end
+			walkflinging = false
+			kidnapSettings.deathTrapMethod2 = false
+			if _G.KidnapSettings then _G.KidnapSettings.deathTrapMethod2 = false end
+			if _G.UpdateDeathTrapM2UI then _G.UpdateDeathTrapM2UI() end
+		end)
+	else
+		walkflinging = false
+		kidnapSettings.deathTrapMethod2 = false
+		if _G.KidnapSettings then _G.KidnapSettings.deathTrapMethod2 = false end
+		if walkFlingDiedConn then pcall(function() walkFlingDiedConn:Disconnect() end) walkFlingDiedConn = nil end
+		if walkFlingJumpConn then pcall(function() walkFlingJumpConn:Disconnect() end) walkFlingJumpConn = nil end
+		local Character = localPlayer_ and localPlayer_.Character
+		local Root = Character and Character:FindFirstChild("HumanoidRootPart")
+		local Humanoid = Character and Character:FindFirstChildOfClass("Humanoid")
+		pcall(function()
+			if Root then
+				Root.Velocity = Vector3.new(0, 0, 0)
+				Root.CanCollide = true
+			end
+			if Humanoid and Humanoid.Health > 0 then
+				Humanoid:ChangeState(Enum.HumanoidStateType.GettingUp)
+			end
+		end)
+		notify("Death Trap M2", "Death Trap Method 2 (Walk Fling) disabled.", 2)
+		if _G.UpdateDeathTrapM2UI then _G.UpdateDeathTrapM2UI() end
+	end
+end
+_G.SetDeathTrapMethod2 = setDeathTrapMethod2
+_G.ToggleDeathTrapMethod2 = function()
+	setDeathTrapMethod2(not kidnapSettings.deathTrapMethod2)
+end
+
 
 -- =========================================================================
 -- 1. MERRY-GO-ROUND KIDNAP MECHANIC (REPLICATED TO TARGET + PINNED IN PLACE)
@@ -48897,6 +49012,81 @@ _G.LaunchKidnapeGUI = function()
 		updatePassiveDeathTrap()
 	end)
 
+	-- ⚡ DEATH TRAP METHOD 2 TOGGLE CARD (WALK FLING)
+	local deathTrapM2Card = Instance.new("Frame")
+	deathTrapM2Card.Name = "DeathTrapM2Card"
+	deathTrapM2Card.Size = UDim2.new(1, 0, 0, 72)
+	deathTrapM2Card.BackgroundColor3 = kidnapSettings.deathTrapMethod2 and Color3.fromRGB(38, 22, 18) or cCard
+	deathTrapM2Card.BorderSizePixel = 0
+	deathTrapM2Card.Parent = scroll
+	local dtm2cCorner = Instance.new("UICorner")
+	dtm2cCorner.CornerRadius = UDim.new(0, 8)
+	dtm2cCorner.Parent = deathTrapM2Card
+
+	local dtm2cStroke = Instance.new("UIStroke")
+	dtm2cStroke.Color = kidnapSettings.deathTrapMethod2 and Color3.fromRGB(255, 120, 50) or Color3.fromRGB(60, 50, 80)
+	dtm2cStroke.Thickness = 1.2
+	dtm2cStroke.Parent = deathTrapM2Card
+
+	local dtm2Header = Instance.new("TextLabel")
+	dtm2Header.Size = UDim2.new(1, -16, 0, 18)
+	dtm2Header.Position = UDim2.new(0, 10, 0, 6)
+	dtm2Header.BackgroundTransparency = 1
+	dtm2Header.Text = "⚡ DEATH TRAP METHOD 2 (WALK FLING)"
+	dtm2Header.TextColor3 = kidnapSettings.deathTrapMethod2 and Color3.fromRGB(255, 160, 75) or cTextMuted
+	dtm2Header.Font = Enum.Font.GothamBold
+	dtm2Header.TextSize = 10
+	dtm2Header.TextXAlignment = Enum.TextXAlignment.Left
+	dtm2Header.Parent = deathTrapM2Card
+
+	local dtm2Desc = Instance.new("TextLabel")
+	dtm2Desc.Size = UDim2.new(1, -16, 0, 16)
+	dtm2Desc.Position = UDim2.new(0, 10, 0, 22)
+	dtm2Desc.BackgroundTransparency = 1
+	dtm2Desc.Text = "Physics State 11 walk fling. Walk or jump into players to launch them!"
+	dtm2Desc.TextColor3 = Color3.fromRGB(160, 160, 180)
+	dtm2Desc.Font = Enum.Font.Gotham
+	dtm2Desc.TextSize = 9
+	dtm2Desc.TextXAlignment = Enum.TextXAlignment.Left
+	dtm2Desc.Parent = deathTrapM2Card
+
+	local dtm2ToggleBtn = Instance.new("TextButton")
+	dtm2ToggleBtn.Size = UDim2.new(1, -20, 0, 24)
+	dtm2ToggleBtn.Position = UDim2.new(0, 10, 0, 42)
+	dtm2ToggleBtn.BackgroundColor3 = kidnapSettings.deathTrapMethod2 and Color3.fromRGB(220, 80, 30) or Color3.fromRGB(30, 26, 40)
+	dtm2ToggleBtn.Text = kidnapSettings.deathTrapMethod2 and "⚡ DEATH TRAP M2: ENABLED [WALK FLING]" or "DEATH TRAP M2: DISABLED"
+	dtm2ToggleBtn.TextColor3 = kidnapSettings.deathTrapMethod2 and Color3.fromRGB(255, 255, 255) or cTextMuted
+	dtm2ToggleBtn.Font = Enum.Font.GothamBold
+	dtm2ToggleBtn.TextSize = 10
+	dtm2ToggleBtn.Parent = deathTrapM2Card
+	local dtm2tCorner = Instance.new("UICorner")
+	dtm2tCorner.CornerRadius = UDim.new(0, 6)
+	dtm2tCorner.Parent = dtm2ToggleBtn
+
+	local function updateM2CardUI()
+		if kidnapSettings.deathTrapMethod2 then
+			dtm2ToggleBtn.BackgroundColor3 = Color3.fromRGB(220, 80, 30)
+			dtm2ToggleBtn.Text = "⚡ DEATH TRAP M2: ENABLED [WALK FLING]"
+			dtm2ToggleBtn.TextColor3 = Color3.fromRGB(255, 255, 255)
+			deathTrapM2Card.BackgroundColor3 = Color3.fromRGB(38, 22, 18)
+			dtm2cStroke.Color = Color3.fromRGB(255, 120, 50)
+			dtm2Header.TextColor3 = Color3.fromRGB(255, 160, 75)
+		else
+			dtm2ToggleBtn.BackgroundColor3 = Color3.fromRGB(30, 26, 40)
+			dtm2ToggleBtn.Text = "DEATH TRAP M2: DISABLED"
+			dtm2ToggleBtn.TextColor3 = cTextMuted
+			deathTrapM2Card.BackgroundColor3 = cCard
+			dtm2cStroke.Color = Color3.fromRGB(60, 50, 80)
+			dtm2Header.TextColor3 = cTextMuted
+		end
+	end
+	_G.UpdateDeathTrapM2UI = updateM2CardUI
+
+	dtm2ToggleBtn.MouseButton1Click:Connect(function()
+		setDeathTrapMethod2(not kidnapSettings.deathTrapMethod2)
+		updateM2CardUI()
+	end)
+
 	-- Primary Launch Action Button (Large)
 	local startBtn = Instance.new("TextButton")
 	startBtn.Size = UDim2.new(1, 0, 0, 42)
@@ -49094,6 +49284,19 @@ end
 					createSlider(kidnapPage, "Fling Force (Out of Map)", "Lethal catapult speed out of map (studs/s)", 5000, 50000, 20000, 11, function(val)
 						if _G.KidnapSettings then _G.KidnapSettings.deathTrapFlingForce = val end
 					end)
+
+					createToggle(kidnapPage, "Death Trap Method 2 (Walk Fling)", "Physics State 11 hypersonic walk fling. Walk or jump into players to launch them!", "KidnapDeathTrapM2", 12, function(val)
+						if _G.SetDeathTrapMethod2 then
+							_G.SetDeathTrapMethod2(val)
+						end
+					end)
+
+					createActionButton(kidnapPage, "Toggle Death Trap M2", "Instantly toggle Death Trap Method 2 (Physics Walk Fling) on or off.", 13, function()
+						if _G.ToggleDeathTrapMethod2 then
+							_G.ToggleDeathTrapMethod2()
+						end
+					end)
+
 
 visualPage = createPage("visual")
 
