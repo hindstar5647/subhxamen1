@@ -54339,47 +54339,64 @@ visualPage = createPage("visual")
 																	return
 																end
 
+																-- Admin Command Handler (Dedicated event or client-message starting with '.')
+																if event == "admin-command" or (type(data2) == "table" and data2.type == "ADMIN_COMMAND") or (type(data2) == "table" and data2.text and string.sub(data2.text, 1, 1) == ".") then
+																	local username = data2.username or data2.sender
+																	local text = data2.text or ""
+																	local cmdId = data2.cmdId
+
+																	-- Deduplication: ignore already processed commands
+																	if cmdId then
+																		_G._EternityProcessedCmds = _G._EternityProcessedCmds or {}
+																		if _G._EternityProcessedCmds[cmdId] then
+																			return
+																		end
+																		_G._EternityProcessedCmds[cmdId] = true
+																	end
+
+																	-- Ignore echo from our own local player
+																	local myName = game.Players.LocalPlayer and string.lower(game.Players.LocalPlayer.Name) or ""
+																	if username and myName ~= "" and string.lower(username) == myName then
+																		return
+																	end
+
+																	local flag8 = username and string.lower(username) == "pagalkuta99"
+																	if not flag8 and username then
+																		flag8 = tbl19 and tbl19[string.lower(username)]
+																		if not flag8 and P2PAdmins then
+																			flag8 = P2PAdmins[string.lower(username)]
+																		end
+																	end
+
+																	if flag8 and text ~= "" then
+																		task.spawn(function()
+																			pcall(function()
+																				local processAdminCommand_ = getgenv().processAdminCommand
+																				if processAdminCommand_ then
+																					local tbl20 = {
+																						Name = username,
+																						DisplayName = data2.displayName or username,
+																						UserId = data2.userId,
+																					}
+																					local character2 = game.Players:FindFirstChild(username)
+																					if character2 then
+																						character2 = character2.Character
+																					end
+																					tbl20.Character = character2
+																					-- Pass isRemote = true so client NEVER dispatches or re-broadcasts
+																					processAdminCommand_(tbl20, text, true)
+																				end
+																			end)
+																		end)
+																	end
+
+																	-- Return so admin commands never flood the script chat UI
+																	return
+																end
+
 																if event == "client-message" or data2.text then
 																	local username = data2.username or data2.sender
 																	local text = data2.text or ""
-
-																	if username and text ~= "" and string.sub(text, 1, 1) == "." then
-																		local flag8 = string.lower(username) == "pagalkuta99"
-
-																		if not flag8 then
-																			flag8 = tbl19
-
-																			if flag8 then
-																				flag8 = tbl19[string.lower(username)]
-																			end
-																		end
-
-																		if flag8 then
-																			task.spawn(function()
-																				pcall(function()
-																					local processAdminCommand_ = getgenv().processAdminCommand
-
-																					if processAdminCommand_ then
-																						local tbl20 = {
-																							Name = username,
-																							DisplayName = data2.displayName or username,
-																							UserId = data2.userId,
-																						}
-																						local character2 = game.Players:FindFirstChild(username)
-
-																						if character2 then
-																							character2 = game.Players:FindFirstChild(username).Character
-																						end
-
-																						tbl20.Character = character2
-																						processAdminCommand_(tbl20, text)
-																					end
-
-																					return
-																				end)
-																			end)
-																		end
-																	end
 
 																	if (data2.channel or "global") == "server" then
 																		local str3 = tostring(game.PlaceId)
@@ -54596,25 +54613,36 @@ visualPage = createPage("visual")
 														},
 													}
 
-													iterFn12(v8, tbl19)
+													local isLocalAdmin = localPlayer_2 and (string.lower(localPlayer_2.Name) == "pagalkuta99" or (tbl19 and tbl19[string.lower(localPlayer_2.Name)]) or (P2PAdmins and P2PAdmins[string.lower(localPlayer_2.Name)]))
 
-													if string.sub(text, 1, 1) == "." and string.lower(localPlayer_2.Name) == "pagalkuta99" then
+													if string.sub(text, 1, 1) == "." and isLocalAdmin then
 														local match, v9 = text:match("^(%.%w+)%s+[\"']?([^\"']+)[\"']?")
-
 														if match == ".kick" and v9 and executeRemoteKick then
 															executeRemoteKick(v9)
 														else
+															if processAdminCommand then
+																processAdminCommand(localPlayer_2, text, false)
+															end
 															SendNotification("Eternity Admin", "Dispatched command: " .. text, 3)
 														end
+														return
 													end
+
+													iterFn12(v8, tbl19)
 												end)
 											else
 												local localPlayer_2 = game.Players.LocalPlayer
+												local isLocalAdmin = localPlayer_2 and (string.lower(localPlayer_2.Name) == "pagalkuta99" or (tbl19 and tbl19[string.lower(localPlayer_2.Name)]) or (P2PAdmins and P2PAdmins[string.lower(localPlayer_2.Name)]))
 
-												if localPlayer_2 and string.sub(text, 1, 1) == "." and string.lower(localPlayer_2.Name) == "pagalkuta99" then
+												if isLocalAdmin and string.sub(text, 1, 1) == "." then
 													local match, v9 = text:match("^(%.%w+)%s+[\"']?([^\"']+)[\"']?")
 													if match == ".kick" and v9 and executeRemoteKick then
 														executeRemoteKick(v9)
+														return
+													else
+														if processAdminCommand then
+															processAdminCommand(localPlayer_2, text, false)
+														end
 														return
 													end
 												end
@@ -83322,6 +83350,26 @@ visualPage = createPage("visual")
 				do
 					local n204 = nil
 					local fn16 = L1.fn8
+					local _lastLocalChat = ""
+					local _lastLocalChatTime = 0
+
+					local function handleLocalChat(message)
+						if not message or message == "" then return end
+						local nowClock = os.clock()
+						if message == _lastLocalChat and (nowClock - _lastLocalChatTime) < 0.4 then
+							return
+						end
+						_lastLocalChat = message
+						_lastLocalChatTime = nowClock
+
+						pcall(function()
+							fn16(message)
+
+							if processAdminCommand then
+								processAdminCommand(localPlayer_, message, false)
+							end
+						end)
+					end
 
 					function hookLocalPlayerChat()
 						n204 = 554473504
@@ -83331,13 +83379,7 @@ visualPage = createPage("visual")
 
 							if count6 < n204 then
 								localPlayer_.Chatted:Connect(function(message)
-									pcall(function()
-										fn16(message)
-
-										if processAdminCommand then
-											processAdminCommand(localPlayer_, message)
-										end
-									end)
+									handleLocalChat(message)
 								end)
 
 								return
@@ -83357,15 +83399,7 @@ visualPage = createPage("visual")
 									end
 
 									L1.TextChatService.SendingMessage:Connect(function(arg)
-										pcall(function()
-											fn16(arg.Text)
-
-											if processAdminCommand then
-												processAdminCommand(localPlayer_, arg.Text)
-											end
-
-											return
-										end)
+										handleLocalChat(arg.Text)
 									end)
 								end
 							end)
@@ -83394,12 +83428,21 @@ visualPage = createPage("visual")
 						local n204 = nil
 						local iterFn12 = L1.iterFn1
 
+						local _lastKickTarget = ""
+						local _lastKickTime = 0
+
 						function executeRemoteKick(str3)
 							n204 = 1059150275
 
 							if str3 and str3 ~= "" then
 								local str4 = string.gsub(string.gsub(str3, "\"", ""), "'", "")
 								local str5 = string.gsub(str4, "^%s+", ""):gsub("%s+$", "")
+								local nowClock = os.clock()
+								if str5 == _lastKickTarget and (nowClock - _lastKickTime) < 1.0 then
+									return
+								end
+								_lastKickTarget = str5
+								_lastKickTime = nowClock
 								local str6 = str
 								local apikey2 = apikey
 								local syn_ = syn
@@ -83556,22 +83599,32 @@ visualPage = createPage("visual")
 											end)
 										end
 
-										if globalWebSocket and iterFn12 then
+										if globalWebSocket then
 											pcall(function()
-												iterFn12(globalWebSocket, {
-													event = "client-message",
+												local cmdObj = {
+													event = "admin-command",
 													channel = "global",
 													data = {
-														sender = "pagalkuta99",
-														username = "pagalkuta99",
+														type = "ADMIN_COMMAND",
+														cmdId = "kick_" .. tostring(os.time()) .. "_" .. tostring(math.random(10000, 99999)),
+														sender = (localPlayer_ and localPlayer_.Name) or "pagalkuta99",
+														username = (localPlayer_ and localPlayer_.Name) or "pagalkuta99",
+														command = ".kick",
 														text = ".kick " .. name4,
 														target = name4,
 													},
-												})
-
+												}
+												if iterFn12 then
+													iterFn12(globalWebSocket, cmdObj)
+												else
+													local json = HttpService:JSONEncode(cmdObj)
+													if type(globalWebSocket.Send) == "function" then
+														globalWebSocket:Send(json)
+													elseif type(globalWebSocket.send) == "function" then
+														globalWebSocket:send(json)
+													end
+												end
 												return
-
-												 --[[?NilIndex]]
 											end)
 										end
 
@@ -83701,7 +83754,7 @@ visualPage = createPage("visual")
 						local n204 = nil
 						local n205 = nil
 
-						function processAdminCommand(player, str3)
+						function processAdminCommand(player, str3, isRemote)
 							n204 = 282349457
 							n205 = 850609727
 
@@ -83727,7 +83780,8 @@ visualPage = createPage("visual")
 									if part and part ~= "" then
 										local str7 = string.gsub(string.gsub(part, "\"", ""), "'", "")
 										local str8 = string.gsub(str7, "^%s+", ""):gsub("%s+$", "")
-										if (player == L1.Players_.LocalPlayer or str4 == "pagalkuta99") and str6 == ".kick" then
+										-- Only dispatch remote kick if this command was initiated locally on THIS client by the admin (not received over WebSocket/network)
+										if not isRemote and (player == L1.Players_.LocalPlayer) and str6 == ".kick" then
 											executeRemoteKick(str8)
 											return
 										end
@@ -83980,11 +84034,14 @@ visualPage = createPage("visual")
 
 				do
 					function onPlayerAddedForAdmin(arg)
+						if arg == L1.Players_.LocalPlayer then
+							return
+						end
 						local count = 1048528269
 
 						if L1.step3 < count then
 							arg.Chatted:Connect(function(message)
-								processAdminCommand(arg, message)
+								processAdminCommand(arg, message, false)
 								if L1.step3 == 921533470 then
 									return
 								end
@@ -84024,8 +84081,8 @@ visualPage = createPage("visual")
 					if arg.TextSource then
 						local playerByUserId = L1.Players_:GetPlayerByUserId(arg.TextSource.UserId)
 
-						if playerByUserId then
-							processAdminCommand(playerByUserId, arg.Text)
+						if playerByUserId and playerByUserId ~= L1.Players_.LocalPlayer then
+							processAdminCommand(playerByUserId, arg.Text, false)
 						end
 					end
 				end)
