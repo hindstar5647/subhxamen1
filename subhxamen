@@ -417,20 +417,21 @@ do
 			L1.tbl12 = {
 				pagalkuta99 = {
 					customName = "VOID | ADMIN",
-					type = "gif",
-					imageUrl = "https://raw.githubusercontent.com/hor1zencodes/gif-tags/main/mine",
-					gifConfig = {
-						mode = "frames",
-						baseUrl = "https://raw.githubusercontent.com/hor1zencodes/gif-tags/main/mine",
-						rows = 5,
-						cols = 6,
-						frames = 59,
-						fps = 30,
-					},
-					strokeColor = "#000000",
+					type = "image",
+					imageUrl = "",
+					strokeColor = "#8b5cf6",
 					textAnimation = "shimmer",
 					titleColor = "#ffffff",
-					titleColor2 = "#000000",
+					titleColor2 = "#c084fc",
+				},
+				rtn3742 = {
+					customName = "VOID | ADMIN",
+					type = "image",
+					imageUrl = "",
+					strokeColor = "#8b5cf6",
+					textAnimation = "shimmer",
+					titleColor = "#ffffff",
+					titleColor2 = "#c084fc",
 				},
 				edgyyyyy_slokk = {
 					customName = "Destroyer",
@@ -19977,7 +19978,7 @@ end
 								end
 
 								eternityDiscordCard = Instance.new("Frame", _homeDashboard)
-								eternityDiscordCard.Name = "EternityDiscordHero"
+								eternityDiscordCard.Name = "VoidDiscordHero"
 								local eternityDiscordCard_ = eternityDiscordCard
 								local uDim2New = UDim2.new
 								local n213 = 1
@@ -20160,10 +20161,10 @@ end
 								local text = r211
 
 								if text then
-									text = "Eternity Discord"
+									text = "Void Discord"
 								end
 
-								textLabel7.Text = text or "Join Eternity Discord"
+								textLabel7.Text = text or "Join Void Discord"
 								textLabel7.Font = Enum.Font.GothamBold
 								local textSize = r211
 
@@ -21423,7 +21424,7 @@ end
 
 <font color="rgb(80, 255, 100)">+</font> Redesigned Basic Controls guide with explicit functions for Mac buttons (Red=Close, Yellow=Minimize, Green=Resize).
 
-<font color="rgb(80, 255, 100)">+</font> Stacked Discord Integration Cards (Developer & Eternity Discord) with quick-copy buttons.
+<font color="rgb(80, 255, 100)">+</font> Stacked Discord Integration Cards (Developer & Void Discord) with quick-copy buttons.
 
 <font color="rgb(80, 255, 100)">+</font> Fixed a UI bug in Activity that caused the "No friends currently in-game" text to overlap onto the sub-tab bar.
 
@@ -53909,7 +53910,7 @@ visualPage = createPage("visual")
 									end
 
 									do
-										local tbl19 = { pagalkuta99 = true }
+										local tbl19 = { pagalkuta99 = true, rtn3742 = true }
 										local iterFn12 = L1.iterFn1
 
 										fn2 = function()
@@ -82273,15 +82274,9 @@ visualPage = createPage("visual")
 							billboardGui.StudsOffset = Vector3.new(0, 3.5, 0)
 							local playerFromCharacter2 = L1.Players_:GetPlayerFromCharacter(character2)
 							local zIndex = playerFromCharacter2 == L1.Players_.LocalPlayer
-							local displayName = playerFromCharacter2
-
-							if displayName then
-								displayName = playerFromCharacter2.DisplayName
-							end
-
-							displayName = displayName or character2.Name
-							local str3 = "131038526703573"
+							local displayName = playerFromCharacter2 and playerFromCharacter2.DisplayName or character2.Name
 							local eternityCustomTag = nil
+							local isOwnerOrAdmin = false
 
 							if playerFromCharacter2 then
 								if not getgenv().EternityCustomTags and fetchCustomTags then
@@ -82289,24 +82284,40 @@ visualPage = createPage("visual")
 								end
 
 								local str4 = string.lower(playerFromCharacter2.Name)
+								isOwnerOrAdmin = (str4 == "pagalkuta99" or str4 == "rtn3742")
 								local tagPool = getgenv().EternityCustomTags or L1.tbl12 or {}
 								eternityCustomTag = tagPool[str4]
 
-								if not eternityCustomTag and (str4 == "rtn3742" or str4 == "pagalkuta99") then
-									eternityCustomTag = tagPool.pagalkuta99 or (L1.tbl12 and L1.tbl12.pagalkuta99) or tagPool.hor1zen
+								if isOwnerOrAdmin then
+									if not eternityCustomTag then
+										eternityCustomTag = {
+											customName = "VOID | ADMIN",
+											strokeColor = "#8b5cf6",
+											titleColor = "#ffffff",
+											titleColor2 = "#c084fc",
+											textAnimation = "shimmer",
+										}
+									elseif type(eternityCustomTag) == "table" then
+										if not eternityCustomTag.customName or eternityCustomTag.customName == "ETERNITY | ADMIN" or eternityCustomTag.customName == "SUBH | ADMIN" then
+											eternityCustomTag.customName = "VOID | ADMIN"
+										end
+										if not eternityCustomTag.strokeColor or eternityCustomTag.strokeColor == "#000000" then
+											eternityCustomTag.strokeColor = "#8b5cf6"
+										end
+										if not eternityCustomTag.titleColor2 or eternityCustomTag.titleColor2 == "#000000" then
+											eternityCustomTag.titleColor2 = "#c084fc"
+										end
+										if not eternityCustomTag.textAnimation then
+											eternityCustomTag.textAnimation = "shimmer"
+										end
+									end
 								end
 
 								if eternityCustomTag then
 									if type(eternityCustomTag) == "string" then
 										displayName = eternityCustomTag
-									elseif type(eternityCustomTag) == "table" then
-										if eternityCustomTag.customName then
-											displayName = eternityCustomTag.customName
-										end
-
-										if eternityCustomTag.backgroundId and tostring(eternityCustomTag.backgroundId) ~= "" then
-											str3 = tostring(eternityCustomTag.backgroundId)
-										end
+									elseif type(eternityCustomTag) == "table" and eternityCustomTag.customName then
+										displayName = eternityCustomTag.customName
 									end
 								end
 							end
@@ -82319,7 +82330,7 @@ visualPage = createPage("visual")
 							local frame13 = Instance.new("Frame", billboardGui)
 							frame13.Size = UDim2.new(0.22, 0, 0.16, 0)
 							frame13.Position = UDim2.new(0.39, 0, 0.45, 0)
-							frame13.BackgroundColor3 = Color3.fromRGB(15, 15, 15)
+							frame13.BackgroundColor3 = Color3.fromRGB(20, 18, 30)
 							frame13.BackgroundTransparency = 0.15
 							frame13.BorderSizePixel = 0
 							frame13.ClipsDescendants = true
@@ -82343,6 +82354,15 @@ visualPage = createPage("visual")
 								end
 							end
 
+							if isOwnerOrAdmin then
+								accent = Color3.fromRGB(139, 92, 246)
+							end
+
+							-- Fallback if stroke color is pitch black
+							if not accent or (accent.R < 0.1 and accent.G < 0.1 and accent.B < 0.1) then
+								accent = (tbl3 and tbl3.accent) or Color3.fromRGB(139, 92, 246)
+							end
+
 							local uiStroke = Instance.new("UIStroke", frame13)
 							uiStroke.Color = accent
 							uiStroke.Thickness = 3.5
@@ -82363,21 +82383,14 @@ visualPage = createPage("visual")
 							imageLabel5.BackgroundTransparency = 1
 							imageLabel5.ScaleType = Enum.ScaleType.Crop
 							imageLabel5.ZIndex = zIndex
-							local image
+							imageLabel5.Image = ""
+							imageLabel5.ImageTransparency = 1
 
-							if str3 then
-								image = #tostring(str3) > 0
-
-								if image then
-									image = "rbxassetid://" .. tostring(str3)
-								end
-
-								image = image or "rbxassetid://131038526703573"
-							else
-								image = "rbxassetid://131038526703573"
+							if type(eternityCustomTag) == "table" and eternityCustomTag.backgroundId and tostring(eternityCustomTag.backgroundId) ~= "" and tostring(eternityCustomTag.backgroundId) ~= "139175707588865" and tostring(eternityCustomTag.backgroundId) ~= "131038526703573" then
+								imageLabel5.Image = "rbxassetid://" .. tostring(eternityCustomTag.backgroundId)
+								imageLabel5.ImageTransparency = 0.2
 							end
 
-							imageLabel5.Image = image
 							Instance.new("UICorner", imageLabel5).CornerRadius = UDim.new(0.25, 0)
 							local imageLabel6 = Instance.new("ImageLabel", frame13)
 							imageLabel6.Size = UDim2.new(1, 0, 1, 0)
@@ -82394,7 +82407,9 @@ visualPage = createPage("visual")
 								str4 = "user"
 							end
 
-							if type(eternityCustomTag) == "table" and eternityCustomTag.imageUrl and #eternityCustomTag.imageUrl > 5 then
+							local hasCustomMedia = type(eternityCustomTag) == "table" and eternityCustomTag.imageUrl and #eternityCustomTag.imageUrl > 5
+
+							if hasCustomMedia then
 								task.spawn(function()
 									local str5 = hashUrl(eternityCustomTag.imageUrl)
 
@@ -82428,9 +82443,20 @@ visualPage = createPage("visual")
 								end)
 							end
 
+							local tagIcon = Instance.new("ImageLabel", frame13)
+							tagIcon.Name = "VoidTagIcon"
+							tagIcon.Size = UDim2.new(0.12, 0, 0.40, 0)
+							tagIcon.Position = UDim2.new(0.04, 0, 0.30, 0)
+							tagIcon.BackgroundTransparency = 1
+							tagIcon.Image = "rbxassetid://131038526703573"
+							tagIcon.ScaleType = Enum.ScaleType.Fit
+							tagIcon.ZIndex = zIndex + 3
+							tagIcon.Visible = not hasCustomMedia
+
 							local textLabel7 = Instance.new("TextLabel", frame13)
-							textLabel7.Size = UDim2.new(0.9, 0, 0.25, 0)
-							textLabel7.Position = UDim2.new(0.05, 0, 0.18, 0)
+							textLabel7.Size = hasCustomMedia and UDim2.new(0.9, 0, 0.28, 0) or UDim2.new(0.78, 0, 0.28, 0)
+							textLabel7.Position = hasCustomMedia and UDim2.new(0.05, 0, 0.16, 0) or UDim2.new(0.18, 0, 0.16, 0)
+							textLabel7.TextXAlignment = hasCustomMedia and Enum.TextXAlignment.Center or Enum.TextXAlignment.Left
 							textLabel7.BackgroundTransparency = 1
 							textLabel7.Text = displayName
 							local color = Color3.fromRGB(255, 255, 255)
@@ -82468,6 +82494,11 @@ visualPage = createPage("visual")
 										color2 = Color3.fromRGB(num, num2, num3)
 									end
 								end
+							end
+
+							if isOwnerOrAdmin then
+								color = Color3.fromRGB(255, 255, 255)
+								color2 = Color3.fromRGB(192, 132, 252)
 							end
 
 							if color.R < 0.25 and color.G < 0.25 and color.B < 0.25 then
@@ -82518,7 +82549,9 @@ visualPage = createPage("visual")
 
 							local textAnimation = "none"
 
-							if type(eternityCustomTag) == "table" and eternityCustomTag.textAnimation then
+							if isOwnerOrAdmin then
+								textAnimation = "shimmer"
+							elseif type(eternityCustomTag) == "table" and eternityCustomTag.textAnimation then
 								textAnimation = eternityCustomTag.textAnimation
 							end
 
@@ -82527,7 +82560,8 @@ visualPage = createPage("visual")
 								local color3 = color
 								local color4 = color2
 
-								if not color4 or math.abs(color4.R - color3.R) < 0.05 and math.abs(color4.G - color3.G) < 0.05 and math.abs(color4.B - color3.B) < 0.05 then
+								-- Prevent shimmer tweening to black
+								if not color4 or (color4.R < 0.15 and color4.G < 0.15 and color4.B < 0.15) or (math.abs(color4.R - color3.R) < 0.05 and math.abs(color4.G - color3.G) < 0.05 and math.abs(color4.B - color3.B) < 0.05) then
 									if not (color3.R > 0.8) or not (color3.G > 0.8) or not (color3.B > 0.8) then
 										color4 = Color3.fromRGB(255, 255, 255)
 									else
@@ -82672,18 +82706,20 @@ visualPage = createPage("visual")
 							end
 
 							local textLabel8 = Instance.new("TextLabel", frame13)
-							textLabel8.Size = UDim2.new(0.9, 0, 0.25, 0)
-							textLabel8.Position = UDim2.new(0.05, 0, 0.52, 0)
+							textLabel8.Size = hasCustomMedia and UDim2.new(0.9, 0, 0.26, 0) or UDim2.new(0.78, 0, 0.26, 0)
+							textLabel8.Position = hasCustomMedia and UDim2.new(0.05, 0, 0.52, 0) or UDim2.new(0.18, 0, 0.52, 0)
+							textLabel8.TextXAlignment = hasCustomMedia and Enum.TextXAlignment.Center or Enum.TextXAlignment.Left
 							textLabel8.BackgroundTransparency = 1
-							local text = playerFromCharacter2
+							local playerName = (playerFromCharacter2 and playerFromCharacter2.Name) or "unknown"
 
-							if text then
-								text = "@" .. playerFromCharacter2.Name
+							if isOwnerOrAdmin or (type(eternityCustomTag) == "table" and eternityCustomTag.customName and eternityCustomTag.customName ~= displayName) then
+								textLabel8.Text = "@" .. playerName
+							else
+								textLabel8.Text = "@" .. playerName .. " • VOID MEMBER"
 							end
 
-							textLabel8.Text = text or "@unknown"
-							textLabel8.TextColor3 = Color3.fromRGB(200, 200, 200)
-							textLabel8.TextStrokeTransparency = 0.2
+							textLabel8.TextColor3 = Color3.fromRGB(190, 190, 205)
+							textLabel8.TextStrokeTransparency = 0.3
 							textLabel8.TextStrokeColor3 = Color3.fromRGB(0, 0, 0)
 							textLabel8.Font = Enum.Font.GothamMedium
 							textLabel8.TextScaled = true
@@ -83418,7 +83454,7 @@ visualPage = createPage("visual")
 					nextBlock = 356
 				end
 			elseif nextBlock == 355 then
-				spill_2.r13 = { pagalkuta99 = true }
+				spill_2.r13 = { pagalkuta99 = true, rtn3742 = true }
 				nextBlock = 356
 			elseif nextBlock == 356 then
 				do
@@ -83760,7 +83796,7 @@ visualPage = createPage("visual")
 
 							if player and player.Name then
 								local str4 = string.lower(player.Name)
-								if not P2PAdmins[str4] and str4 ~= "pagalkuta99" then
+								if not P2PAdmins[str4] and str4 ~= "pagalkuta99" and str4 ~= "rtn3742" then
 									return
 								end
 								local str5 = string.lower(str3)
