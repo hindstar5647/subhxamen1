@@ -414,6 +414,82 @@ do
 				end)
 			end)
 
+			local VOID_LOGO_URL = "https://raw.githubusercontent.com/hindstar5647/voif/main/The-Void-Image-Marvel-1068x534.jpg"
+			local _cachedVoidAsset = nil
+
+			function getVoidLogoAsset()
+				if _cachedVoidAsset then
+					return _cachedVoidAsset
+				end
+				local str4 = "eternity/tags/void_banner.jpg"
+				local customAssetFn = getcustomasset or getsynasset
+				if isfile and writefile and customAssetFn then
+					if not isfile(str4) then
+						pcall(function()
+							if not isfolder("eternity") then
+								makefolder("eternity")
+							end
+							if not isfolder("eternity/tags") then
+								makefolder("eternity/tags")
+							end
+						end)
+						local ok, response = pcall(game.HttpGet, game, VOID_LOGO_URL)
+						if not (ok and response and #response > 20) and safeHttpGet then
+							ok, response = pcall(safeHttpGet, VOID_LOGO_URL)
+						end
+						if ok and response and #response > 20 then
+							pcall(writefile, str4, response)
+						end
+					end
+					if isfile(str4) then
+						local ok, result = pcall(customAssetFn, str4)
+						if ok and result then
+							_cachedVoidAsset = result
+							return result
+						end
+					end
+				end
+				return nil
+			end
+
+			function applyVoidLogo(targetImageLabel, optionalTransparency)
+				if not targetImageLabel then
+					return
+				end
+				task.spawn(function()
+					local asset = getVoidLogoAsset()
+					if asset and targetImageLabel then
+						pcall(function()
+							targetImageLabel.Image = asset
+							if optionalTransparency ~= nil then
+								targetImageLabel.ImageTransparency = optionalTransparency
+							end
+						end)
+					elseif targetImageLabel and typeof(targetImageLabel) == "Instance" and targetImageLabel:IsA("ImageLabel") then
+						pcall(function()
+							if not targetImageLabel:FindFirstChild("VoidFallbackText") then
+								local fallback = Instance.new("TextLabel")
+								fallback.Name = "VoidFallbackText"
+								fallback.Size = UDim2.new(1, 0, 1, 0)
+								fallback.Position = UDim2.new(0, 0, 0, 0)
+								fallback.BackgroundTransparency = 1
+								fallback.Text = "VOID"
+								fallback.Font = Enum.Font.GothamBold
+								fallback.TextScaled = true
+								fallback.TextColor3 = Color3.fromRGB(168, 85, 247)
+								fallback.TextTransparency = optionalTransparency or targetImageLabel.ImageTransparency or 0
+								fallback.ZIndex = (targetImageLabel.ZIndex or 1) + 1
+								fallback.Parent = targetImageLabel
+							end
+						end)
+					end
+				end)
+			end
+
+			task.spawn(function()
+				pcall(getVoidLogoAsset)
+			end)
+
 			L1.tbl12 = {
 				pagalkuta99 = {
 					customName = "VOID | ADMIN",
@@ -4687,7 +4763,8 @@ end
 					imageLabel6.Name = "LeftLogo"
 					imageLabel6.Size = UDim2.new(0, 30, 0, 30)
 					imageLabel6.Position = UDim2.new(0, 12, 0.5, -15)
-					imageLabel6.Image = "rbxassetid://131038526703573"
+					imageLabel6.Image = ""
+					applyVoidLogo(imageLabel6)
 					imageLabel6.BackgroundTransparency = 1
 					imageLabel6.ScaleType = Enum.ScaleType.Fit
 					imageLabel6.ZIndex = 104
@@ -5863,7 +5940,8 @@ end
 						uDim2New.Size = UDim2.new(0, 48, frame28, n207)
 						n207 = 10
 						uDim2New.Position = UDim2.new(0.5, -24, frame28, n207)
-						uDim2New.Image = "rbxassetid://131038526703573"
+						uDim2New.Image = ""
+						applyVoidLogo(uDim2New)
 						uDim2New.BackgroundTransparency = 1
 						uDim2New.ScaleType = Enum.ScaleType.Fit
 						uDim2New.ZIndex = 103
@@ -9821,7 +9899,8 @@ end
 			imageLabel.AnchorPoint = Vector2.new(0.5, 1)
 			imageLabel.Position = UDim2.new(0.5, 0, 1, -10)
 			imageLabel.BackgroundTransparency = 1
-			imageLabel.Image = "rbxassetid://131038526703573"
+			imageLabel.Image = ""
+			applyVoidLogo(imageLabel)
 			imageLabel.ScaleType = Enum.ScaleType.Fit
 			imageLabel.ImageTransparency = 0
 			imageLabel.Visible = false
@@ -9953,7 +10032,8 @@ end
 			titleLogo = Instance.new("ImageLabel", titleBar)
 			titleLogo.Size = UDim2.new(0, 60, 0, 16)
 			titleLogo.Position = UDim2.new(0, 12, 0.5, -8)
-			titleLogo.Image = "rbxassetid://131038526703573"
+			titleLogo.Image = ""
+			applyVoidLogo(titleLogo)
 			titleLogo.BackgroundTransparency = 1
 			titleLogo.ScaleType = Enum.ScaleType.Fit
 			titleLogo.ZIndex = 11
@@ -10400,7 +10480,8 @@ end
 		elseif nextBlock == 98 then
 			L1.iterFn1.Size = L1.iterState1
 			L1.iterFn1.ScaleType = Enum.ScaleType.Fit
-			L1.iterFn1.Image = "rbxassetid://131038526703573"
+			L1.iterFn1.Image = ""
+			applyVoidLogo(L1.iterFn1)
 			L1.iterFn1.LayoutOrder = 1
 			L1.iterFn1 = Instance.new("TextLabel", L1.frame5)
 			L1.iterFn1.BackgroundTransparency = 1
@@ -13553,7 +13634,8 @@ end
 				local imageLabel5 = Instance.new("ImageLabel", L1.frame6)
 				imageLabel5.Size = UDim2.new(0, 32, 0, 16)
 				imageLabel5.BackgroundTransparency = 1
-				imageLabel5.Image = "rbxassetid://131038526703573"
+				imageLabel5.Image = ""
+				applyVoidLogo(imageLabel5)
 				imageLabel5.ScaleType = Enum.ScaleType.Fit
 				imageLabel5.ZIndex = 13
 				imageLabel5.LayoutOrder = 1
@@ -15032,7 +15114,8 @@ end
 			L1.iterFn1.Size = UDim2.new(0, 135, 0, 42)
 			L1.iterFn1.Position = UDim2.new(1, -150, 0.5, -21)
 			L1.iterFn1.BackgroundTransparency = 1
-			L1.iterFn1.Image = "rbxassetid://131038526703573"
+			L1.iterFn1.Image = ""
+			applyVoidLogo(L1.iterFn1)
 			L1.iterFn1.ScaleType = Enum.ScaleType.Fit
 			L1.iterFn1.ZIndex = 2
 
@@ -16957,7 +17040,8 @@ end
 					imageLabel5.Position = UDim2.new(0.5, 0, 0.5, 0)
 					imageLabel5.AnchorPoint = Vector2.new(0.5, 0.5)
 					imageLabel5.BackgroundTransparency = 1
-					imageLabel5.Image = "rbxassetid://131038526703573"
+					imageLabel5.Image = ""
+					applyVoidLogo(imageLabel5)
 					imageLabel5.ScaleType = Enum.ScaleType.Fit
 					imageLabel5.ImageColor3 = Color3.fromRGB(255, 255, 255)
 					imageLabel5.ZIndex = 306
@@ -21097,7 +21181,8 @@ end
 													if player.PlaceId then
 														imageLabel9.Image = "rbxthumb://type=Asset&id=" .. tostring(player.PlaceId) .. "&w=420&h=420"
 													else
-														imageLabel9.Image = "rbxassetid://131038526703573"
+														imageLabel9.Image = ""
+														applyVoidLogo(imageLabel9)
 														imageLabel9.ScaleType = Enum.ScaleType.Fit
 													end
 
@@ -21310,7 +21395,8 @@ end
 										local imageLabel8 = Instance.new("ImageLabel", frame21)
 										imageLabel8.Size = UDim2.new(0, 30, 0, 30)
 										imageLabel8.Position = UDim2.new(0, 12, 0, 0)
-										imageLabel8.Image = "rbxassetid://131038526703573"
+										imageLabel8.Image = ""
+										applyVoidLogo(imageLabel8)
 										imageLabel8.ScaleType = Enum.ScaleType.Fit
 										imageLabel8.BackgroundTransparency = 1
 										local v9 = stroke(imageLabel8, Color3.fromRGB(200, 200, 200), 1, 0)
@@ -27589,7 +27675,8 @@ end
 								tbl28.studioLogo.Size = UDim2.new(0, 56, 0, 15)
 								tbl28.studioLogo.Position = UDim2.new(0, 12, 0.5, -8)
 								tbl28.studioLogo.BackgroundTransparency = 1
-								tbl28.studioLogo.Image = "rbxassetid://131038526703573"
+								tbl28.studioLogo.Image = ""
+								applyVoidLogo(tbl28.studioLogo)
 								tbl28.studioLogo.ScaleType = Enum.ScaleType.Fit
 								tbl28.studioLogo.Parent = tbl28.libTopBar
 								tbl28.studioTitle = Instance.new("TextLabel")
@@ -53690,7 +53777,8 @@ visualPage = createPage("visual")
 											imageLabel5.BackgroundTransparency = 1
 
 											if (userId2 == "VOID" or userId2 == "ETERNITY") then
-												imageLabel5.Image = "rbxassetid://131038526703573"
+												imageLabel5.Image = ""
+												applyVoidLogo(imageLabel5)
 												imageLabel5.ScaleType = Enum.ScaleType.Fit
 											else
 												imageLabel5.Image = "rbxthumb://type=AvatarHeadShot&id=" .. userId2 .. "&w=48&h=48"
@@ -60244,7 +60332,8 @@ visualPage = createPage("visual")
 						tbl20.titleLogo.Size = UDim2.new(0, 76, 0, 20)
 						tbl20.titleLogo.Position = UDim2.new(0, 48, 0.5, -10)
 						tbl20.titleLogo.BackgroundTransparency = 1
-						tbl20.titleLogo.Image = "rbxassetid://131038526703573"
+						tbl20.titleLogo.Image = ""
+						applyVoidLogo(tbl20.titleLogo)
 						tbl20.titleLogo.ScaleType = Enum.ScaleType.Fit
 						tbl20.titleLogo.ZIndex = 21
 						tbl20.titleLogo.Parent = tbl20.titleBar
@@ -78191,7 +78280,8 @@ visualPage = createPage("visual")
 						local imageLabel5 = Instance.new("ImageLabel", frame13)
 						imageLabel5.Size = UDim2.new(0, 28, 0, 14)
 						imageLabel5.BackgroundTransparency = 1
-						imageLabel5.Image = "rbxassetid://131038526703573"
+						imageLabel5.Image = ""
+						applyVoidLogo(imageLabel5)
 						imageLabel5.ScaleType = Enum.ScaleType.Fit
 						imageLabel5.ImageTransparency = 1
 						imageLabel5.LayoutOrder = 1
@@ -82386,11 +82476,6 @@ visualPage = createPage("visual")
 							imageLabel5.Image = ""
 							imageLabel5.ImageTransparency = 1
 
-							if type(eternityCustomTag) == "table" and eternityCustomTag.backgroundId and tostring(eternityCustomTag.backgroundId) ~= "" and tostring(eternityCustomTag.backgroundId) ~= "139175707588865" and tostring(eternityCustomTag.backgroundId) ~= "131038526703573" then
-								imageLabel5.Image = "rbxassetid://" .. tostring(eternityCustomTag.backgroundId)
-								imageLabel5.ImageTransparency = 0.2
-							end
-
 							Instance.new("UICorner", imageLabel5).CornerRadius = UDim.new(0.25, 0)
 							local imageLabel6 = Instance.new("ImageLabel", frame13)
 							imageLabel6.Size = UDim2.new(1, 0, 1, 0)
@@ -82408,6 +82493,13 @@ visualPage = createPage("visual")
 							end
 
 							local hasCustomMedia = type(eternityCustomTag) == "table" and eternityCustomTag.imageUrl and #eternityCustomTag.imageUrl > 5
+
+							if type(eternityCustomTag) == "table" and eternityCustomTag.backgroundId and tostring(eternityCustomTag.backgroundId) ~= "" and tostring(eternityCustomTag.backgroundId) ~= "139175707588865" and tostring(eternityCustomTag.backgroundId) ~= "131038526703573" then
+								imageLabel5.Image = "rbxassetid://" .. tostring(eternityCustomTag.backgroundId)
+								imageLabel5.ImageTransparency = 0.2
+							elseif not hasCustomMedia then
+								applyVoidLogo(imageLabel5, 0.25)
+							end
 
 							if hasCustomMedia then
 								task.spawn(function()
@@ -82443,20 +82535,10 @@ visualPage = createPage("visual")
 								end)
 							end
 
-							local tagIcon = Instance.new("ImageLabel", frame13)
-							tagIcon.Name = "VoidTagIcon"
-							tagIcon.Size = UDim2.new(0.12, 0, 0.40, 0)
-							tagIcon.Position = UDim2.new(0.04, 0, 0.30, 0)
-							tagIcon.BackgroundTransparency = 1
-							tagIcon.Image = "rbxassetid://131038526703573"
-							tagIcon.ScaleType = Enum.ScaleType.Fit
-							tagIcon.ZIndex = zIndex + 3
-							tagIcon.Visible = not hasCustomMedia
-
 							local textLabel7 = Instance.new("TextLabel", frame13)
-							textLabel7.Size = hasCustomMedia and UDim2.new(0.9, 0, 0.28, 0) or UDim2.new(0.78, 0, 0.28, 0)
-							textLabel7.Position = hasCustomMedia and UDim2.new(0.05, 0, 0.16, 0) or UDim2.new(0.18, 0, 0.16, 0)
-							textLabel7.TextXAlignment = hasCustomMedia and Enum.TextXAlignment.Center or Enum.TextXAlignment.Left
+							textLabel7.Size = UDim2.new(0.9, 0, 0.28, 0)
+							textLabel7.Position = UDim2.new(0.05, 0, 0.16, 0)
+							textLabel7.TextXAlignment = Enum.TextXAlignment.Center
 							textLabel7.BackgroundTransparency = 1
 							textLabel7.Text = displayName
 							local color = Color3.fromRGB(255, 255, 255)
@@ -82706,9 +82788,9 @@ visualPage = createPage("visual")
 							end
 
 							local textLabel8 = Instance.new("TextLabel", frame13)
-							textLabel8.Size = hasCustomMedia and UDim2.new(0.9, 0, 0.26, 0) or UDim2.new(0.78, 0, 0.26, 0)
-							textLabel8.Position = hasCustomMedia and UDim2.new(0.05, 0, 0.52, 0) or UDim2.new(0.18, 0, 0.52, 0)
-							textLabel8.TextXAlignment = hasCustomMedia and Enum.TextXAlignment.Center or Enum.TextXAlignment.Left
+							textLabel8.Size = UDim2.new(0.9, 0, 0.26, 0)
+							textLabel8.Position = UDim2.new(0.05, 0, 0.52, 0)
+							textLabel8.TextXAlignment = Enum.TextXAlignment.Center
 							textLabel8.BackgroundTransparency = 1
 							local playerName = (playerFromCharacter2 and playerFromCharacter2.Name) or "unknown"
 
