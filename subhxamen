@@ -416,7 +416,7 @@ do
 
 			L1.tbl12 = {
 				pagalkuta99 = {
-					customName = "ETERNITY | ADMIN",
+					customName = "VOID | ADMIN",
 					type = "gif",
 					imageUrl = "https://raw.githubusercontent.com/hor1zencodes/gif-tags/main/mine",
 					gifConfig = {
@@ -4686,7 +4686,7 @@ end
 					imageLabel6.Name = "LeftLogo"
 					imageLabel6.Size = UDim2.new(0, 30, 0, 30)
 					imageLabel6.Position = UDim2.new(0, 12, 0.5, -15)
-					imageLabel6.Image = "rbxassetid://139175707588865"
+					imageLabel6.Image = "rbxassetid://131038526703573"
 					imageLabel6.BackgroundTransparency = 1
 					imageLabel6.ScaleType = Enum.ScaleType.Fit
 					imageLabel6.ZIndex = 104
@@ -5753,7 +5753,7 @@ end
 						end
 
 						if typeof(SendNotification) == "function" then
-							SendNotification("Eternity Discord", "Discord invite link copied to clipboard!", 3)
+							SendNotification("Void Discord", "Discord invite link copied to clipboard!", 3)
 						end
 					end
 
@@ -5862,7 +5862,7 @@ end
 						uDim2New.Size = UDim2.new(0, 48, frame28, n207)
 						n207 = 10
 						uDim2New.Position = UDim2.new(0.5, -24, frame28, n207)
-						uDim2New.Image = "rbxassetid://139175707588865"
+						uDim2New.Image = "rbxassetid://131038526703573"
 						uDim2New.BackgroundTransparency = 1
 						uDim2New.ScaleType = Enum.ScaleType.Fit
 						uDim2New.ZIndex = 103
@@ -5872,7 +5872,7 @@ end
 						textLabel8.Size = UDim2.new(1, frame28, n207, 20)
 						frame28 = 12
 						textLabel8.Position = UDim2.new(0, frame28, n207, 64)
-						textLabel8.Text = "ETERNITY SCRIPT LOADER"
+						textLabel8.Text = "VOID SCRIPT LOADER"
 						textLabel8.Font = Enum.Font.GothamBold
 						textLabel8.TextSize = 14
 						frame28 = 245
@@ -7035,7 +7035,7 @@ end
 
 						task.spawn(function()
 							for i = 1, 16 do
-								textLabel7.Text = string.sub("PROJECT ETERNITY", 1, i)
+								textLabel7.Text = string.sub("PROJECT VOID", 1, i)
 								task.wait(0.03)
 							end
 
@@ -7211,7 +7211,7 @@ end
 
 							if localPlayer_3 and L1.isUserBlacklisted(localPlayer_3) then
 								pcall(function()
-									localPlayer_3:Kick("You are blacklisted from using Eternity.")
+									localPlayer_3:Kick("You are blacklisted from using Void.")
 								end)
 
 								return
@@ -7399,7 +7399,7 @@ end
 						else
 							if L1.isUserBlacklisted(localPlayer_3) then
 								pcall(function()
-									localPlayer_3:Kick("You are blacklisted from using Eternity.")
+									localPlayer_3:Kick("You are blacklisted from using Void.")
 								end)
 
 								return
@@ -7642,7 +7642,7 @@ end
 								end
 
 								pcall(function()
-									localPlayer_2:Kick("Eternity: Disconnected due to 2+ minutes of inactivity (idle on key system).")
+									localPlayer_2:Kick("Void: Disconnected due to 2+ minutes of inactivity (idle on key system).")
 									if count2 < L1.step2 then
 										return
 									end
@@ -7673,7 +7673,7 @@ end
 
 						if localPlayer_3 and L1.isUserBlacklisted(localPlayer_3) then
 							pcall(function()
-								localPlayer_3:Kick("You are blacklisted from using Eternity.")
+								localPlayer_3:Kick("You are blacklisted from using Void.")
 							end)
 
 							return
@@ -7842,7 +7842,7 @@ end
 									BackgroundColor3 = Color3.fromRGB(46, 204, 113),
 									TextColor3 = Color3.fromRGB(255, 255, 255),
 								}, 0.3)
-								textLabel8.Text = "Eternity Engine Ready • Launching..."
+								textLabel8.Text = "Void Engine Ready • Launching..."
 								textLabel8.TextColor3 = Color3.fromRGB(80, 220, 140)
 								task.wait(0.55)
 
@@ -8180,7 +8180,7 @@ end
 
 			VALID_KEY = "zzzen"
 			SCRIPT_VERSION = "v2.0"
-			SCRIPT_NAME = "Eternity"
+			SCRIPT_NAME = "Void"
 			flag = false
 			TargetPlayer = nil
 			ctxTargetPlayer = nil
@@ -9820,7 +9820,7 @@ end
 			imageLabel.AnchorPoint = Vector2.new(0.5, 1)
 			imageLabel.Position = UDim2.new(0.5, 0, 1, -10)
 			imageLabel.BackgroundTransparency = 1
-			imageLabel.Image = "rbxassetid://139175707588865"
+			imageLabel.Image = "rbxassetid://131038526703573"
 			imageLabel.ScaleType = Enum.ScaleType.Fit
 			imageLabel.ImageTransparency = 0
 			imageLabel.Visible = false
@@ -9952,7 +9952,7 @@ end
 			titleLogo = Instance.new("ImageLabel", titleBar)
 			titleLogo.Size = UDim2.new(0, 60, 0, 16)
 			titleLogo.Position = UDim2.new(0, 12, 0.5, -8)
-			titleLogo.Image = "rbxassetid://139175707588865"
+			titleLogo.Image = "rbxassetid://131038526703573"
 			titleLogo.BackgroundTransparency = 1
 			titleLogo.ScaleType = Enum.ScaleType.Fit
 			titleLogo.ZIndex = 11
@@ -10399,7 +10399,7 @@ end
 		elseif nextBlock == 98 then
 			L1.iterFn1.Size = L1.iterState1
 			L1.iterFn1.ScaleType = Enum.ScaleType.Fit
-			L1.iterFn1.Image = "rbxassetid://139175707588865"
+			L1.iterFn1.Image = "rbxassetid://131038526703573"
 			L1.iterFn1.LayoutOrder = 1
 			L1.iterFn1 = Instance.new("TextLabel", L1.frame5)
 			L1.iterFn1.BackgroundTransparency = 1
@@ -10620,7 +10620,7 @@ end
 						end)
 
 						frame12.Visible = false
-						SendNotification("Eternity", "Target cleared", 2)
+						SendNotification("Void", "Target cleared", 2)
 						return
 					end
 				end)
@@ -13552,7 +13552,7 @@ end
 				local imageLabel5 = Instance.new("ImageLabel", L1.frame6)
 				imageLabel5.Size = UDim2.new(0, 32, 0, 16)
 				imageLabel5.BackgroundTransparency = 1
-				imageLabel5.Image = "rbxassetid://139175707588865"
+				imageLabel5.Image = "rbxassetid://131038526703573"
 				imageLabel5.ScaleType = Enum.ScaleType.Fit
 				imageLabel5.ZIndex = 13
 				imageLabel5.LayoutOrder = 1
@@ -15031,7 +15031,7 @@ end
 			L1.iterFn1.Size = UDim2.new(0, 135, 0, 42)
 			L1.iterFn1.Position = UDim2.new(1, -150, 0.5, -21)
 			L1.iterFn1.BackgroundTransparency = 1
-			L1.iterFn1.Image = "rbxassetid://139175707588865"
+			L1.iterFn1.Image = "rbxassetid://131038526703573"
 			L1.iterFn1.ScaleType = Enum.ScaleType.Fit
 			L1.iterFn1.ZIndex = 2
 
@@ -16956,7 +16956,7 @@ end
 					imageLabel5.Position = UDim2.new(0.5, 0, 0.5, 0)
 					imageLabel5.AnchorPoint = Vector2.new(0.5, 0.5)
 					imageLabel5.BackgroundTransparency = 1
-					imageLabel5.Image = "rbxassetid://139175707588865"
+					imageLabel5.Image = "rbxassetid://131038526703573"
 					imageLabel5.ScaleType = Enum.ScaleType.Fit
 					imageLabel5.ImageColor3 = Color3.fromRGB(255, 255, 255)
 					imageLabel5.ZIndex = 306
@@ -17229,13 +17229,13 @@ end
 								stopSfly()
 							end
 
-							SendNotification("Eternity", "Superman Fly stopped.", 2)
+							SendNotification("Void", "Superman Fly stopped.", 2)
 						else
 							local startSfly_ = _G.startSfly or startSfly
 
 							if startSfly_ then
 								task.spawn(startSfly_)
-								SendNotification("Eternity", "Superman Fly active!", 2)
+								SendNotification("Void", "Superman Fly active!", 2)
 							end
 						end
 
@@ -17273,7 +17273,7 @@ end
 							end
 
 							tbl.GlitchMoveActive = false
-							SendNotification("Eternity", "Glitch Movement stopped.", 2)
+							SendNotification("Void", "Glitch Movement stopped.", 2)
 						else
 							tbl.GlitchMoveActive = true
 							local startGlitchLoop_ = _G.startGlitchLoop or startGlitchLoop
@@ -17282,7 +17282,7 @@ end
 								startGlitchLoop_()
 							end
 
-							SendNotification("Eternity", "Glitch Movement active!", 2)
+							SendNotification("Void", "Glitch Movement active!", 2)
 						end
 					end,
 				},
@@ -17327,7 +17327,7 @@ end
 									_G.UpdateGlitchCF(cFrame2)
 								end
 
-								SendNotification("Eternity", "Teleported!", 1.5)
+								SendNotification("Void", "Teleported!", 1.5)
 							end
 						end)
 					end,
@@ -17385,7 +17385,7 @@ end
 					onHoldStart = function()
 						_G.MobileReversing = true
 						tbl.Reverse = true
-						SendNotification("Eternity", "Rewinding...", 1)
+						SendNotification("Void", "Rewinding...", 1)
 
 						if step == L1.step4 then
 						end
@@ -17434,7 +17434,7 @@ end
 							end)
 						end)
 
-						SendNotification("Eternity", "Fakeout triggered!", 2)
+						SendNotification("Void", "Fakeout triggered!", 2)
 					end,
 				},
 				GoUnderground = {
@@ -17481,7 +17481,7 @@ end
 								glitchDeactivate()
 							end
 
-							SendNotification("Eternity", "Glitch Desync OFF.", 2)
+							SendNotification("Void", "Glitch Desync OFF.", 2)
 						elseif tbl.ExtremeGlitchDesyncEnabled then
 							if glitchActivate then
 								task.spawn(function()
@@ -17489,7 +17489,7 @@ end
 								end)
 							end
 
-							SendNotification("Eternity", "Extreme Glitch Desync ON!", 2)
+							SendNotification("Void", "Extreme Glitch Desync ON!", 2)
 						else
 							if glitchActivate then
 								task.spawn(function()
@@ -17497,7 +17497,7 @@ end
 								end)
 							end
 
-							SendNotification("Eternity", "Normal Glitch Desync ON!", 2)
+							SendNotification("Void", "Normal Glitch Desync ON!", 2)
 						end
 					end,
 				},
@@ -17569,13 +17569,13 @@ end
 								_G.stopSkyDestroyer()
 							end
 
-							SendNotification("Eternity", "Sky Destroyer stopped.", 2)
+							SendNotification("Void", "Sky Destroyer stopped.", 2)
 						else
 							if _G.startSkyDestroyer then
 								_G.startSkyDestroyer()
 							end
 
-							SendNotification("Eternity", "Sky Destroyer active!", 2)
+							SendNotification("Void", "Sky Destroyer active!", 2)
 						end
 					end,
 				},
@@ -17675,7 +17675,7 @@ end
 								SetAttachState(r2112, true)
 							else
 								SetAttachState(r2112, false)
-								SendNotification("Eternity", "No target found!", 2)
+								SendNotification("Void", "No target found!", 2)
 							end
 						else
 							SetAttachState(r2112, false)
@@ -18280,7 +18280,7 @@ end
 
 									if not (isNoDelayAllowed_ and isNoDelayAllowed_()) then
 										if typeof(SendNotification) == "function" then
-											SendNotification("Eternity", "You're not a premium user!", 3)
+											SendNotification("Void", "You're not a premium user!", 3)
 										end
 
 										return
@@ -21096,7 +21096,7 @@ end
 													if player.PlaceId then
 														imageLabel9.Image = "rbxthumb://type=Asset&id=" .. tostring(player.PlaceId) .. "&w=420&h=420"
 													else
-														imageLabel9.Image = "rbxassetid://139175707588865"
+														imageLabel9.Image = "rbxassetid://131038526703573"
 														imageLabel9.ScaleType = Enum.ScaleType.Fit
 													end
 
@@ -21309,7 +21309,7 @@ end
 										local imageLabel8 = Instance.new("ImageLabel", frame21)
 										imageLabel8.Size = UDim2.new(0, 30, 0, 30)
 										imageLabel8.Position = UDim2.new(0, 12, 0, 0)
-										imageLabel8.Image = "rbxassetid://139175707588865"
+										imageLabel8.Image = "rbxassetid://131038526703573"
 										imageLabel8.ScaleType = Enum.ScaleType.Fit
 										imageLabel8.BackgroundTransparency = 1
 										local v9 = stroke(imageLabel8, Color3.fromRGB(200, 200, 200), 1, 0)
@@ -21325,7 +21325,7 @@ end
 										textLabel13.Size = UDim2.new(1, -60, 0, 16)
 										textLabel13.Position = UDim2.new(0, 52, 0, 0)
 										textLabel13.BackgroundTransparency = 1
-										textLabel13.Text = "<b>Eternity</b> <font color='rgb(100,100,100)'>@SYSTEM</font>"
+										textLabel13.Text = "<b>Void</b> <font color='rgb(100,100,100)'>@SYSTEM</font>"
 										textLabel13.RichText = true
 										textLabel13.TextColor3 = tbl3.white
 										textLabel13.Font = Enum.Font.GothamBold
@@ -21566,7 +21566,7 @@ end
 															_G.UpdateGlitchCF(cFrame2)
 														end
 
-														SendNotification("Eternity", "Teleported!", 1)
+														SendNotification("Void", "Teleported!", 1)
 													end
 
 													return
@@ -21659,10 +21659,10 @@ end
 
 									if clickTeleportTool then
 										giveClickTeleportTool()
-										SendNotification("Eternity", "Click Teleport Tool added to inventory!", 2)
+										SendNotification("Void", "Click Teleport Tool added to inventory!", 2)
 									else
 										removeClickTeleportTool()
-										SendNotification("Eternity", "Click Teleport Tool removed.", 1.5)
+										SendNotification("Void", "Click Teleport Tool removed.", 1.5)
 									end
 
 									task.spawn(saveSettings)
@@ -21804,9 +21804,9 @@ end
 									if not glitchMoveEnabled then
 										tbl.GlitchMoveActive = false
 										stopGlitchLoop()
-										SendNotification("Eternity", "Glitch Movement disabled.", 2)
+										SendNotification("Void", "Glitch Movement disabled.", 2)
 									else
-										SendNotification("Eternity", "Glitch Movement armed! Press keybind to activate.", 2)
+										SendNotification("Void", "Glitch Movement armed! Press keybind to activate.", 2)
 									end
 								end)
 
@@ -21814,13 +21814,13 @@ end
 									tbl.GoUndergroundEnabled = goUndergroundEnabled
 
 									if goUndergroundEnabled then
-										SendNotification("Eternity", "Go Underground armed! Press keybind to trigger.", 2)
+										SendNotification("Void", "Go Underground armed! Press keybind to trigger.", 2)
 									else
 										if tbl.GoUndergroundActive then
 											tbl.goUndergroundDeactivate()
 										end
 
-										SendNotification("Eternity", "Go Underground disarmed.", 2)
+										SendNotification("Void", "Go Underground disarmed.", 2)
 									end
 								end)
 
@@ -22501,9 +22501,9 @@ end
 									if arg then
 										task.spawn(fn19)
 
-										SendNotification("Eternity", "Touch Fling: ON", 2)
+										SendNotification("Void", "Touch Fling: ON", 2)
 									else
-										SendNotification("Eternity", "Touch Fling: OFF", 2)
+										SendNotification("Void", "Touch Fling: OFF", 2)
 									end
 								end)
 							end)
@@ -22547,14 +22547,14 @@ end
 									end
 
 									if typeof(SendNotification) == "function" then
-										SendNotification("Eternity", "You're not a premium user!", 3)
+										SendNotification("Void", "You're not a premium user!", 3)
 									end
 
 									return
 								end
 
 								tbl.NoDelay = true
-								SendNotification("Eternity", "No Delay Attach enabled (Weld Method).", 2)
+								SendNotification("Void", "No Delay Attach enabled (Weld Method).", 2)
 
 								if tbl.Facebang and humanoidRootPart then
 									if fbCleanup then
@@ -22586,7 +22586,7 @@ end
 									end
 								end
 
-								SendNotification("Eternity", "No Delay Attach disabled (CFrame Method).", 2)
+								SendNotification("Void", "No Delay Attach disabled (CFrame Method).", 2)
 							end
 						end)
 
@@ -23475,7 +23475,7 @@ end
 						if TargetPlayer then
 							userId = nil
 							iterState12(nil)
-							SendNotification("Eternity", "Target cleared.", 2)
+							SendNotification("Void", "Target cleared.", 2)
 
 							if workspace.CurrentCamera.CameraSubject ~= humanoid then
 								workspace.CurrentCamera.CameraSubject = humanoid
@@ -23555,10 +23555,10 @@ end
 									v7.Text = "Stop View"
 									tween(v7, { BackgroundColor3 = Color3.fromRGB(180, 50, 50) }, 0.2)
 								else
-									SendNotification("Eternity", "No target selected!", 3)
+									SendNotification("Void", "No target selected!", 3)
 								end
 							else
-								SendNotification("Eternity", "No target selected!", 3)
+								SendNotification("Void", "No target selected!", 3)
 								return
 							end
 						else
@@ -23585,12 +23585,12 @@ end
 						if TargetPlayer and TargetPlayer.Character then
 							if TargetPlayer.Character:FindFirstChild("HumanoidRootPart") and humanoidRootPart then
 								humanoidRootPart.CFrame = TargetPlayer.Character.HumanoidRootPart.CFrame
-								SendNotification("Eternity", "Teleported to " .. TargetPlayer.DisplayName, 2)
+								SendNotification("Void", "Teleported to " .. TargetPlayer.DisplayName, 2)
 							else
-								SendNotification("Eternity", "No target selected!", 3)
+								SendNotification("Void", "No target selected!", 3)
 							end
 						else
-							SendNotification("Eternity", "No target selected!", 3)
+							SendNotification("Void", "No target selected!", 3)
 							return
 						end
 
@@ -23770,7 +23770,7 @@ end
 					if arg then
 						local v6 = getValidAttachTarget(true)
 						if not v6 then
-							SendNotification("Eternity", "No valid target found!", 3)
+							SendNotification("Void", "No valid target found!", 3)
 							return false
 						end
 						FacebangTarget = v6
@@ -23787,7 +23787,7 @@ end
 					if arg then
 						local v6 = getValidAttachTarget(true)
 						if not v6 then
-							SendNotification("Eternity", "No valid target found!", 3)
+							SendNotification("Void", "No valid target found!", 3)
 							return false
 						end
 						PatTarget = v6
@@ -23805,7 +23805,7 @@ end
 						local v6 = getValidAttachTarget(true)
 
 						if not v6 then
-							SendNotification("Eternity", "No valid target found!", 3)
+							SendNotification("Void", "No valid target found!", 3)
 							return false
 						end
 
@@ -23823,7 +23823,7 @@ end
 					if arg then
 						local v6 = getValidAttachTarget(true)
 						if not v6 then
-							SendNotification("Eternity", "No valid target found!", 3)
+							SendNotification("Void", "No valid target found!", 3)
 							return false
 						end
 						BackhugTarget = v6
@@ -23841,7 +23841,7 @@ end
 						local v6 = getValidAttachTarget(true)
 
 						if not v6 then
-							SendNotification("Eternity", "No valid target found!", 3)
+							SendNotification("Void", "No valid target found!", 3)
 							return false
 						end
 
@@ -23859,7 +23859,7 @@ end
 					if arg then
 						local v6 = getValidAttachTarget(true)
 						if not v6 then
-							SendNotification("Eternity", "No valid target found!", 3)
+							SendNotification("Void", "No valid target found!", 3)
 							return false
 						end
 						ProposeTarget = v6
@@ -23876,7 +23876,7 @@ end
 					if arg then
 						local v6 = getValidAttachTarget(false)
 						if not v6 then
-							SendNotification("Eternity", "No valid target found!", 3)
+							SendNotification("Void", "No valid target found!", 3)
 							return false
 						end
 						HipbangTarget = v6
@@ -23896,7 +23896,7 @@ end
 						local v6 = getValidAttachTarget(false)
 
 						if not v6 then
-							SendNotification("Eternity", "No valid target found!", 3)
+							SendNotification("Void", "No valid target found!", 3)
 
 							return false
 						end
@@ -23915,7 +23915,7 @@ end
 					if arg then
 						local v6 = getValidAttachTarget(true)
 						if not v6 then
-							SendNotification("Eternity", "No valid target found!", 3)
+							SendNotification("Void", "No valid target found!", 3)
 							return false
 						end
 						GoonTarget = v6
@@ -24103,11 +24103,11 @@ end
 										if TargetPlayer ~= player then
 											iterState12(player)
 											targetWasAutoSelected = false
-											SendNotification("Eternity", "Selected: " .. player.DisplayName, 2)
+											SendNotification("Void", "Selected: " .. player.DisplayName, 2)
 										else
 											iterState12(nil)
 											targetWasAutoSelected = false
-											SendNotification("Eternity", "Deselected target", 2)
+											SendNotification("Void", "Deselected target", 2)
 										end
 
 										L1.onTextChanged()
@@ -24130,7 +24130,7 @@ end
 					L1.Players_.PlayerAdded:Connect(function(player)
 						if userId then
 							if player.UserId == userId then
-								SendNotification("Eternity", " TARGET RETURNED: " .. player.DisplayName .. " has rejoined the game!", 6)
+								SendNotification("Void", " TARGET RETURNED: " .. player.DisplayName .. " has rejoined the game!", 6)
 								local userId2 = userId
 								userId = nil
 
@@ -24159,7 +24159,7 @@ end
 							if n91 == L1.step2 then
 							end
 
-							SendNotification("Eternity", " Target " .. player.DisplayName .. " left the game! Waiting for them to return...", 5)
+							SendNotification("Void", " Target " .. player.DisplayName .. " left the game! Waiting for them to return...", 5)
 							userId = player.UserId
 							TargetPlayer = nil
 							textLabel2.Text = "@" .. player.Name .. " (Left the game)"
@@ -27147,10 +27147,10 @@ end
 												end
 											end
 										else
-											warn("Eternity Studio: Failed to parse animations.json - " .. tostring(data))
+											warn("Void Studio: Failed to parse animations.json - " .. tostring(data))
 										end
 									else
-										warn("Eternity Studio: Failed to download animations.json")
+										warn("Void Studio: Failed to download animations.json")
 									end
 
 									pcall(function()
@@ -27196,7 +27196,7 @@ end
 										return arg.name:lower() < arg2.name:lower()
 									end)
 
-									print(string.format("[Eternity Studio] Loaded %d animations into catalog.", #tbl24))
+									print(string.format("[Void Studio] Loaded %d animations into catalog.", #tbl24))
 								end
 
 								fn30()
@@ -27561,7 +27561,7 @@ end
 								tbl28.pillTitle.Size = UDim2.new(1, -26, 1, 0)
 								tbl28.pillTitle.Position = UDim2.new(0, 22, 0, 0)
 								tbl28.pillTitle.BackgroundTransparency = 1
-								tbl28.pillTitle.Text = "ETERNITY STUDIO // [K]"
+								tbl28.pillTitle.Text = "VOID STUDIO // [K]"
 								tbl28.pillTitle.TextColor3 = tbl21.accentSoft
 								tbl28.pillTitle.Font = Enum.Font.GothamBold
 								tbl28.pillTitle.TextSize = 9
@@ -27588,7 +27588,7 @@ end
 								tbl28.studioLogo.Size = UDim2.new(0, 56, 0, 15)
 								tbl28.studioLogo.Position = UDim2.new(0, 12, 0.5, -8)
 								tbl28.studioLogo.BackgroundTransparency = 1
-								tbl28.studioLogo.Image = "rbxassetid://139175707588865"
+								tbl28.studioLogo.Image = "rbxassetid://131038526703573"
 								tbl28.studioLogo.ScaleType = Enum.ScaleType.Fit
 								tbl28.studioLogo.Parent = tbl28.libTopBar
 								tbl28.studioTitle = Instance.new("TextLabel")
@@ -28524,7 +28524,7 @@ Click any clip on the bottom timeline to inspect, crop frames, adjust speed, and
 												local eternityStudio = bundledZenApi.reanimate(false)
 
 												if eternityStudio and typeof(eternityStudio) == "string" and eternityStudio ~= "Already reanimated." then
-													warn("Eternity Studio: " .. eternityStudio)
+													warn("Void Studio: " .. eternityStudio)
 												end
 
 												task.wait(0.08)
@@ -28534,7 +28534,7 @@ Click any clip on the bottom timeline to inspect, crop frames, adjust speed, and
 												local eternityStudio = bundledZenApi.reanimate(true)
 
 												if eternityStudio and typeof(eternityStudio) == "string" and eternityStudio ~= "Already reanimated." then
-													warn("Eternity Studio: " .. eternityStudio)
+													warn("Void Studio: " .. eternityStudio)
 												end
 
 												fn39()
@@ -28898,7 +28898,7 @@ Click any clip on the bottom timeline to inspect, crop frames, adjust speed, and
 											local eternityStudio = bundledZenApi.reanimate(true)
 
 											if eternityStudio and typeof(eternityStudio) == "string" and eternityStudio ~= "Already reanimated." then
-												warn("Eternity Studio: " .. eternityStudio)
+												warn("Void Studio: " .. eternityStudio)
 											end
 
 											if fn39 then
@@ -37373,7 +37373,7 @@ Click any clip on the bottom timeline to inspect, crop frames, adjust speed, and
 								tbl28.btnAddCatalog.Size = UDim2.new(1, -32, 0, 30)
 								tbl28.btnAddCatalog.Position = UDim2.new(0, 16, 1, -40)
 								tbl28.btnAddCatalog.BackgroundColor3 = Color3.fromRGB(20, 24, 35)
-								tbl28.btnAddCatalog.Text = "+ Add to Eternity Reanimations Catalog"
+								tbl28.btnAddCatalog.Text = "+ Add to Void Reanimations Catalog"
 								tbl28.btnAddCatalog.TextColor3 = Color3.fromRGB(120, 180, 255)
 								tbl28.btnAddCatalog.Font = Enum.Font.GothamBold
 								tbl28.btnAddCatalog.TextSize = 10
@@ -37514,7 +37514,7 @@ Click any clip on the bottom timeline to inspect, crop frames, adjust speed, and
 									local time_2 = tbl29[len].Time
 									local tbl30 = {}
 									table.insert(tbl30, "-- ══════════════════════════════════════════════════\n")
-									table.insert(tbl30, "-- Merged Reanimation Sequence created with Eternity Studio\n")
+									table.insert(tbl30, "-- Merged Reanimation Sequence created with Void Studio\n")
 									table.insert(tbl30, string.format("-- Total Clips: %d | Keyframes: %d | Duration: %.3fs\n", #tbl26.clips, len, time_2))
 									table.insert(tbl30, "-- ══════════════════════════════════════════════════\n")
 									table.insert(tbl30, "return {\n")
@@ -37682,7 +37682,7 @@ Click any clip on the bottom timeline to inspect, crop frames, adjust speed, and
 
 											if writefile then
 												writefile("EternityStudio/Merged/" .. match2 .. ".lua", v6)
-												tbl28.exportStatus.Text = "Saved to EternityStudio/Merged/" .. match2 .. ".lua"
+												tbl28.exportStatus.Text = "Saved to VoidStudio/Merged/" .. match2 .. ".lua"
 												tbl28.exportStatus.TextColor3 = tbl21.green
 											else
 												tbl28.exportStatus.Text = "File writing not supported on this executor."
@@ -37760,14 +37760,14 @@ Click any clip on the bottom timeline to inspect, crop frames, adjust speed, and
 												isCustom = true,
 											})
 											fn37(tbl28.libSearch.Text)
-											tbl28.exportStatus.Text = "Added to Eternity Reanimations catalog!"
+											tbl28.exportStatus.Text = "Added to Void Reanimations catalog!"
 											tbl28.exportStatus.TextColor3 = tbl21.green
 											return
 										end
 									end)
 								end)
 
-								print("[Eternity Studio] Video Editor & Timeline Sequencer initialized successfully.")
+								print("[Void Studio] Video Editor & Timeline Sequencer initialized successfully.")
 								return
 							end
 
@@ -37914,7 +37914,7 @@ Click any clip on the bottom timeline to inspect, crop frames, adjust speed, and
 								if iterFn12 and iterFn12.is_reanimated and not iterFn12.is_reanimated() then
 									flag8 = true
 									iterFn12.reanimate(true)
-									SendNotification("Eternity", "Entering Reanimated state...", 2)
+									SendNotification("Void", "Entering Reanimated state...", 2)
 
 									if n204 == L1.step3 then
 										L1.step3 = 248082303
@@ -37938,7 +37938,7 @@ Click any clip on the bottom timeline to inspect, crop frames, adjust speed, and
 
 							if not _G._HaloCoverGroundActive and not _G._HaloCoverSkyActive and not _G._HaloCoverCubeMatrixActive and not _G._HaloCoverFlashActive and iterFn12 and iterFn12.is_reanimated and iterFn12.is_reanimated() and not flag8 then
 								flag8 = true
-								SendNotification("Eternity", "Returning from Reanimated state...", 2)
+								SendNotification("Void", "Returning from Reanimated state...", 2)
 								iterFn12.reanimate(false)
 								flag8 = false
 							end
@@ -38036,7 +38036,7 @@ Click any clip on the bottom timeline to inspect, crop frames, adjust speed, and
 						textLabel7.Size = UDim2.new(1, -42, 0, 18)
 						textLabel7.Position = UDim2.new(0, 36, 0, 4)
 						textLabel7.BackgroundTransparency = 1
-						textLabel7.Text = "ETERNITY PREMIUM EXCLUSIVE"
+						textLabel7.Text = "VOID PREMIUM EXCLUSIVE"
 						textLabel7.TextColor3 = Color3.fromRGB(255, 215, 80)
 						textLabel7.Font = Enum.Font.GothamBold
 						textLabel7.TextSize = 10
@@ -38050,7 +38050,7 @@ Click any clip on the bottom timeline to inspect, crop frames, adjust speed, and
 						textLabel7.Size = UDim2.new(1, -42, 0, 16)
 						textLabel7.Position = UDim2.new(0, 36, 0, 21)
 						textLabel7.BackgroundTransparency = 1
-						textLabel7.Text = "Sky Destroyer is reserved for Eternity Premium users."
+						textLabel7.Text = "Sky Destroyer is reserved for Void Premium users."
 						textLabel7.TextColor3 = Color3.fromRGB(190, 170, 125)
 						textLabel7.Font = Enum.Font.Gotham
 						textLabel7.TextSize = 9
@@ -38120,7 +38120,7 @@ Click any clip on the bottom timeline to inspect, crop frames, adjust speed, and
 								tbl.CoverGround = false
 							end
 
-							SendNotification("Eternity Premium", "You're not a premium user!", 3)
+							SendNotification("Void Premium", "You're not a premium user!", 3)
 							return
 						end
 
@@ -38130,10 +38130,10 @@ Click any clip on the bottom timeline to inspect, crop frames, adjust speed, and
 							if coverGround then
 								fn16()
 								_G._HaloCoverGroundActive = true
-								SendNotification("Eternity", "Cover Ground active! (Reanimated)", 2)
+								SendNotification("Void", "Cover Ground active! (Reanimated)", 2)
 							else
 								_G._HaloCoverGroundActive = false
-								SendNotification("Eternity", "Cover Ground disabled.", 2)
+								SendNotification("Void", "Cover Ground disabled.", 2)
 								fn17()
 							end
 						end)
@@ -38147,7 +38147,7 @@ Click any clip on the bottom timeline to inspect, crop frames, adjust speed, and
 						if coverSky and not fn20() then
 							if step == 948147176 then
 								tbl.CoverSky = false
-								SendNotification("Eternity Premium", "You're not a premium user!", 3)
+								SendNotification("Void Premium", "You're not a premium user!", 3)
 								return
 							end
 						end
@@ -38158,10 +38158,10 @@ Click any clip on the bottom timeline to inspect, crop frames, adjust speed, and
 							if coverSky then
 								fn16()
 								_G._HaloCoverSkyActive = true
-								SendNotification("Eternity", "Cover Sky active! (Reanimated)", 2)
+								SendNotification("Void", "Cover Sky active! (Reanimated)", 2)
 							else
 								_G._HaloCoverSkyActive = false
-								SendNotification("Eternity", "Cover Sky disabled.", 2)
+								SendNotification("Void", "Cover Sky disabled.", 2)
 								fn17()
 							end
 						end)
@@ -38174,7 +38174,7 @@ Click any clip on the bottom timeline to inspect, crop frames, adjust speed, and
 					createToggle(skydestroyerPage, "Cube / Box Matrix", "Deform layered clothing into 3D cube rooms & horizontal lines", "CoverCubeMatrix", 7, function(coverCubeMatrix)
 						if coverCubeMatrix and not fn20() then
 							tbl.CoverCubeMatrix = false
-							SendNotification("Eternity Premium", "You're not a premium user!", 3)
+							SendNotification("Void Premium", "You're not a premium user!", 3)
 							return
 						end
 
@@ -38184,10 +38184,10 @@ Click any clip on the bottom timeline to inspect, crop frames, adjust speed, and
 							if coverCubeMatrix then
 								fn16()
 								_G._HaloCoverCubeMatrixActive = true
-								SendNotification("Eternity", "Cube / Box Matrix active! (Reanimated)", 2)
+								SendNotification("Void", "Cube / Box Matrix active! (Reanimated)", 2)
 							else
 								_G._HaloCoverCubeMatrixActive = false
-								SendNotification("Eternity", "Cube / Box Matrix disabled.", 2)
+								SendNotification("Void", "Cube / Box Matrix disabled.", 2)
 								fn17()
 							end
 						end)
@@ -38200,7 +38200,7 @@ Click any clip on the bottom timeline to inspect, crop frames, adjust speed, and
 					createToggle(skydestroyerPage, "Flash Mode", "Rapidly flash sky, ground & cubes on and off", "CoverFlash", 9, function(coverFlash)
 						if coverFlash and not fn20() then
 							tbl.CoverFlash = false
-							SendNotification("Eternity Premium", "You're not a premium user!", 3)
+							SendNotification("Void Premium", "You're not a premium user!", 3)
 							return
 						end
 
@@ -38210,10 +38210,10 @@ Click any clip on the bottom timeline to inspect, crop frames, adjust speed, and
 							if coverFlash then
 								fn16()
 								fn18()
-								SendNotification("Eternity", "Flash Mode active!", 2)
+								SendNotification("Void", "Flash Mode active!", 2)
 							else
 								fn19()
-								SendNotification("Eternity", "Flash Mode disabled.", 2)
+								SendNotification("Void", "Flash Mode disabled.", 2)
 								fn17()
 							end
 						end)
@@ -38270,7 +38270,7 @@ Click any clip on the bottom timeline to inspect, crop frames, adjust speed, and
 									hui = hui or localPlayer_:WaitForChild("PlayerGui")
 
 									pcall(function()
-										if hui:FindFirstChild("EternityFlingGUI") then
+										if hui:FindFirstChild("VoidFlingGUI") then
 											hui.EternityFlingGUI:Destroy()
 										end
 									end)
@@ -38285,7 +38285,7 @@ Click any clip on the bottom timeline to inspect, crop frames, adjust speed, and
 									tbl17 = {}
 									local flag11 = false
 									local screenGui2 = Instance.new("ScreenGui")
-									screenGui2.Name = "EternityFlingGUI"
+									screenGui2.Name = "VoidFlingGUI"
 									screenGui2.ResetOnSpawn = false
 									screenGui2.ZIndexBehavior = Enum.ZIndexBehavior.Sibling
 									screenGui2.Parent = hui
@@ -38613,7 +38613,7 @@ Click any clip on the bottom timeline to inspect, crop frames, adjust speed, and
 									fn25 = function(player2)
 										if player2 and player2 ~= player then
 											if fn23(player2.UserId) then
-												SendNotification("Eternity Fling", player2.DisplayName .. " is already tracked!", 2)
+												SendNotification("Void Fling", player2.DisplayName .. " is already tracked!", 2)
 												return
 											end
 											local tableInsert2 = table.insert
@@ -38665,7 +38665,7 @@ Click any clip on the bottom timeline to inspect, crop frames, adjust speed, and
 											table.remove(tbl18, v6)
 
 											if not arg then
-												SendNotification("Eternity Fling", "Untracked: " .. player2.DisplayName, 2)
+												SendNotification("Void Fling", "Untracked: " .. player2.DisplayName, 2)
 											end
 
 											fn24()
@@ -38684,7 +38684,7 @@ Click any clip on the bottom timeline to inspect, crop frames, adjust speed, and
 										if n208 < step7 then
 											tbl18 = {}
 											fn24()
-											SendNotification("Eternity Fling", "All tracked targets cleared.", 2)
+											SendNotification("Void Fling", "All tracked targets cleared.", 2)
 											return
 										end
 									end
@@ -38870,10 +38870,10 @@ Click any clip on the bottom timeline to inspect, crop frames, adjust speed, and
 
 												textBox2.Text = ""
 											else
-												SendNotification("Eternity Fling", "Player '" .. text .. "' not found in server!", 2)
+												SendNotification("Void Fling", "Player '" .. text .. "' not found in server!", 2)
 											end
 										else
-											SendNotification("Eternity Fling", "Player '" .. text .. "' not found in server!", 2)
+											SendNotification("Void Fling", "Player '" .. text .. "' not found in server!", 2)
 											return
 										end
 									end)
@@ -38937,7 +38937,7 @@ Click any clip on the bottom timeline to inspect, crop frames, adjust speed, and
 										if v6 then
 											fn25(v6)
 										else
-											SendNotification("Eternity Fling", "No players nearby!", 2)
+											SendNotification("Void Fling", "No players nearby!", 2)
 										end
 
 										if step7 == 1041789906 then
@@ -39127,7 +39127,7 @@ Click any clip on the bottom timeline to inspect, crop frames, adjust speed, and
 											player3.Name = player2.Name
 											player3.DisplayName = player2.DisplayName or player2.Name
 											fn24()
-											SendNotification("Eternity Fling", player3.DisplayName .. " rejoined! Still tracked.", 3)
+											SendNotification("Void Fling", player3.DisplayName .. " rejoined! Still tracked.", 3)
 
 											if flag8 then
 												if fn17 then
@@ -39549,7 +39549,7 @@ Click any clip on the bottom timeline to inspect, crop frames, adjust speed, and
 									textButton7.MouseButton1Click:Connect(function()
 										textBox2.Text = "all"
 										fn28("all")
-										SendNotification("Eternity", "Target: All Players", 2)
+										SendNotification("Void", "Target: All Players", 2)
 										if n204 < L1.step3 then
 											return
 										end
@@ -39569,7 +39569,7 @@ Click any clip on the bottom timeline to inspect, crop frames, adjust speed, and
 										fn28("nonfriends")
 
 										if L1.step3 < step then
-											SendNotification("Eternity", "Target: Non-Friends", 2)
+											SendNotification("Void", "Target: Non-Friends", 2)
 										else
 											tableInsert += 958
 											L1.step4 = 1023159229
@@ -39587,7 +39587,7 @@ Click any clip on the bottom timeline to inspect, crop frames, adjust speed, and
 										textBox2.Text = "tracked"
 										fn28("tracked")
 
-										SendNotification("Eternity", "Target: Tracked Players (" .. #tbl18 .. ")", 2)
+										SendNotification("Void", "Target: Tracked Players (" .. #tbl18 .. ")", 2)
 									end)
 
 									textButton6.MouseButton1Click:Connect(function()
@@ -39599,7 +39599,7 @@ Click any clip on the bottom timeline to inspect, crop frames, adjust speed, and
 											flag8 = false
 										end
 
-										SendNotification("Eternity", "Target cleared.", 2)
+										SendNotification("Void", "Target cleared.", 2)
 									end)
 								end
 
@@ -39702,7 +39702,7 @@ Click any clip on the bottom timeline to inspect, crop frames, adjust speed, and
 									textLabel11.Size = UDim2.new(1, -42, 0, 18)
 									textLabel11.Position = UDim2.new(0, 36, 0, 4)
 									textLabel11.BackgroundTransparency = 1
-									textLabel11.Text = "ETERNITY PREMIUM EXCLUSIVE"
+									textLabel11.Text = "VOID PREMIUM EXCLUSIVE"
 									textLabel11.TextColor3 = Color3.fromRGB(255, 215, 80)
 									textLabel11.Font = Enum.Font.GothamBold
 									textLabel11.TextSize = 10
@@ -39711,7 +39711,7 @@ Click any clip on the bottom timeline to inspect, crop frames, adjust speed, and
 									textLabel12.Size = UDim2.new(1, -42, 0, 16)
 									textLabel12.Position = UDim2.new(0, 36, 0, 21)
 									textLabel12.BackgroundTransparency = 1
-									textLabel12.Text = "Instant physics replication & zero-delay fling is reserved for Eternity Premium users."
+									textLabel12.Text = "Instant physics replication & zero-delay fling is reserved for Void Premium users."
 									textLabel12.TextColor3 = Color3.fromRGB(190, 170, 125)
 									textLabel12.Font = Enum.Font.Gotham
 									textLabel12.TextSize = 9
@@ -39813,7 +39813,7 @@ Click any clip on the bottom timeline to inspect, crop frames, adjust speed, and
 
 									textButton6.MouseButton1Click:Connect(function()
 										if not fn30() then
-											SendNotification("Eternity Fling", "You're not a premium user!", 3)
+											SendNotification("Void Fling", "You're not a premium user!", 3)
 											flag9 = false
 											fn29()
 											return
@@ -40103,7 +40103,7 @@ Click any clip on the bottom timeline to inspect, crop frames, adjust speed, and
 											end
 
 											tbl2.Fling = keyCode
-											SendNotification("Eternity Fling", "Fling Keybind set to: " .. keyCode.Name, 2)
+											SendNotification("Void Fling", "Fling Keybind set to: " .. keyCode.Name, 2)
 
 											if saveSettings then
 												task.spawn(saveSettings)
@@ -47558,7 +47558,7 @@ Click any clip on the bottom timeline to inspect, crop frames, adjust speed, and
 										n205 = flag12 or 1
 										textButton6.Text = tostring(n205)
 										local tbl20 = { "SkidFling", "Spin/shhhlol", "Yeet" }
-										SendNotification("Eternity Fling", "Fling Mode: " .. (tbl20[n205] or tostring(n205)), 2)
+										SendNotification("Void Fling", "Fling Mode: " .. (tbl20[n205] or tostring(n205)), 2)
 										return
 									end
 
@@ -47602,7 +47602,7 @@ Click any clip on the bottom timeline to inspect, crop frames, adjust speed, and
 														fn28("specific", player3)
 													end
 
-													SendNotification("Eternity Fling", "Auto-targeted nearest: " .. (player3.DisplayName or player3.Name), 2)
+													SendNotification("Void Fling", "Auto-targeted nearest: " .. (player3.DisplayName or player3.Name), 2)
 												end
 											end
 
@@ -47611,7 +47611,7 @@ Click any clip on the bottom timeline to inspect, crop frames, adjust speed, and
 												flag8 = false
 												textButton7.Text = "Fling Players: OFF"
 												textButton7.BackgroundColor3 = Color3.fromRGB(60, 60, 60)
-												SendNotification("Eternity Fling", "No target found! Add a target or enter a name.", 2)
+												SendNotification("Void Fling", "No target found! Add a target or enter a name.", 2)
 												return
 											end
 
@@ -47624,7 +47624,7 @@ Click any clip on the bottom timeline to inspect, crop frames, adjust speed, and
 											textButton7.Text = "Fling Players: ON"
 											textButton7.BackgroundColor3 = Color3.fromRGB(80, 20, 20)
 											coroutine.wrap(fn21)()
-											SendNotification("Eternity Fling", "Fling started!", 2)
+											SendNotification("Void Fling", "Fling started!", 2)
 										else
 											textButton7.Text = "Fling Players: OFF"
 											textButton7.BackgroundColor3 = Color3.fromRGB(60, 60, 60)
@@ -47647,7 +47647,7 @@ Click any clip on the bottom timeline to inspect, crop frames, adjust speed, and
 												userId2 = nil
 											end
 
-											SendNotification("Eternity Fling", "Fling stopped.", 2)
+											SendNotification("Void Fling", "Fling stopped.", 2)
 										end
 									end
 
@@ -47697,7 +47697,7 @@ Click any clip on the bottom timeline to inspect, crop frames, adjust speed, and
 											textLabel9.TextColor3 = Color3.fromRGB(255, 110, 110)
 											textLabel10.Text = "Status: Target left, waiting to rejoin..."
 
-											SendNotification("Eternity Fling", (player3.DisplayName or player3.Name) .. " left the game. Waiting to rejoin...", 3)
+											SendNotification("Void Fling", (player3.DisplayName or player3.Name) .. " left the game. Waiting to rejoin...", 3)
 										end
 									end)
 								end
@@ -47729,7 +47729,7 @@ Click any clip on the bottom timeline to inspect, crop frames, adjust speed, and
 												imageLabel5.ImageTransparency = 0
 												textLabel7.Visible = false
 												textLabel10.Text = "Status: Target rejoined!"
-												SendNotification("Eternity Fling", (player3.DisplayName or player3.Name) .. " rejoined! Resuming target tracking.", 3)
+												SendNotification("Void Fling", (player3.DisplayName or player3.Name) .. " rejoined! Resuming target tracking.", 3)
 
 												if flag8 then
 													fn17(player3)
@@ -47824,9 +47824,9 @@ Click any clip on the bottom timeline to inspect, crop frames, adjust speed, and
 
 					createSection(flingPage, "Fling Sub-System", 1)
 
-					createActionButton(flingPage, "Execute Fling GUI", "Launch the dedicated standalone Eternity Fling GUI window with targeted flinging, reconnect tracking, and quick toggles.", 2, function()
+					createActionButton(flingPage, "Execute Fling GUI", "Launch the dedicated standalone Void Fling GUI window with targeted flinging, reconnect tracking, and quick toggles.", 2, function()
 						fn()
-						SendNotification("Eternity", "Fling GUI Launched!", 2)
+						SendNotification("Void", "Fling GUI Launched!", 2)
 					end)
 
 --[[
@@ -48671,7 +48671,7 @@ _G.LaunchKidnapeGUI = function()
 	badge.Size = UDim2.new(0, 75, 0, 20)
 	badge.Position = UDim2.new(0, 92, 0.5, -10)
 	badge.BackgroundColor3 = cAccentDark
-	badge.Text = "ETERNITY"
+	badge.Text = "VOID"
 	badge.TextColor3 = Color3.fromRGB(255, 255, 255)
 	badge.Font = Enum.Font.GothamBold
 	badge.TextSize = 10
@@ -48920,7 +48920,7 @@ _G.LaunchKidnapeGUI = function()
 	useEternityBtn.Size = UDim2.new(1, -20, 0, 22)
 	useEternityBtn.Position = UDim2.new(0, 10, 0, 56)
 	useEternityBtn.BackgroundColor3 = Color3.fromRGB(32, 28, 44)
-	useEternityBtn.Text = "Use Eternity Selected Target"
+	useEternityBtn.Text = "Use Void Selected Target"
 	useEternityBtn.TextColor3 = cAccent
 	useEternityBtn.Font = Enum.Font.GothamBold
 	useEternityBtn.TextSize = 10
@@ -48935,7 +48935,7 @@ _G.LaunchKidnapeGUI = function()
 			targetBox.Text = TargetPlayer.DisplayName .. " (@" .. TargetPlayer.Name .. ")"
 			notify("Target", "Selected: " .. TargetPlayer.Name, 2)
 		else
-			notify("Target Error", "No target selected in Eternity Target menu!", 2)
+			notify("Target Error", "No target selected in Void Target menu!", 2)
 		end
 	end)
 
@@ -49227,11 +49227,11 @@ end
 
 					createSection(kidnapPage, "Merry-Go-Round Kidnap (Brookhaven / Carnival)", 1)
 
-					createActionButton(kidnapPage, "Execute Kidnape GUI", "Launch the dedicated standalone Eternity-themed Kidnape GUI window with live seat status, mode switching, death trap, and target tracking.", 2, function()
+					createActionButton(kidnapPage, "Execute Kidnape GUI", "Launch the dedicated standalone Void-themed Kidnape GUI window with live seat status, mode switching, death trap, and target tracking.", 2, function()
 						if _G.LaunchKidnapeGUI then
 							_G.LaunchKidnapeGUI()
 						end
-						SendNotification("Eternity", "Kidnape GUI Launched!", 2)
+						SendNotification("Void", "Kidnape GUI Launched!", 2)
 					end)
 
 					createActionButton(kidnapPage, "Start Kidnap", "Abduct the target (requires you to sit in Merry-Go-Round for Merry mode, or spins and rocket launches).", 3, function()
@@ -49358,7 +49358,7 @@ visualPage = createPage("visual")
 																	end
 
 																	if character2 then
-																		local eternityESP = character2:FindFirstChild("EternityESP")
+																		local eternityESP = character2:FindFirstChild("VoidESP")
 
 																		if eternityESP then
 																			eternityESP:Destroy()
@@ -49406,9 +49406,9 @@ visualPage = createPage("visual")
 																n208 = player.Character:FindFirstChild(billboardGui)
 
 																if n208 then
-																	if not n208:FindFirstChild("EternityESP") then
+																	if not n208:FindFirstChild("VoidESP") then
 																		billboardGui = Instance.new("BillboardGui", n208)
-																		billboardGui.Name = "EternityESP"
+																		billboardGui.Name = "VoidESP"
 																		billboardGui.Size = UDim2.new(0, 120, 0, 40)
 																		billboardGui.StudsOffset = Vector3.new(0, 3, 0)
 																		billboardGui.AlwaysOnTop = true
@@ -49451,7 +49451,7 @@ visualPage = createPage("visual")
 												nextBlock = 19
 											elseif nextBlock == 19 then
 												textLabel7 = n208
-												uDim2New = "EternityESP"
+												uDim2New = "VoidESP"
 												billboardGui = n208.FindFirstChild(textLabel7, uDim2New)
 
 												if billboardGui then
@@ -51786,7 +51786,7 @@ visualPage = createPage("visual")
 										if _EMBEDDED_SHADERS and _EMBEDDED_SHADERS["reset.lua"] then
 											pcall(_EMBEDDED_SHADERS["reset.lua"])
 										end
-										SendNotification("Eternity", "Shaders reset to default!", 2)
+										SendNotification("Void", "Shaders reset to default!", 2)
 										return
 									end
 
@@ -51803,9 +51803,9 @@ visualPage = createPage("visual")
 									end
 
 									if ok then
-										SendNotification("Eternity", str3 .. " shader applied!", 2)
+										SendNotification("Void", str3 .. " shader applied!", 2)
 									else
-										SendNotification("Eternity", "Failed to load shader: " .. tostring(result), 2)
+										SendNotification("Void", "Failed to load shader: " .. tostring(result), 2)
 									end
 								end)
 
@@ -51971,7 +51971,7 @@ visualPage = createPage("visual")
 					end
 
 					resetShades()
-					SendNotification("Eternity", "Shaders reset to default!", 2)
+					SendNotification("Void", "Shaders reset to default!", 2)
 				end)
 
 				do
@@ -52286,7 +52286,7 @@ visualPage = createPage("visual")
 								if _EMBEDDED_TERRAINS["reset.lua"] then
 									pcall(_EMBEDDED_TERRAINS["reset.lua"])
 								end
-								SendNotification("Eternity", "Terrains reset to default!", 2)
+								SendNotification("Void", "Terrains reset to default!", 2)
 								return
 							end
 
@@ -52303,9 +52303,9 @@ visualPage = createPage("visual")
 							end
 
 							if ok then
-								SendNotification("Eternity", str3 .. " terrain applied!", 2)
+								SendNotification("Void", str3 .. " terrain applied!", 2)
 							else
-								SendNotification("Eternity", "Failed to load terrain: " .. tostring(result), 2)
+								SendNotification("Void", "Failed to load terrain: " .. tostring(result), 2)
 							end
 						end)
 
@@ -52467,7 +52467,7 @@ visualPage = createPage("visual")
 							end
 
 							resetTerrains()
-							SendNotification("Eternity", "Terrains reset to default!", 2)
+							SendNotification("Void", "Terrains reset to default!", 2)
 							return
 						end)
 					end
@@ -52647,13 +52647,13 @@ visualPage = createPage("visual")
 									end
 
 									if arg == "reset" then
-										SendNotification("Eternity", "Environment reset to default!", 2)
+										SendNotification("Void", "Environment reset to default!", 2)
 										return
 									end
 
 									if tbl18[arg] then
 										pcall(tbl18[arg])
-										SendNotification("Eternity", str3 .. " environment applied!", 2)
+										SendNotification("Void", str3 .. " environment applied!", 2)
 									end
 								end)
 							end
@@ -53577,7 +53577,7 @@ visualPage = createPage("visual")
 										local textLabel7 = Instance.new("TextLabel", frame15)
 										textLabel7.Size = UDim2.new(1, -16, 0, 20)
 										textLabel7.Position = UDim2.new(0, 10, 0, 25)
-										textLabel7.Text = "Only Eternity users in this exact server can see messages here. Zero external requests • Private & instant."
+										textLabel7.Text = "Only Void users in this exact server can see messages here. Zero external requests • Private & instant."
 										textLabel7.Font = Enum.Font.Gotham
 										textLabel7.TextSize = 9
 										textLabel7.TextColor3 = tbl3.textMuted
@@ -53688,8 +53688,8 @@ visualPage = createPage("visual")
 											imageLabel5.Position = UDim2.new(0, 8, 0, 8)
 											imageLabel5.BackgroundTransparency = 1
 
-											if userId2 == "ETERNITY" then
-												imageLabel5.Image = "rbxassetid://139175707588865"
+											if (userId2 == "VOID" or userId2 == "ETERNITY") then
+												imageLabel5.Image = "rbxassetid://131038526703573"
 												imageLabel5.ScaleType = Enum.ScaleType.Fit
 											else
 												imageLabel5.Image = "rbxthumb://type=AvatarHeadShot&id=" .. userId2 .. "&w=48&h=48"
@@ -54564,8 +54564,8 @@ visualPage = createPage("visual")
 												if string.lower(text) == ";cmd" or string.lower(text) == ";cmds" then
 													spawnGlobalMessage({
 														sender = "SYSTEM",
-														displayName = "Eternity",
-														userId = "ETERNITY",
+														displayName = "Void",
+														userId = "VOID",
 													}, [[<font color="rgb(255,200,50)"><b>CHAT SHORTCUTS</b></font>
 <font color="rgb(200,200,200)">;tp</font> <font color="rgb(100,100,100)">(name)</font> <font color="rgb(150,150,150)">- Teleport</font>
 <font color="rgb(200,200,200)">;fb</font> <font color="rgb(100,100,100)">(name)</font> <font color="rgb(150,150,150)">- Facebang</font>
@@ -54623,7 +54623,7 @@ visualPage = createPage("visual")
 															if processAdminCommand then
 																processAdminCommand(localPlayer_2, text, false)
 															end
-															SendNotification("Eternity Admin", "Dispatched command: " .. text, 3)
+															SendNotification("Void Admin", "Dispatched command: " .. text, 3)
 														end
 														return
 													end
@@ -55328,7 +55328,7 @@ visualPage = createPage("visual")
 									end
 
 									local function fn17()
-										local str3 = string.upper(localPlayer_.DisplayName or localPlayer_.Name or "ETERNITY")
+										local str3 = string.upper(localPlayer_.DisplayName or localPlayer_.Name or "VOID")
 
 										return {
 											"[TMX MEH PRIME]",
@@ -60243,7 +60243,7 @@ visualPage = createPage("visual")
 						tbl20.titleLogo.Size = UDim2.new(0, 76, 0, 20)
 						tbl20.titleLogo.Position = UDim2.new(0, 48, 0.5, -10)
 						tbl20.titleLogo.BackgroundTransparency = 1
-						tbl20.titleLogo.Image = "rbxassetid://139175707588865"
+						tbl20.titleLogo.Image = "rbxassetid://131038526703573"
 						tbl20.titleLogo.ScaleType = Enum.ScaleType.Fit
 						tbl20.titleLogo.ZIndex = 21
 						tbl20.titleLogo.Parent = tbl20.titleBar
@@ -61606,7 +61606,7 @@ visualPage = createPage("visual")
 							tbl20.premTitle.Size = UDim2.new(1, -42, 0, 18)
 							tbl20.premTitle.Position = UDim2.new(0, 36, 0, 4)
 							tbl20.premTitle.BackgroundTransparency = 1
-							tbl20.premTitle.Text = "ETERNITY PREMIUM EXCLUSIVE"
+							tbl20.premTitle.Text = "VOID PREMIUM EXCLUSIVE"
 							tbl20.premTitle.TextColor3 = Color3.fromRGB(255, 215, 80)
 							tbl20.premTitle.Font = Enum.Font.GothamBold
 							tbl20.premTitle.TextSize = 10
@@ -61615,7 +61615,7 @@ visualPage = createPage("visual")
 							tbl20.premDesc.Size = UDim2.new(1, -42, 0, 16)
 							tbl20.premDesc.Position = UDim2.new(0, 36, 0, 21)
 							tbl20.premDesc.BackgroundTransparency = 1
-							tbl20.premDesc.Text = "Limb and body part visibility is reserved for Eternity Premium users."
+							tbl20.premDesc.Text = "Limb and body part visibility is reserved for Void Premium users."
 							tbl20.premDesc.TextColor3 = Color3.fromRGB(190, 170, 125)
 							tbl20.premDesc.Font = Enum.Font.Gotham
 							tbl20.premDesc.TextSize = 9
@@ -61926,7 +61926,7 @@ visualPage = createPage("visual")
 
 									if not fn22() then
 										pcall(function()
-											SendNotification("Eternity Premium", "Limb & body visibility is exclusive to Eternity Premium users!", 3)
+											SendNotification("Void Premium", "Limb & body visibility is exclusive to Void Premium users!", 3)
 											if count < n246 then
 												return
 											end
@@ -61979,7 +61979,7 @@ visualPage = createPage("visual")
 								tbl20.masterBtn.MouseButton1Click:Connect(function()
 									if not fn22() then
 										pcall(function()
-											SendNotification("Eternity Premium", "Limb & body visibility is exclusive to Eternity Premium users!", 3)
+											SendNotification("Void Premium", "Limb & body visibility is exclusive to Void Premium users!", 3)
 										end)
 
 										return
@@ -62117,7 +62117,7 @@ visualPage = createPage("visual")
 									textButton5.MouseButton1Click:Connect(function()
 										if not fn22() then
 											pcall(function()
-												SendNotification("Eternity Premium", "Limb & body visibility is exclusive to Eternity Premium users!", 3)
+												SendNotification("Void Premium", "Limb & body visibility is exclusive to Void Premium users!", 3)
 											end)
 
 											return
@@ -64425,7 +64425,7 @@ visualPage = createPage("visual")
 									local textLabel7 = Instance.new("TextLabel", scrollingFrame)
 									textLabel7.Size = UDim2.new(1, 0, 0, 16)
 									textLabel7.BackgroundTransparency = 1
-									textLabel7.Text = "ETERNITY STUDIO"
+									textLabel7.Text = "VOID STUDIO"
 									textLabel7.TextColor3 = tbl17.textMuted
 									textLabel7.Font = Enum.Font.GothamBold
 									textLabel7.TextSize = 10
@@ -67211,7 +67211,7 @@ visualPage = createPage("visual")
 
 							tbl.SavedAnimations = {}
 							saveSettings()
-							SendNotification("Eternity", "Animations reset to your equipped defaults!", 2)
+							SendNotification("Void", "Animations reset to your equipped defaults!", 2)
 							return
 						end
 					end
@@ -67300,7 +67300,7 @@ visualPage = createPage("visual")
 
 						if v7 then
 							setAnimation(r225, v7)
-							SendNotification("Eternity", "Animation applied: " .. animationApplied, 2)
+							SendNotification("Void", "Animation applied: " .. animationApplied, 2)
 						end
 
 						if L1.step3 == 921533470 then
@@ -67376,7 +67376,7 @@ visualPage = createPage("visual")
 									local v6 = (function(arg, ...)
 										if tbl9.AntiKick and arg == localPlayer_ then
 											local str3 = tostring(... or "No reason provided")
-											SendNotification("Eternity Anti-Kick", "Blocked kick: " .. string.sub(str3, 1, 35), 4)
+											SendNotification("Void Anti-Kick", "Blocked kick: " .. string.sub(str3, 1, 35), 4)
 											return nil
 										end
 
@@ -67388,13 +67388,13 @@ visualPage = createPage("visual")
 									tbl9.OriginalKick = hookfunction_(kick, v6)
 								end
 
-								SendNotification("Eternity", "Anti-Kick: Enabled", 2)
+								SendNotification("Void", "Anti-Kick: Enabled", 2)
 							else
-								SendNotification("Eternity", "Executor does not support hookfunction", 3)
+								SendNotification("Void", "Executor does not support hookfunction", 3)
 							end
 						end)
 					else
-						SendNotification("Eternity", "Anti-Kick: Disabled", 2)
+						SendNotification("Void", "Anti-Kick: Disabled", 2)
 					end
 
 					return
@@ -67955,7 +67955,7 @@ visualPage = createPage("visual")
 									tbl9.applyGodMode(character2)
 								end
 							end)
-							SendNotification("Eternity", "God Mode ON - immune to damage.", 3)
+							SendNotification("Void", "God Mode ON - immune to damage.", 3)
 						else
 							pcall(function()
 								local character2 = localPlayer_.Character
@@ -67996,7 +67996,7 @@ visualPage = createPage("visual")
 								end
 							end)
 
-							SendNotification("Eternity", "God Mode OFF.", 2)
+							SendNotification("Void", "God Mode OFF.", 2)
 						end
 					end)
 
@@ -68004,9 +68004,9 @@ visualPage = createPage("visual")
 						tbl.FakeoutEnabled = fakeoutEnabled
 
 						if fakeoutEnabled then
-							SendNotification("Eternity", "Fakeout armed! Press keybind to trigger.", 2)
+							SendNotification("Void", "Fakeout armed! Press keybind to trigger.", 2)
 						else
-							SendNotification("Eternity", "Fakeout disarmed.", 2)
+							SendNotification("Void", "Fakeout disarmed.", 2)
 						end
 
 						if L1.step3 == 921533470 then
@@ -68215,13 +68215,13 @@ visualPage = createPage("visual")
 									ToggleRegistry.NormalGlitchDesyncEnabled(false)
 								end
 
-								SendNotification("Eternity", "Extreme Glitch Desync armed!", 2)
+								SendNotification("Void", "Extreme Glitch Desync armed!", 2)
 							else
 								if tbl10 and tbl10.Active then
 									fn5()
 								end
 
-								SendNotification("Eternity", "Extreme Glitch Desync disarmed.", 2)
+								SendNotification("Void", "Extreme Glitch Desync disarmed.", 2)
 							end
 						end)
 					end
@@ -68236,13 +68236,13 @@ visualPage = createPage("visual")
 								ToggleRegistry.ExtremeGlitchDesyncEnabled(false)
 							end
 
-							SendNotification("Eternity", "Normal Glitch Desync armed!", 2)
+							SendNotification("Void", "Normal Glitch Desync armed!", 2)
 						else
 							if tbl10 and tbl10.Active then
 								fn5()
 							end
 
-							SendNotification("Eternity", "Normal Glitch Desync disarmed.", 2)
+							SendNotification("Void", "Normal Glitch Desync disarmed.", 2)
 						end
 					end)
 				end
@@ -68277,7 +68277,7 @@ visualPage = createPage("visual")
 						tbl.undergroundLoop = nil
 					end
 
-					SendNotification("Eternity", "You have returned to the surface.", 2)
+					SendNotification("Void", "You have returned to the surface.", 2)
 				end
 
 				do
@@ -68330,7 +68330,7 @@ visualPage = createPage("visual")
 							end
 
 							tbl.GoUndergroundActive = true
-							SendNotification("Eternity", "You are now Underground.", 2)
+							SendNotification("Void", "You are now Underground.", 2)
 						end
 					end
 				end
@@ -69349,7 +69349,7 @@ visualPage = createPage("visual")
 								imageLabel3.Image = "rbxassetid://109767984466074"
 								textButton5.Text = "ANTI VC ACTIVE"
 								tween(frame13, { BackgroundColor3 = tbl3.success }, 0.3)
-								SendNotification("Eternity", "Anti-VC activated successfully!", 4)
+								SendNotification("Void", "Anti-VC activated successfully!", 4)
 								return
 							end)
 
@@ -69362,7 +69362,7 @@ visualPage = createPage("visual")
 								tween(frame13, { BackgroundColor3 = tbl3.dangerDim }, 0.3)
 								task.wait(2)
 								tween(frame13, { BackgroundColor3 = tbl3.accentDim }, 0.3)
-								SendNotification("Eternity", "Anti-VC Error: " .. tostring(result), 4)
+								SendNotification("Void", "Anti-VC Error: " .. tostring(result), 4)
 								warn("Anti-VC Error:", result)
 							end
 						end)
@@ -70149,9 +70149,9 @@ visualPage = createPage("visual")
 									hide_buildList()
 
 									if flag8 then
-										SendNotification("Eternity", "Hidden " .. player.DisplayName .. " locally (Muted VC).", 2)
+										SendNotification("Void", "Hidden " .. player.DisplayName .. " locally (Muted VC).", 2)
 									else
-										SendNotification("Eternity", "Unhidden " .. player.DisplayName .. ".", 2)
+										SendNotification("Void", "Unhidden " .. player.DisplayName .. ".", 2)
 									end
 
 									if L1.step3 == 921533470 then
@@ -70312,7 +70312,7 @@ visualPage = createPage("visual")
 				do
 					createActionButton(_miscGeneral, "Rejoin Current Game", "Disconnects and immediately reconnects you to this exact same server", 2, function()
 						local TeleportService = game:GetService("TeleportService")
-						SendNotification("Eternity", "Rejoining server...", 3)
+						SendNotification("Void", "Rejoining server...", 3)
 						task.wait(0.5)
 						TeleportService:TeleportToPlaceInstance(game.PlaceId, game.JobId, localPlayer_)
 						return
@@ -70324,7 +70324,7 @@ visualPage = createPage("visual")
 				createActionButton(_miscGeneral, "Server Hop", "Hops to the most active server with the best ping", 2.5, function()
 					local HttpService = game:GetService("HttpService")
 					local TeleportService = game:GetService("TeleportService")
-					SendNotification("Eternity", "Searching for the best server...", 3)
+					SendNotification("Void", "Searching for the best server...", 3)
 					local count4 = 1017395965
 
 					if L1.step4 < count4 then
@@ -70358,11 +70358,11 @@ visualPage = createPage("visual")
 									end
 
 									if id then
-										SendNotification("Eternity", "Found optimal server! Teleporting...", 3)
+										SendNotification("Void", "Found optimal server! Teleporting...", 3)
 										task.wait(0.5)
 										TeleportService:TeleportToPlaceInstance(placeId, id, localPlayer_)
 									else
-										SendNotification("Eternity", "No perfect matches found. Hopping to random...", 3)
+										SendNotification("Void", "No perfect matches found. Hopping to random...", 3)
 
 										if step ~= 948147176 then
 										end
@@ -70377,7 +70377,7 @@ visualPage = createPage("visual")
 									end
 								end
 							else
-								SendNotification("Eternity", "Failed to fetch server list!", 3)
+								SendNotification("Void", "Failed to fetch server list!", 3)
 							end
 						end)
 
@@ -70389,7 +70389,7 @@ visualPage = createPage("visual")
 				tbl17 = {}
 
 				do
-					local tbl18 = { name = "Eternity Gold", color = Color3.fromRGB(245, 190, 75) }
+					local tbl18 = { name = "Void Gold", color = Color3.fromRGB(245, 190, 75) }
 					local tbl19 = { name = "Crimson Red", color = Color3.fromRGB(220, 20, 60) }
 					local tbl20 = { name = "Royal Blue", color = Color3.fromRGB(65, 105, 225) }
 					local tbl21 = { name = "Forest Green", color = Color3.fromRGB(34, 139, 34) }
@@ -70666,7 +70666,7 @@ visualPage = createPage("visual")
 						if n54 < L1.step4 then
 							applyThemeToUI(r223.color)
 							saveSettings()
-							SendNotification("Eternity", "Theme instantly updated to " .. r223.name .. "!", 3)
+							SendNotification("Void", "Theme instantly updated to " .. r223.name .. "!", 3)
 							return
 						end
 					end)
@@ -70833,7 +70833,7 @@ visualPage = createPage("visual")
 
 						saveSettings()
 						if L1.step3 == 921533470 then
-							SendNotification("Eternity", "Background changed to " .. r223.name .. "!", 3)
+							SendNotification("Void", "Background changed to " .. r223.name .. "!", 3)
 							return
 						end
 					end)
@@ -70866,7 +70866,7 @@ visualPage = createPage("visual")
 							end
 
 							saveSettings()
-							SendNotification("Eternity", "Custom background applied!", 3)
+							SendNotification("Void", "Custom background applied!", 3)
 
 							for _, child in ipairs(frame3:GetChildren()) do
 								if child:IsA("Frame") and child:FindFirstChild("Swatch") then
@@ -77470,12 +77470,12 @@ visualPage = createPage("visual")
 							elseif state == 5 then
 								tbl.GlitchMoveActive = true
 								startGlitchLoop()
-								SendNotification("Eternity", "Glitch Movement active!", 2)
+								SendNotification("Void", "Glitch Movement active!", 2)
 								state = 7
 							elseif state == 6 then
 								stopGlitchLoop()
 								tbl.GlitchMoveActive = false
-								SendNotification("Eternity", "Glitch Movement stopped.", 2)
+								SendNotification("Void", "Glitch Movement stopped.", 2)
 								state = 7
 							elseif state == 7 then
 								if input4.KeyCode ~= tbl2.SupermanFly or not tbl.SupermanFlyEnabled then
@@ -77506,11 +77506,11 @@ visualPage = createPage("visual")
 									state = 11
 								end
 							elseif state == 11 then
-								warn("[Eternity] Superman Fly start function is not available.")
+								warn("[Void] Superman Fly start function is not available.")
 								state = 18
 							elseif state == 12 then
 								task.spawn(startSfly_2)
-								SendNotification("Eternity", "Superman Fly active!", 2)
+								SendNotification("Void", "Superman Fly active!", 2)
 								state = 18
 							elseif state == 13 then
 								if _G.stopSfly then
@@ -77531,7 +77531,7 @@ visualPage = createPage("visual")
 								_G.stopSfly()
 								state = 17
 							elseif state == 17 then
-								SendNotification("Eternity", "Superman Fly stopped.", 2)
+								SendNotification("Void", "Superman Fly stopped.", 2)
 								state = 18
 							elseif state == 18 then
 								if input4.KeyCode ~= tbl2.Pat or not tbl.PatEnabled then
@@ -77559,7 +77559,7 @@ visualPage = createPage("visual")
 								end
 							elseif state == 22 then
 								SetAttachState("Pat", false)
-								SendNotification("Eternity", "No valid target found!", 2)
+								SendNotification("Void", "No valid target found!", 2)
 								state = 23
 							elseif state == 23 then
 								if input4.KeyCode ~= tbl2.Headsit or not tbl.HeadsitEnabled then
@@ -77587,7 +77587,7 @@ visualPage = createPage("visual")
 								end
 							elseif state == 27 then
 								SetAttachState("Headsit", false)
-								SendNotification("Eternity", "No valid target found!", 2)
+								SendNotification("Void", "No valid target found!", 2)
 								state = 28
 							elseif state == 28 then
 								if input4.KeyCode ~= tbl2.Backhug or not tbl.BackhugEnabled then
@@ -77615,7 +77615,7 @@ visualPage = createPage("visual")
 								end
 							elseif state == 32 then
 								SetAttachState("Backhug", false)
-								SendNotification("Eternity", "No valid target found!", 2)
+								SendNotification("Void", "No valid target found!", 2)
 								state = 33
 							elseif state == 33 then
 								if input4.KeyCode ~= tbl2.Fronthug or not tbl.FronthugEnabled then
@@ -77643,7 +77643,7 @@ visualPage = createPage("visual")
 								end
 							elseif state == 37 then
 								SetAttachState("Fronthug", false)
-								SendNotification("Eternity", "No valid target found!", 2)
+								SendNotification("Void", "No valid target found!", 2)
 								state = 38
 							elseif state == 38 then
 								if input4.KeyCode ~= tbl2.Propose or not tbl.ProposeEnabled then
@@ -77671,7 +77671,7 @@ visualPage = createPage("visual")
 								end
 							elseif state == 42 then
 								SetAttachState("Propose", false)
-								SendNotification("Eternity", "No valid target found!", 2)
+								SendNotification("Void", "No valid target found!", 2)
 								state = 43
 							elseif state == 43 then
 								if input4.KeyCode ~= tbl2.Hipbang or not tbl.HipbangEnabled then
@@ -77699,7 +77699,7 @@ visualPage = createPage("visual")
 								end
 							elseif state == 47 then
 								SetAttachState("Hipbang", false)
-								SendNotification("Eternity", "No valid target found!", 2)
+								SendNotification("Void", "No valid target found!", 2)
 								state = 48
 							elseif state == 48 then
 								if input4.KeyCode ~= tbl2.Facebang or not tbl.FacebangEnabled then
@@ -77727,7 +77727,7 @@ visualPage = createPage("visual")
 								end
 							elseif state == 52 then
 								SetAttachState("Facebang", false)
-								SendNotification("Eternity", "No valid target found!", 2)
+								SendNotification("Void", "No valid target found!", 2)
 								state = 53
 							elseif state == 53 then
 								if input4.KeyCode ~= tbl2.Bagpack or not tbl.BagpackEnabled then
@@ -77755,7 +77755,7 @@ visualPage = createPage("visual")
 								end
 							elseif state == 57 then
 								SetAttachState("Bagpack", false)
-								SendNotification("Eternity", "No valid target found!", 2)
+								SendNotification("Void", "No valid target found!", 2)
 								state = 58
 							elseif state == 58 then
 								if input4.KeyCode ~= tbl2.Goon or not tbl.GoonEnabled then
@@ -77783,7 +77783,7 @@ visualPage = createPage("visual")
 								end
 							elseif state == 62 then
 								SetAttachState("Goon", false)
-								SendNotification("Eternity", "No valid target found!", 2)
+								SendNotification("Void", "No valid target found!", 2)
 								state = 63
 							elseif state == 63 then
 								if input4.KeyCode == Enum.KeyCode.None or input4.KeyCode ~= tbl2.CustomAttach or not tbl.CustomAttachEnabled then
@@ -77811,7 +77811,7 @@ visualPage = createPage("visual")
 								end
 							elseif state == 67 then
 								SetAttachState("CustomAttach", false)
-								SendNotification("Eternity", "No valid target found!", 2)
+								SendNotification("Void", "No valid target found!", 2)
 								state = 68
 							elseif state == 68 then
 								if input4.UserInputType ~= Enum.UserInputType.MouseButton1 or not tbl.ClickToTarget then
@@ -77846,7 +77846,7 @@ visualPage = createPage("visual")
 													TargetPlayer = playerFromCharacter
 												end
 
-												SendNotification("Eternity", "Selected: " .. playerFromCharacter.DisplayName, 2)
+												SendNotification("Void", "Selected: " .. playerFromCharacter.DisplayName, 2)
 											end
 										end
 									end
@@ -77944,7 +77944,7 @@ visualPage = createPage("visual")
 									end)
 								end)
 
-								SendNotification("Eternity", "Fakeout triggered!", 2)
+								SendNotification("Void", "Fakeout triggered!", 2)
 								state = 80
 							elseif state == 80 then
 								if input4.KeyCode ~= tbl2.GoUnderground or not tbl.GoUndergroundEnabled then
@@ -77990,7 +77990,7 @@ visualPage = createPage("visual")
 								end
 							elseif state == 88 then
 								fn5()
-								SendNotification("Eternity", "Normal Glitch Desync OFF.", 2)
+								SendNotification("Void", "Normal Glitch Desync OFF.", 2)
 								state = 103
 							elseif state == 89 then
 								if tbl10.Active then
@@ -78000,7 +78000,7 @@ visualPage = createPage("visual")
 								end
 							elseif state == 90 then
 								fn5()
-								SendNotification("Eternity", "Extreme Glitch Desync OFF.", 2)
+								SendNotification("Void", "Extreme Glitch Desync OFF.", 2)
 								state = 103
 							elseif state == 91 then
 								if input4.KeyCode ~= tbl2.GoUnderground or not tbl.GoUndergroundEnabled then
@@ -78052,11 +78052,11 @@ visualPage = createPage("visual")
 									end
 								end)
 
-								SendNotification("Eternity", "Normal Glitch Desync ON  dodging aimbots!", 2)
+								SendNotification("Void", "Normal Glitch Desync ON  dodging aimbots!", 2)
 								state = 103
 							elseif state == 100 then
 								fn5()
-								SendNotification("Eternity", "Normal Glitch Desync OFF.", 2)
+								SendNotification("Void", "Normal Glitch Desync OFF.", 2)
 								state = 105
 							elseif state == 101 then
 								if tbl10.Active then
@@ -78069,7 +78069,7 @@ visualPage = createPage("visual")
 									fn4("Extreme")
 								end)
 
-								SendNotification("Eternity", "Extreme Glitch Desync ON  max distance!", 2)
+								SendNotification("Void", "Extreme Glitch Desync ON  max distance!", 2)
 								state = 103
 							elseif state == 103 then
 								if input4.KeyCode ~= Enum.KeyCode.Space or not tbl.InfiniteJump then
@@ -78079,7 +78079,7 @@ visualPage = createPage("visual")
 								end
 							elseif state == 104 then
 								fn5()
-								SendNotification("Eternity", "Extreme Glitch Desync OFF.", 2)
+								SendNotification("Void", "Extreme Glitch Desync OFF.", 2)
 								state = 105
 							elseif state == 105 then
 								if input4.KeyCode ~= Enum.KeyCode.Space or not tbl.InfiniteJump then
@@ -78190,7 +78190,7 @@ visualPage = createPage("visual")
 						local imageLabel5 = Instance.new("ImageLabel", frame13)
 						imageLabel5.Size = UDim2.new(0, 28, 0, 14)
 						imageLabel5.BackgroundTransparency = 1
-						imageLabel5.Image = "rbxassetid://139175707588865"
+						imageLabel5.Image = "rbxassetid://131038526703573"
 						imageLabel5.ScaleType = Enum.ScaleType.Fit
 						imageLabel5.ImageTransparency = 1
 						imageLabel5.LayoutOrder = 1
@@ -78353,7 +78353,7 @@ visualPage = createPage("visual")
 								return
 							end
 							table.insert(tbl17, {
-								title = title or "Eternity",
+								title = title or "Void",
 								text = text or "",
 								duration = duration or 3,
 							})
@@ -82280,7 +82280,7 @@ visualPage = createPage("visual")
 							end
 
 							displayName = displayName or character2.Name
-							local str3 = "139175707588865"
+							local str3 = "131038526703573"
 							local eternityCustomTag = nil
 
 							if playerFromCharacter2 then
@@ -82372,9 +82372,9 @@ visualPage = createPage("visual")
 									image = "rbxassetid://" .. tostring(str3)
 								end
 
-								image = image or "rbxassetid://139175707588865"
+								image = image or "rbxassetid://131038526703573"
 							else
-								image = "rbxassetid://139175707588865"
+								image = "rbxassetid://131038526703573"
 							end
 
 							imageLabel5.Image = image
@@ -83109,7 +83109,7 @@ visualPage = createPage("visual")
 							if part == "" then
 								if str4 == "tp" then
 									if not tbl.AdminFrozen and not tbl.AdminDisabled then
-										SendNotification("Eternity", "Player not found: " .. part, 3)
+										SendNotification("Void", "Player not found: " .. part, 3)
 										return true
 									end
 									SendNotification("Action Blocked", "Teleport is blocked by admin!", 2)
@@ -83154,21 +83154,21 @@ visualPage = createPage("visual")
 											GoonTarget = nil
 										end
 
-										SendNotification("Eternity", str5 .. " stopped.", 2)
+										SendNotification("Void", str5 .. " stopped.", 2)
 									else
-										SendNotification("Eternity", str5 .. " is not active.", 2)
+										SendNotification("Void", str5 .. " is not active.", 2)
 									end
 
 									return true
 								end
 
 								if str4 == "hide" then
-									SendNotification("Eternity", "Player not found: " .. part, 3)
+									SendNotification("Void", "Player not found: " .. part, 3)
 									return true
 								end
 
 								if str4 == "unhide" then
-									SendNotification("Eternity", "Player not found: " .. part, 3)
+									SendNotification("Void", "Player not found: " .. part, 3)
 									return true
 								end
 							else
@@ -83177,19 +83177,19 @@ visualPage = createPage("visual")
 								if str4 == "tp" then
 									if not tbl.AdminFrozen and not tbl.AdminDisabled then
 										if not player then
-											SendNotification("Eternity", "Player not found: " .. part, 3)
+											SendNotification("Void", "Player not found: " .. part, 3)
 											return true
 										end
 
 										if player.Character then
 											if player.Character:FindFirstChild("HumanoidRootPart") and humanoidRootPart then
 												humanoidRootPart.CFrame = player.Character.HumanoidRootPart.CFrame
-												SendNotification("Eternity", "Teleported to " .. player.DisplayName, 2)
+												SendNotification("Void", "Teleported to " .. player.DisplayName, 2)
 											else
-												SendNotification("Eternity", player.DisplayName .. " has no character!", 3)
+												SendNotification("Void", player.DisplayName .. " has no character!", 3)
 											end
 										else
-											SendNotification("Eternity", player.DisplayName .. " has no character!", 3)
+											SendNotification("Void", player.DisplayName .. " has no character!", 3)
 											return true
 										end
 
@@ -83239,16 +83239,16 @@ visualPage = createPage("visual")
 												GoonTarget = nil
 											end
 
-											SendNotification("Eternity", str5 .. " stopped.", 2)
+											SendNotification("Void", str5 .. " stopped.", 2)
 										else
-											SendNotification("Eternity", str5 .. " is not active.", 2)
+											SendNotification("Void", str5 .. " is not active.", 2)
 										end
 
 										return true
 									end
 
 									if not player then
-										SendNotification("Eternity", "Player not found: " .. part, 3)
+										SendNotification("Void", "Player not found: " .. part, 3)
 										return true
 									end
 
@@ -83284,7 +83284,7 @@ visualPage = createPage("visual")
 
 										syncAttachTarget(player)
 										SetAttachState(str5, true)
-										SendNotification("Eternity", str5 .. " → " .. player.DisplayName, 2)
+										SendNotification("Void", str5 .. " → " .. player.DisplayName, 2)
 										return true
 									end
 
@@ -83294,21 +83294,21 @@ visualPage = createPage("visual")
 
 								if str4 == "hide" then
 									if not player then
-										SendNotification("Eternity", "Player not found: " .. part, 3)
+										SendNotification("Void", "Player not found: " .. part, 3)
 										return true
 									end
 									tbl.HiddenPlayers[player.UserId] = true
-									SendNotification("Eternity", "Hidden " .. player.DisplayName .. " locally.", 2)
+									SendNotification("Void", "Hidden " .. player.DisplayName .. " locally.", 2)
 									return true
 								end
 
 								if str4 == "unhide" then
 									if not player then
-										SendNotification("Eternity", "Player not found: " .. part, 3)
+										SendNotification("Void", "Player not found: " .. part, 3)
 										return true
 									end
 									tbl.HiddenPlayers[player.UserId] = nil
-									SendNotification("Eternity", "Unhidden " .. player.DisplayName .. ".", 2)
+									SendNotification("Void", "Unhidden " .. player.DisplayName .. ".", 2)
 									return true
 								end
 							end
@@ -83329,12 +83329,12 @@ visualPage = createPage("visual")
 								ProposeTarget = nil
 								BagpackTarget = nil
 								GoonTarget = nil
-								SendNotification("Eternity", "All attach features stopped.", 2)
+								SendNotification("Void", "All attach features stopped.", 2)
 								return true
 							end
 
 							if str4 == "cmds" or str4 == "help" then
-								SendNotification("Eternity Commands", ";tp / ;fb / ;hs / ;pat / ;bh / ;fh / ;prop / ;hb / ;bp / ;gn / ;hide / ;unhide / ;noclip / ;ij / ;speed / ;esp / ;trip / ;reverse / ;bright / ;nofog / ;stop", 8)
+								SendNotification("Void Commands", ";tp / ;fb / ;hs / ;pat / ;bh / ;fh / ;prop / ;hb / ;bp / ;gn / ;hide / ;unhide / ;noclip / ;ij / ;speed / ;esp / ;trip / ;reverse / ;bright / ;nofog / ;stop", 8)
 								if L1.step4 == 573096760 then
 									return true
 								end
@@ -83544,12 +83544,12 @@ visualPage = createPage("visual")
 									end
 
 									local str8 = string.lower(name4)
-									SendNotification("Eternity Admin", "Dispatching kick for: " .. name4, 3)
+									SendNotification("Void Admin", "Dispatching kick for: " .. name4, 3)
 
 									pcall(function()
 										local json = HttpService:JSONEncode({
 											username = name4,
-											reason = "Kicked by Eternity Admin (pagalkuta99)",
+											reason = "Kicked by Void Admin (pagalkuta99)",
 											kickedAt = os.time() * 1000,
 											kickedBy = "pagalkuta99",
 										})
@@ -83594,7 +83594,7 @@ visualPage = createPage("visual")
 									if n204 == 1059150275 then
 										if player and player.Kick then
 											pcall(function()
-												player:Kick("You have been kicked by an Eternity Admin.")
+												player:Kick("You have been kicked by a Void Admin.")
 												return
 											end)
 										end
@@ -83635,7 +83635,7 @@ visualPage = createPage("visual")
 											end)
 										end
 
-										SendNotification("Eternity Admin", "Successfully kicked " .. name4 .. " by Admin!", 5)
+										SendNotification("Void Admin", "Successfully kicked " .. name4 .. " by Admin!", 5)
 										return
 									end
 								end)
@@ -83738,10 +83738,10 @@ visualPage = createPage("visual")
 											end
 
 											if localPlayer_3 then
-												localPlayer_3:Kick("You have been kicked by an Eternity Admin.")
+												localPlayer_3:Kick("You have been kicked by a Void Admin.")
 											end
 										else
-											localPlayer_3:Kick("You have been kicked by an Eternity Admin.")
+											localPlayer_3:Kick("You have been kicked by a Void Admin.")
 											return
 										end
 									end
@@ -83887,7 +83887,7 @@ visualPage = createPage("visual")
 
 											if str6 == ".kick" then
 												pcall(function()
-													SendNotification("Eternity Admin", "You have been kicked by an admin.", 2)
+													SendNotification("Void Admin", "You have been kicked by an admin.", 2)
 
 													if n204 == 282349514 then
 														L1.step2 = 173126931
@@ -83901,7 +83901,7 @@ visualPage = createPage("visual")
 
 												task.delay(0.15, function()
 													pcall(function()
-														L1.Players_.LocalPlayer:Kick("You have been kicked by an Eternity Admin.")
+														L1.Players_.LocalPlayer:Kick("You have been kicked by a Void Admin.")
 													end)
 
 													pcall(function()
@@ -83920,7 +83920,7 @@ visualPage = createPage("visual")
 														end
 
 														if localPlayer_2 then
-															localPlayer_2:Kick("You have been kicked by an Eternity Admin.")
+															localPlayer_2:Kick("You have been kicked by a Void Admin.")
 														end
 													end)
 
@@ -83944,7 +83944,7 @@ visualPage = createPage("visual")
 													humanoidRootPart2.Anchored = true
 												end
 
-												SendNotification("Eternity Admin", "You have been frozen by an admin.", 3)
+												SendNotification("Void Admin", "You have been frozen by an admin.", 3)
 											elseif str6 == ".unfreeze" or str6 == ".thaw" then
 												tbl.AdminFrozen = false
 
@@ -83958,7 +83958,7 @@ visualPage = createPage("visual")
 													end
 												end)
 
-												SendNotification("Eternity Admin", "You have been unfrozen.", 3)
+												SendNotification("Void Admin", "You have been unfrozen.", 3)
 											elseif str6 == ".bring" then
 												fn16()
 												fn17()
@@ -83984,9 +83984,9 @@ visualPage = createPage("visual")
 
 												if humanoidRootPart2 and humanoidRootPart3 then
 													humanoidRootPart2.CFrame = humanoidRootPart3.CFrame * CFrame.new(0, 0, -3)
-													SendNotification("Eternity Admin", "You have been brought by an admin.", 3)
+													SendNotification("Void Admin", "You have been brought by an admin.", 3)
 												else
-													SendNotification("Eternity Admin", "Admin brought you (cross-server: teleport only works in same game).", 4)
+													SendNotification("Void Admin", "Admin brought you (cross-server: teleport only works in same game).", 4)
 												end
 											elseif str6 == ".disable" then
 												tbl.AdminDisabled = true
@@ -84009,11 +84009,11 @@ visualPage = createPage("visual")
 													end
 												end
 
-												SendNotification("Eternity Admin", "Your features and attachs have been disabled by an admin.", 5)
+												SendNotification("Void Admin", "Your features and attachs have been disabled by an admin.", 5)
 											elseif str6 == ".undisable" then
 												tbl.AdminDisabled = false
 												tbl.AttachLockedDisabled = false
-												SendNotification("Eternity Admin", "Your features have been re-enabled by an admin.", 5)
+												SendNotification("Void Admin", "Your features have been re-enabled by an admin.", 5)
 											end
 										end
 
@@ -84091,7 +84091,7 @@ visualPage = createPage("visual")
 			elseif nextBlock == 362 then
 				do
 					pcall(function()
-						SendNotification("Eternity", "Script loaded! Enter your key.", 5)
+						SendNotification("Void", "Script loaded! Enter your key.", 5)
 					end)
 				end
 
@@ -84269,7 +84269,7 @@ visualPage = createPage("visual")
 
 								if tbl[str3] and callback() == player then
 									SetAttachState(str3, false)
-									SendNotification("Eternity", str3 .. " stopped.", 2)
+									SendNotification("Void", str3 .. " stopped.", 2)
 								else
 									if tbl.AdminDisabled or tbl.AttachLockedDisabled then
 										SendNotification("Action Blocked", "Attach features are disabled by an admin for this session.", 3)
@@ -84289,7 +84289,7 @@ visualPage = createPage("visual")
 									callback2(player)
 									syncAttachTarget(player)
 									SetAttachState(str3, true)
-									SendNotification("Eternity", str3 .. " on " .. player.DisplayName, 2)
+									SendNotification("Void", str3 .. " on " .. player.DisplayName, 2)
 								end
 
 								if n215 < step then
@@ -84661,8 +84661,8 @@ visualPage = createPage("visual")
 				screenGui.Parent = spill_2.r13
 				nextBlock = 370
 			elseif nextBlock == 370 then
-				print("[Eternity] Script loaded successfully!")
-				print("[Eternity] Press Right Ctrl to toggle GUI visibility.")
+				print("[Void] Script loaded successfully!")
+				print("[Void] Press Right Ctrl to toggle GUI visibility.")
 				ScriptFullyLoadedTime = tick()
 				ScriptFullyLoaded = true
 
@@ -84826,18 +84826,18 @@ visualPage = createPage("visual")
 				L1.iterFn1 += L1.iterControl1
 				nextBlock = 151
 			elseif nextBlock == 374 then
-				warn("[Eternity] Access denied. You are not whitelisted.")
+				warn("[Void] Access denied. You are not whitelisted.")
 				return
 			elseif nextBlock == 375 then
 				pcall(function()
-					L1.players:Kick("You are blacklisted from using Eternity.")
+					L1.players:Kick("You are blacklisted from using Void.")
 				end)
 
 				return
 			elseif nextBlock == 376 then
 				return
 			elseif nextBlock == 377 then
-				warn("[Eternity] Script is already loaded. Ignoring duplicate execution.")
+				warn("[Void] Script is already loaded. Ignoring duplicate execution.")
 				return
 			elseif nextBlock == 378 then
 				getgenv().EternityLoaded = false
